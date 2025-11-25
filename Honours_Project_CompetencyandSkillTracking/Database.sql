@@ -12,7 +12,7 @@ CREATE TABLE Staff
 	StaffID varchar(10) NOT NULL PRIMARY KEY,
     Username varchar(20) NOT NULL,
     `Password` varchar(20) NOT NULL,
-	SEmail varchar(50) NOT NULL,
+	Email varchar(50) NOT NULL,
     Surname varchar(40),
     Forenames varchar(50) NOT NULL DEFAULT '',
     `Role` varchar(10) NOT NULL,
@@ -27,19 +27,6 @@ CREATE TABLE Students
 	StEmail varchar(50) NOT NULL,
     Surname varchar(40),
     Forenames varchar(50) NOT NULL DEFAULT '',
-    `Role` varchar(10) NOT NULL,
-    CONSTRAINT UniqueIDs UNIQUE (StudentID)
-);
-
-CREATE TABLE Employers
-(
-	EmployerID varchar(10) NOT NULL PRIMARY KEY,
-    Username varchar(20) NOT NULL,
-    `Password` varchar(20) NOT NULL,
-	EmEmail varchar(50) NOT NULL,
-    Surname varchar(40),
-    Forenames varchar(50) NOT NULL DEFAULT '',
-    PlaceOfEmployment varchar(50) NOT NULL DEFAULT '',
     `Role` varchar(10) NOT NULL,
     CONSTRAINT UniqueIDs UNIQUE (StudentID)
 );

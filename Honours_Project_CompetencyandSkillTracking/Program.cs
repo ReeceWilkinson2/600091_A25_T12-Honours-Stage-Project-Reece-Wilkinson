@@ -1,4 +1,4 @@
-using Honours_Project___Competency_and_Skill_tracking.Components;
+using Honours_Project_CompetencyandSkillTracking.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
