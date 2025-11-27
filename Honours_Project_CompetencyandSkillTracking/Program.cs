@@ -1,10 +1,19 @@
 using Honours_Project_CompetencyandSkillTracking.Components;
+using Honours_Project_CompetencyandSkillTracking.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+
+
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddDbContext<UserInfoDbContext>(option => { option.UseSqlite("Data Source = UserDatabase.db"); });
+builder.Services.AddScoped<UserDataServices>();
 
 var app = builder.Build();
 
@@ -18,7 +27,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-
+app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
