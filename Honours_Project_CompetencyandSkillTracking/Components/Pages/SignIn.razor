@@ -1,0 +1,79 @@
+﻿@page "/signin"
+@rendermode InteractiveServer
+@layout LoggedOutLayout
+@using Honours_Project_CompetencyandSkillTracking.Components.Layout
+@using Honours_Project_CompetencyandSkillTracking.Data
+@using Honours_Project_CompetencyandSkillTracking.Classes
+@inject NavigationManager NavigationManager
+@inject UserDataServices service
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<PageTitle>SignIn</PageTitle>
+
+<div class="body">
+	<div class="form-body">
+		<div class="form-wrapper">
+			<EditForm Model="@form" OnValidSubmit="LogInUser">
+				<DataAnnotationsValidator></DataAnnotationsValidator>
+				<ValidationSummary></ValidationSummary>
+				<h1>Login</h1>
+				<div class="input-box">
+					<InputText @bind-Value="@form.Email" id="email" class="input" placeholder="Email" type="email"></InputText>
+					<i class="bx bxs-user"></i>
+				</div>
+				<div class="input-box">
+					<InputText @bind-Value="@form.Password" id="password" class="input" placeholder="Password" type="password"></InputText>
+					<i class="bx bxs-lock"></i>
+				</div>
+				<div class="remember-forgot">
+					<label><input type="checkbox"> Remember me</label>
+					<a href="/reset-password">Forgot Password?</a>
+				</div>
+				<button type="submit">Login</button>
+			</EditForm>
+			<div class="register">
+				<p>Don't have an account? <a href="/signup">Sign up here!</a></p>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	SignInForm form = new SignInForm();
+	int idContent;
+
+	List<UserData> UsersData = new List<UserData>();
+
+	private async Task RefreshUserData()
+	{
+		UsersData = await service.GetUserDataAsync();
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		await RefreshUserData();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			idContent = await localStorage.GetItemAsync<int>("UserId");
+			StateHasChanged();
+		}
+	}
+
+	public void LogInUser(EditContext context)
+	{
+		foreach (var userDataCheck in UsersData)
+		{
+			if (userDataCheck.UserEmail == form.Email && userDataCheck.UserPassword == form.Password)
+			{
+				localStorage.SetItemAsync("UserId", userDataCheck.UserId);
+				Console.WriteLine(idContent + "test");
+				NavigationManager.NavigateTo("/home");
+			}
+		}
+	}
+
+}

@@ -1,4 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using Honours.Services
+@using Honours_Project_CompetencyandSkillTracking.Components.Layout
+@inherits LayoutComponentBase
+@inject UserInfoService userInfoService
 
 <div class="page">
     <div class="sidebar">
@@ -7,11 +10,16 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            <NavLink class="nav-link" href="settings">
+                <span target="_blank" class="bi bi-gear-fill h1" aria-hidden="true" style="color:#f7f7f7" title="Profile"></span>
+            </NavLink>
         </div>
 
         <article class="content px-4">
-            @Body
+            <CascadingValue Value="@userInfoService.UserInfo">
+                @Body
+            </CascadingValue>
+
         </article>
     </main>
 </div>
