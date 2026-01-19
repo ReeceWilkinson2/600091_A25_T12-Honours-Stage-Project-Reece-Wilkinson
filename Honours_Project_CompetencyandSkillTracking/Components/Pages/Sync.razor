@@ -1,0 +1,53 @@
+﻿@page "/sync"
+@rendermode InteractiveServer
+@using Honours_Project_CompetencyandSkillTracking.Canvas
+@inject CanvasSyncService CanvasSyncService
+
+<h3>Canvas Sync</h3>
+
+@if (_isSyncing)
+{
+    <p>Syncing Canvas data… please wait.</p>
+}
+else if (_error != null)
+{
+    <p style="color:red">Error: @_error</p>
+}
+else if (_completed)
+{
+    <p style="color:green">Canvas sync completed successfully.</p>
+}
+
+<button @onclick="StartSync" disabled="@_isSyncing">
+    Start Sync
+</button>
+
+@code {
+    private bool _isSyncing;
+    private bool _completed;
+    private string? _error;
+
+    private async Task StartSync()
+    {
+        Console.WriteLine(">>> StartSync clicked");
+
+        _isSyncing = true;
+        _completed = false;
+        _error = null;
+
+        try
+        {
+            await CanvasSyncService.SyncAllAsync();
+            _completed = true;
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _isSyncing = false;
+        }
+    }
+}
+

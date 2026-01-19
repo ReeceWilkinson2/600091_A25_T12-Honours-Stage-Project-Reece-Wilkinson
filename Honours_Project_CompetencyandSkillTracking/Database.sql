@@ -30,3 +30,20 @@ CREATE TABLE Students
     `Role` varchar(10) NOT NULL,
     CONSTRAINT UniqueIDs UNIQUE (StudentID)
 );
+
+CREATE TABLE Courses
+(
+    CanvasCourseID INTEGER NOT NULL PRIMARY KEY,
+    Name TEXT NOT NULL,
+    Syllabus TEXT,
+    Term TEXT NOT NULL,
+)
+
+CREATE TABLE Assignments
+(
+  CanvasAssignmentId INTEGER NOT NULL PRIMARY KEY,
+  CourseId INTEGER NOT NULL,
+  Title TEXT,
+  Description TEXT,
+  DueDate DATETIME
+)

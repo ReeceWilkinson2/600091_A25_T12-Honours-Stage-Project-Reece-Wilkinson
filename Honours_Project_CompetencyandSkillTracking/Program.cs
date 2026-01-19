@@ -1,10 +1,11 @@
+using Blazored.LocalStorage;
+using Honours.Services;
+using Honours_Project_CompetencyandSkillTracking.Canvas;
 using Honours_Project_CompetencyandSkillTracking.Components;
 using Honours_Project_CompetencyandSkillTracking.Data;
-using Honours.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
-using Microsoft.EntityFrameworkCore;
-using Blazored.LocalStorage;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,17 @@ builder.Services.AddDbContext<UserInfoDbContext>(option => { option.UseSqlite("D
 builder.Services.AddScoped<UserDataServices>();
 builder.Services.AddSingleton<UserInfoService>();
 builder.Services.AddBlazoredLocalStorage();
+
+var dbPath = Path.Combine(
+    builder.Environment.ContentRootPath,
+    "UserDatabase.db");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite($"Data Source={dbPath}"));
+builder.Services.AddScoped<CanvasSyncService>();
+builder.Services.AddHttpClient<CanvasService>();
+
+
 
 var app = builder.Build();
 
