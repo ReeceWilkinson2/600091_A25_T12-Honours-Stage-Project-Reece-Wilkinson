@@ -1,49 +1,45 @@
-CREATE SCHEMA IF NOT EXISTS `HonoursSQL`;
-USE `HonoursSQL`;
-
-CREATE TABLE Departments
-(
-	Department varchar(10) NOT NULL PRIMARY KEY,
-    CONSTRAINT UniqueIDs UNIQUE (Department)
+-- Students table
+CREATE TABLE IF NOT EXISTS Students (
+    StudentID TEXT NOT NULL PRIMARY KEY,
+    Username TEXT NOT NULL,
+    Password TEXT NOT NULL,
+    StEmail TEXT NOT NULL,
+    Surname TEXT,
+    Forenames TEXT NOT NULL DEFAULT '',
+    Role TEXT NOT NULL
 );
 
-CREATE TABLE Staff
-(
-	StaffID varchar(10) NOT NULL PRIMARY KEY,
-    Username varchar(20) NOT NULL,
-    `Password` varchar(20) NOT NULL,
-	Email varchar(50) NOT NULL,
-    Surname varchar(40),
-    Forenames varchar(50) NOT NULL DEFAULT '',
-    `Role` varchar(10) NOT NULL,
-    CONSTRAINT UniqueIDs UNIQUE (StaffID)
+-- Staff table
+CREATE TABLE IF NOT EXISTS Staff (
+    StaffID TEXT NOT NULL PRIMARY KEY,
+    Username TEXT NOT NULL,
+    Password TEXT NOT NULL,
+    Email TEXT NOT NULL,
+    Surname TEXT,
+    Forenames TEXT NOT NULL DEFAULT '',
+    Role TEXT NOT NULL
 );
 
-CREATE TABLE Students
-(
-	StudentID varchar(10) NOT NULL PRIMARY KEY,
-    Username varchar(20) NOT NULL,
-    `Password` varchar(20) NOT NULL,
-	StEmail varchar(50) NOT NULL,
-    Surname varchar(40),
-    Forenames varchar(50) NOT NULL DEFAULT '',
-    `Role` varchar(10) NOT NULL,
-    CONSTRAINT UniqueIDs UNIQUE (StudentID)
+-- Departments table
+CREATE TABLE IF NOT EXISTS Departments (
+    Department TEXT NOT NULL PRIMARY KEY
 );
 
-CREATE TABLE Courses
-(
+-- Courses table
+CREATE TABLE IF NOT EXISTS Courses (
     CanvasCourseID INTEGER NOT NULL PRIMARY KEY,
     Name TEXT NOT NULL,
     Syllabus TEXT,
-    Term TEXT NOT NULL,
-)
+    Term TEXT NOT NULL
+);
 
-CREATE TABLE Assignments
-(
-  CanvasAssignmentId INTEGER NOT NULL PRIMARY KEY,
-  CourseId INTEGER NOT NULL,
-  Title TEXT,
-  Description TEXT,
-  DueDate DATETIME
-)
+-- Assignments table
+CREATE TABLE IF NOT EXISTS Assignments (
+    CanvasAssignmentId INTEGER NOT NULL PRIMARY KEY,
+    CourseId INTEGER NOT NULL,
+    Title TEXT,
+    Description TEXT,
+    DueDate TEXT,
+    FOREIGN KEY (CourseId) REFERENCES Courses(CanvasCourseID)
+);
+
