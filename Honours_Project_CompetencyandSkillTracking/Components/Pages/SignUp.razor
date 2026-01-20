@@ -1,0 +1,140 @@
+﻿@page "/signup"
+@rendermode InteractiveServer
+@layout LoggedOutLayout
+@inject NavigationManager NavigationManager
+@inject UserDataServices service
+@using System.Net.Mail
+@using Honours_Project_CompetencyandSkillTracking.Components.Layout
+@using Honours_Project_CompetencyandSkillTracking.Data
+@using Honours_Project_CompetencyandSkillTracking.Classes
+
+<style>
+
+</style>
+
+<div class="body">
+	<div class="form-body">
+		<div class="form-wrapper">
+			<h1>Signup</h1>
+			<p>Please fill out all details</p>
+			<EditForm Model="@form" OnValidSubmit="SignupUser">
+				<DataAnnotationsValidator></DataAnnotationsValidator>
+				<ValidationSummary></ValidationSummary>
+				<div class="input-box">
+					<InputText class="input" id="fname" placeholder="First Name" @bind-Value="form.FirstName"></InputText>
+				</div>
+				<div class="input-box">
+					<InputText class="input" id="lname" placeholder="Last Name" @bind-Value="form.LastName"></InputText>
+				</div>
+				<div class="input-box">
+					<InputText class="input" id="email" placeholder="Email" @bind-Value="form.Email" type="email" />
+					<ValidationMessage For="@(() => form.Email)" />
+					<i class="bx bxs-envelope"></i>
+				</div>
+				<div class="input-box">
+					<InputText class="input" id="password" placeholder="Password" @bind-Value="form.Password" type="password"></InputText>
+					<i class="bx bxs-lock"></i>
+				</div>
+				<div class="role-select">
+					<label for="role">Account Type: </label>
+					<InputSelect class="select" id="role" @bind-value="form.Role">
+						<option value="">(select one)</option>
+						<option value="student">Student</option>
+						<option value="staff">Staff</option>
+						<option value="staff">Employer</option>
+					</InputSelect>
+				</div>
+				@if (form.Role == "staff")
+				{
+					<div class="input-box">
+						<InputText class="input" id="staffPassword" placeholder="Enter Staff Password" @bind-Value="form.StaffPassword" type="password"></InputText>
+					</div>
+				}
+				<div class="terms-and-conditions">
+					<label><input type="checkbox" required id="terms"> I accept the terms and conditions</label>
+				</div>
+				<button type="submit">Sign Up</button>
+			</EditForm>
+			@if (!string.IsNullOrEmpty(errorMessage))
+			{
+				<div class="error-message">
+					<p>@errorMessage</p>
+				</div>
+			}
+		</div>
+	</div>
+</div>
+
+@code {
+	[CascadingParameter]
+	public GlobalUserInfo? userInfo { get; set; }
+
+	SignUpForm form = new SignUpForm();
+	private string Message { get; set; }
+	private string errorMessage = string.Empty;
+
+
+	List<UserData> UsersData = new List<UserData>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await RefreshUserData();
+	}
+
+	private async Task RefreshUserData()
+	{
+		UsersData = await service.GetUserDataAsync();
+	}
+
+	public UserData NewUserData { get; set; } = new UserData();
+
+	private async Task AddNewUserData()
+	{
+		await service.AddUserDataAsync(NewUserData);
+		NewUserData = new UserData();
+		await RefreshUserData();
+	}
+
+	public void SignupUser()
+	{
+		if (form.Role == "staff" && form.StaffPassword != "secretpassword")
+		{
+			errorMessage = "The staff password is incorrect.";
+			return;
+		}
+		//string hashedPassword = PasswordHashing.HashPassword(form.Password);
+		NewUserData.UserUsername = (form.FirstName + form.LastName);
+		NewUserData.UserEmail = form.Email;
+		NewUserData.UserPassword = form.Password;
+		NewUserData.UserEmailConfirmed = true;
+		NewUserData.UserRole = form.Role;
+		AddNewUserData();
+		NavigationManager.NavigateTo("/");
+	}
+	public void SendEmail(EditContext context)
+	{
+		try
+		{
+			using (MailMessage mail = new MailMessage())
+			{
+				// mail.From = new MailAddress("@gmail.com");
+				// mail.To.Add(form.Email);
+				// mail.Subject = "Test Notification";
+				// mail.Body = "<h1>Test</h1>";
+				// mail.IsBodyHtml = true;
+
+				// using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+				// {
+				// 	smtp.Credentials = new System.Net.NetworkCredential("@gmail.com", "eblqwqcadbabwdvp");
+				// 	smtp.EnableSsl = true;
+				// 	smtp.Send(mail);
+				// 	Message = "Mail sent";
+				// }
+			}
+		}
+		catch (Exception ex)
+		{
+			Message = ex.Message;
+		}
+	}
+}

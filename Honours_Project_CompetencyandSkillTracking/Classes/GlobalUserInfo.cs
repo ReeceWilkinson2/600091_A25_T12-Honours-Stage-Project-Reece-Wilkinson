@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
-namespace Honours.Classes
-{
     public class GlobalUserInfo
     {
         [Required]
@@ -13,6 +11,3 @@ namespace Honours.Classes
 
         }
     }
-
-    
-}
