@@ -3,7 +3,6 @@
 @using Honours_Project_CompetencyandSkillTracking.Data
 @using Honours_Project_CompetencyandSkillTracking.Classes
 @using Honours_Project_CompetencyandSkillTracking.Components.Layout
-@layout MainLayout
 @inject NavigationManager NavigationManager
 @inject UserDataServices service
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
@@ -12,39 +11,48 @@
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
+<div class="home-wrapper">
+    <div class="home-header">
+        @foreach (var user in UsersData)
+        {
+            currentUsername = user.UserUsername;
+        }
+        <p><b>Hello @currentUsername</b></p>
+    </div>
+</div>
+
 
 @code {
-    // int idContent;
-    // [CascadingParameter]
-    // public GlobalUserInfo? userInfo { get; set; }
-    // string currentUsername = "";
+    int idContent;
+    [CascadingParameter]
+    public GlobalUserInfo? userInfo { get; set; }
+    string currentUsername = "";
 
-    // List<UserData> UsersData = new List<UserData>();
-    // UserData UpdateUserData = new UserData();
+    List<UserData> UsersData = new List<UserData>();
+    UserData UpdateUserData = new UserData();
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     await RefreshUserData();
-    // }
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshUserData();
+    }
 
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender)
-    //     {
-    //         idContent = await localStorage.GetItemAsync<int>("UserId");
-    //         await RefreshUserData();
-    //         StateHasChanged();
-    //     }
-    // }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            idContent = await localStorage.GetItemAsync<int>("UserId");
+            await RefreshUserData();
+            StateHasChanged();
+        }
+    }
 
-    // private async Task RefreshUserData()
-    // {
-    //     UsersData = await service.GetUserDataAsync();
-    //     var userData = UsersData.FirstOrDefault(u => u.UserId == idContent);
-    //     if (userData != null)
-    //     {
-    //         UpdateUserData = userData;
-    //     }
-    // }
+    private async Task RefreshUserData()
+    {
+        UsersData = await service.GetUserDataAsync();
+        var userData = UsersData.FirstOrDefault(u => u.UserId == idContent);
+        if (userData != null)
+        {
+            UpdateUserData = userData;
+        }
+    }
 }
