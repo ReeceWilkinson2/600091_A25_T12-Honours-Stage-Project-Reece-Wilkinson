@@ -43,3 +43,12 @@ CREATE TABLE IF NOT EXISTS Assignments (
     FOREIGN KEY (CourseId) REFERENCES Courses(CanvasCourseID)
 );
 
+-- Competency table
+CREATE TABLE IF NOT EXISTS Competencies (
+    CompetencyAssignmentId INTEGER NOT NULL PRIMARY KEY,
+    CourseId INTEGER NOT NULL,
+    Title TEXT,
+    Levels INTEGER,
+    Description TEXT,
+    FOREIGN KEY (CourseId) REFERENCES Courses(CanvasCourseID)
+);
