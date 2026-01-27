@@ -3,10 +3,14 @@
 @layout LoggedOutLayout
 @inject NavigationManager NavigationManager
 @inject UserDataServices service
+@inject IOptions<SmtpConfig> SmtpConfig
+@using System.Net
 @using System.Net.Mail
 @using Honours_Project_CompetencyandSkillTracking.Components.Layout
+@using Honours_Project_CompetencyandSkillTracking.Components.Services
 @using Honours_Project_CompetencyandSkillTracking.Data
 @using Honours_Project_CompetencyandSkillTracking.Classes
+@using Microsoft.Extensions.Options
 
 <style>
 
@@ -105,7 +109,8 @@
 		//string hashedPassword = PasswordHashing.HashPassword(form.Password);
 		NewUserData.UserUsername = (form.FirstName + form.LastName);
 		NewUserData.UserEmail = form.Email;
-		NewUserData.UserPassword = form.Password;
+		NewUserData.UserPassword = BCrypt.Net.BCrypt.HashPassword(form.Password);
+
 		NewUserData.UserEmailConfirmed = true;
 		NewUserData.UserRole = form.Role;
 		AddNewUserData();
@@ -113,25 +118,27 @@
 	}
 	public void SendEmail(EditContext context)
 	{
+		var smtp = SmtpConfig.Value;
 		try
 		{
-			using (MailMessage mail = new MailMessage())
-			{
-				// mail.From = new MailAddress("@gmail.com");
-				// mail.To.Add(form.Email);
-				// mail.Subject = "Test Notification";
-				// mail.Body = "<h1>Test</h1>";
-				// mail.IsBodyHtml = true;
+			using var mail = new MailMessage();
+			mail.From = new MailAddress(smtp.Email);
+			mail.To.Add(form.Email);
+			mail.Subject = "Account Created Successfully";
+			mail.Body = "<h1>Test</h1>";
+			mail.IsBodyHtml = true;
 
-				// using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
-				// {
-				// 	smtp.Credentials = new System.Net.NetworkCredential("@gmail.com", "eblqwqcadbabwdvp");
-				// 	smtp.EnableSsl = true;
-				// 	smtp.Send(mail);
-				// 	Message = "Mail sent";
-				// }
-			}
+
+			using var client = new SmtpClient(smtp.Host, smtp.Port);
+			client.Credentials = new NetworkCredential(
+				smtp.Email,
+				smtp.Password
+			);
+			client.EnableSsl = true;
+
+			client.Send(mail);
 		}
+
 		catch (Exception ex)
 		{
 			Message = ex.Message;

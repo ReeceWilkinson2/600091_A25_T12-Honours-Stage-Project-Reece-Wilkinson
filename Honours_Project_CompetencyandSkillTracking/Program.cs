@@ -3,6 +3,7 @@ using Honours.Services;
 using Honours_Project_CompetencyandSkillTracking.Canvas;
 using Honours_Project_CompetencyandSkillTracking.Components;
 using Honours_Project_CompetencyandSkillTracking.Data;
+using Honours_Project_CompetencyandSkillTracking.Components.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -24,6 +25,9 @@ builder.Services.AddDbContext<UserInfoDbContext>(option => { option.UseSqlite("D
 builder.Services.AddScoped<UserDataServices>();
 builder.Services.AddSingleton<UserInfoService>();
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.Configure<SmtpConfig>(
+    builder.Configuration.GetSection("Smtp"));
+
 
 var dbPath = Path.Combine(
     builder.Environment.ContentRootPath,
