@@ -24,6 +24,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         private async Task SyncProfileAsync()
         {
             var profile = await _canvas.GetMyProfileAsync();
+            Console.WriteLine($"Syncing profile: {profile.Id}, {profile.Name}, {profile.Primary_Email}");
 
             var student = await _db.Students.FindAsync(profile.Id);
             if (student == null)
@@ -47,6 +48,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         private async Task SyncCoursesAsync()
         {
             var courses = await _canvas.GetMyCoursesAsync();
+            Console.WriteLine($"Syncing {courses.Count} courses...");
 
             foreach (var c in courses)
             {
@@ -71,6 +73,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
                 // Get assignments for this course
                 var assignments = await _canvas.GetCourseAssignmentsAsync(c.Id);
+                Console.WriteLine($"Syncing {assignments.Count} assignments for course {course.Name}...");
 
                 foreach (var a in assignments)
                 {
