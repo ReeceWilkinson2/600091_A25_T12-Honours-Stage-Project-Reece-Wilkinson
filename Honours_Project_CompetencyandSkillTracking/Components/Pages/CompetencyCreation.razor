@@ -1,0 +1,57 @@
+﻿@page "/CompetencyCreation"
+@rendermode InteractiveServer
+@using Honours_Project_CompetencyandSkillTracking.Components.Layout
+@using Honours_Project_CompetencyandSkillTracking.Components.Services
+@using Honours_Project_CompetencyandSkillTracking.Data
+@using Honours_Project_CompetencyandSkillTracking.Classes
+@inject NavigationManager NavigationManager
+@inject CompetencyDataServices service
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+
+@* <div class="body">
+	<div class="form-body">
+		<div class="form-wrapper">
+			<EditForm Model="@form" OnValidSubmit="CreatCompetency">
+				<DataAnnotationsValidator></DataAnnotationsValidator>
+				<ValidationSummary></ValidationSummary>
+				<h1>Login</h1>
+				<div class="input-box">
+					<InputText @bind-Value="@form.Email" id="email" class="input" placeholder="Email" type="email"></InputText>
+					<i class="bx bxs-user"></i>
+				</div>
+				<div class="input-box">
+					<InputText @bind-Value="@form.Password" id="password" class="input" placeholder="Password" type="password"></InputText>
+					<i class="bx bxs-lock"></i>
+				</div>
+				<button type="submit">Login</button>
+			</EditForm>
+		</div>
+	</div>
+</div> *@
+
+@code {
+	CompetencyCreationForm form = new CompetencyCreationForm();
+	int idContent;
+
+	List<CompetencyData> CompetencyDatas = new List<CompetencyData>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await RefreshCompetencyData();
+	}
+
+	private async Task RefreshCompetencyData()
+	{
+		CompetencyDatas = await service.GetCompetencyDataAsync();
+	}
+
+	public CompetencyData NewCompetency { get; set; } = new CompetencyData();
+
+	private async Task AddNewCompetencyData()
+	{
+		await service.AddCompetencyDataAsync(NewCompetency);
+		NewCompetency = new CompetencyData();
+		await RefreshCompetencyData();
+	}
+}
