@@ -31,15 +31,17 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
             {
                 _db.Students.Add(new Student
                 {
-                    Id = profile.Id,
-                    Name = profile.Name,
-                    Email = profile.Primary_Email
+                    StudentId = profile.Id,
+                    UserName = profile.Name,
+                    StEmail = profile.Primary_Email,
+                    Password = "password",
+                    Role = "Student"
                 });
             }
             else
             {
-                student.Name = profile.Name;
-                student.Email = profile.Primary_Email;
+                student.UserName = profile.Name;
+                student.StEmail = profile.Primary_Email;
             }
 
             await _db.SaveChangesAsync();

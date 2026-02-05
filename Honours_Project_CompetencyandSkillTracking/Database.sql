@@ -1,11 +1,11 @@
 -- Students table
 CREATE TABLE IF NOT EXISTS Students (
     StudentID TEXT NOT NULL PRIMARY KEY,
-    Username TEXT NOT NULL,
+    UserName TEXT NOT NULL,
     Password TEXT NOT NULL,
     StEmail TEXT NOT NULL,
     Surname TEXT,
-    Forenames TEXT NOT NULL DEFAULT '',
+    Forenames TEXT,
     Role TEXT NOT NULL
 );
 
