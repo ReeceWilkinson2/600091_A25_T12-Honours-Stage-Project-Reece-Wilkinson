@@ -3,6 +3,7 @@
 @using Honours_Project_CompetencyandSkillTracking.Data
 @using Honours_Project_CompetencyandSkillTracking.Classes
 @using Honours_Project_CompetencyandSkillTracking.Components.Layout
+@using Syncfusion.Blazor.Charts
 @inject NavigationManager NavigationManager
 @inject UserDataServices service
 
@@ -15,8 +16,39 @@
 		</p>
 
 	</body>
+
+
+
 </div>
+@* https://blazor.syncfusion.com/documentation/chart/chart-types/line *@
+<SfChart>
+    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+    <ChartSeriesCollection>
+        <ChartSeries DataSource="@SalesDetails" XName="X" YName="Y" Type="ChartSeriesType.Line">
+        </ChartSeries>
+    </ChartSeriesCollection>
+</SfChart>
 
 @code {
+    public class ChartData
+    {
+        public string X { get; set; }
+        public double Y { get; set; }
+    }
 
+    public List<ChartData> SalesDetails = new List<ChartData>
+    {
+        new ChartData { X= "Jan", Y= 35 },
+        new ChartData { X= "Feb", Y= 28 },
+        new ChartData { X= "Mar", Y= 34 },
+        new ChartData { X= "Apr", Y= 32 },
+        new ChartData { X= "May", Y= 40 },
+        new ChartData { X= "Jun", Y= 32 },
+        new ChartData { X= "Jul", Y= 35 },
+        new ChartData { X= "Aug", Y= 55 },
+        new ChartData { X= "Sep", Y= 38 },
+        new ChartData { X= "Oct", Y= 30 },
+        new ChartData { X= "Nov", Y= 25 },
+        new ChartData { X= "Dec", Y= 32 }
+    };
 }
