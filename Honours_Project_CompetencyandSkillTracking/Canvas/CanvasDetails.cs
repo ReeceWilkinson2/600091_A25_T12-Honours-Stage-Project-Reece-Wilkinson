@@ -5,10 +5,13 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
     public class CanvasDetails
     {
         [JsonPropertyName("id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
+
+        [JsonExtensionData]
+        public Dictionary<string, object>? ExtraFields { get; set; }
 
     }
 }

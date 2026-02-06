@@ -26,17 +26,21 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
             var profile = await _canvas.GetMyProfileAsync();
             Console.WriteLine($"Syncing profile: {profile.Id}, {profile.Name}, {profile.Primary_Email}");
 
-            var student = await _db.Students.FindAsync(profile.Id);
+            // Store Canvas Id as string to match Student PK
+            string profileId = profile.Id.ToString();
+
+            var student = await _db.Students.FindAsync(profileId);
             if (student == null)
             {
-                _db.Students.Add(new Student
+                student = new Student
                 {
-                    StudentId = profile.Id,
+                    StudentId = profileId,
                     UserName = profile.Name,
                     StEmail = profile.Primary_Email,
                     Password = "password",
                     Role = "Student"
-                });
+                };
+                _db.Students.Add(student);
             }
             else
             {
@@ -54,6 +58,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
             foreach (var c in courses)
             {
+                // Find by Canvas course Id (long)
                 var course = await _db.Courses.FindAsync(c.Id);
                 if (course == null)
                 {
@@ -62,7 +67,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                         Id = c.Id,
                         Name = c.Name,
                         Code = c.Course_Code,
-                        Syllabus = c.Syllabus_Body
+                        Syllabus = c.Syllabus_Body,
+                        Term = c.Term?.Name ?? ""
                     };
                     _db.Courses.Add(course);
                 }
@@ -71,9 +77,10 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     course.Name = c.Name;
                     course.Code = c.Course_Code;
                     course.Syllabus = c.Syllabus_Body;
+                    course.Term = c.Term?.Name ?? "";
                 }
 
-                // Get assignments for this course
+                // Sync assignments
                 var assignments = await _canvas.GetCourseAssignmentsAsync(c.Id);
                 Console.WriteLine($"Syncing {assignments.Count} assignments for course {course.Name}...");
 
@@ -98,39 +105,41 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                         assignment.Description = a.Description;
                         assignment.DueAt = a.Due_At;
                     }
-
-                    //    // Get submissions for this assignment
-                    //    var submissions = await _canvas.GetAssignmentSubmissionsAsync(course.Id, a.Id);
-                    //    foreach (var s in submissions)
-                    //    {
-                    //        var submission = await _db.Submissions.FindAsync(s.Id);
-                    //        if (submission == null)
-                    //        {
-                    //            submission = new Submission
-                    //            {
-                    //                Id = s.Id,
-                    //                AssignmentId = a.Id,
-                    //                Score = s.Score,
-                    //                WorkflowState = s.Workflow_State,
-                    //                SubmittedAt = s.Submitted_At,
-                    //                Comments = string.Join("\n", s.Comments?.Select(cmt => cmt.Comment) ?? Array.Empty<string>())
-                    //            };
-                    //            _db.Submissions.Add(submission);
-                    //        }
-                    //        else
-                    //        {
-                    //            submission.Score = s.Score;
-                    //            submission.WorkflowState = s.Workflow_State;
-                    //            submission.SubmittedAt = s.Submitted_At;
-                    //            submission.Comments = string.Join("\n", s.Comments?.Select(cmt => cmt.Comment) ?? Array.Empty<string>());
-                    //        }
-                    //    }
-                    //}
-
-                    // Save everything for this course in one batch
-                    await _db.SaveChangesAsync();
                 }
+
+                // Save batch per course
+                await _db.SaveChangesAsync();
             }
         }
     }
 }
+
+
+
+//    // Get submissions for this assignment
+//    var submissions = await _canvas.GetAssignmentSubmissionsAsync(course.Id, a.Id);
+//    foreach (var s in submissions)
+//    {
+//        var submission = await _db.Submissions.FindAsync(s.Id);
+//        if (submission == null)
+//        {
+//            submission = new Submission
+//            {
+//                Id = s.Id,
+//                AssignmentId = a.Id,
+//                Score = s.Score,
+//                WorkflowState = s.Workflow_State,
+//                SubmittedAt = s.Submitted_At,
+//                Comments = string.Join("\n", s.Comments?.Select(cmt => cmt.Comment) ?? Array.Empty<string>())
+//            };
+//            _db.Submissions.Add(submission);
+//        }
+//        else
+//        {
+//            submission.Score = s.Score;
+//            submission.WorkflowState = s.Workflow_State;
+//            submission.SubmittedAt = s.Submitted_At;
+//            submission.Comments = string.Join("\n", s.Comments?.Select(cmt => cmt.Comment) ?? Array.Empty<string>());
+//        }
+//    }
+//}

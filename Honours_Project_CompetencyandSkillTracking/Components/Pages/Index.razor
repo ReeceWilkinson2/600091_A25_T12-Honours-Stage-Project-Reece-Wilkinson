@@ -1,150 +1,171 @@
 ﻿@page "/index"
+@using Microsoft.EntityFrameworkCore; 
 @using Honours_Project_CompetencyandSkillTracking.Data
+@using Honours_Project_CompetencyandSkillTracking.Canvas
 @inject UserDataServices service
+@inject AppDbContext DbContext
 @rendermode InteractiveServer
 
 <div class="container">
 
-    <div class="row bg-light">
+    <div class="row bg-light mb-4">
         <table class="table table-bordered">
             <thead class="thead-dark">
                 <tr>
-                    <th>ID</th>
-                    <th>Username</th>
+                    <th>Student ID</th>
+                    <th>Name</th>
                     <th>Email</th>
-                    <th>Theme</th>
-                    <th>UserRole</th>
+                    <th>Role</th>
                     <th>Delete</th>
                 </tr>
             </thead>
             <tbody>
-                @if (UsersData.Any())
+                @if (Students.Any())
                 {
-                    @foreach (var userData in UsersData)
+                    @foreach (var student in Students)
                     {
-                        <tr @onclick="(() => SetUserDataForUpdate(userData))">
-                            <td>@userData.UserId</td>
-                            <td>@userData.UserUsername</td>
-                            <td>@userData.UserEmail</td>
-                            <td>@userData.UserTheme</td>
-                            <td>@userData.UserRole</td>
-                            <td><button class="btn btn-danger" @onclick="(() => DeleteUserData(userData))">Delete</button></td>
+                        <tr @onclick="(() => SetStudentForUpdate(student))">
+                            <td>@student.StudentId</td>
+                            <td>@student.UserName</td>
+                            <td>@student.StEmail</td>
+                            <td>@student.Role</td>
+                            <td>
+                                <button class="btn btn-danger"
+                                        @onclick="() => DeleteStudent(student)"
+                                        @onclick:stopPropagation="true">
+                                    Delete
+                                </button>
+                            </td>
                         </tr>
                     }
                 }
                 else
                 {
-                    <tr><td colspan="6"><strong>No user data available</strong></td></tr>
+                    <tr><td colspan="5" class="text-center"><strong>No students found</strong></td></tr>
                 }
             </tbody>
         </table>
     </div>
 
     <div class="row m-5">
-        <div class="col-5 bg-light m-2 justify-content-start">
+        <!-- Add Student -->
+        <div class="col-5 bg-light m-2">
+            <div class="p-3 mb-3 bg-primary text-white text-center">Add New Student</div>
 
-            <div class="p-3 mb-3 bg-primary text-white text-center">Add New User Data</div>
-
-            <EditForm Model="@NewUserData">
+            <EditForm Model="@NewStudent">
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" class="form-control" @bind-value="@NewUserData.UserUsername" />
+                    <label for="username">Name</label>
+                    <input type="text" id="username" class="form-control" @bind-value="@NewStudent.UserName" />
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="text" id="email" class="form-control" @bind="@NewUserData.UserEmail" />
+                    <input type="text" id="email" class="form-control" @bind-value="@NewStudent.StEmail" />
                 </div>
 
                 <div class="form-group">
-                    <label for="Theme">Theme</label>
-                    <input type="text" id="theme" class="form-control" @bind="@NewUserData.UserTheme" />
-                </div>
-
-                <div class="form-group">
-                    <label for="UserRole">UserRole</label>
-                    <input type="text" id="userrole" class="form-control" @bind="@NewUserData.UserRole" />
+                    <label for="role">Role</label>
+                    <input type="text" id="role" class="form-control" @bind-value="@NewStudent.Role" />
                 </div>
 
                 <div class="text-center p-3 mb-3">
-                    <button class="btn btn-info" @onclick="AddNewUserData"> Add User Data</button>
+                    <button class="btn btn-info" @onclick="AddStudent">Add Student</button>
                 </div>
             </EditForm>
         </div>
 
-        <div class="col-5 bg-light m-2 justify-content-end">
-            <div class="p-3 mb-1 bg-primary text-white text-center">Update User Data</div>
+        <!-- Update Student -->
+        <div class="col-5 bg-light m-2">
+            <div class="p-3 mb-1 bg-primary text-white text-center">Update Student</div>
 
-            <EditForm Model="@UpdateUserData">
+            <EditForm Model="@UpdateStudent">
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" class="form-control" @bind-value="@UpdateUserData.UserUsername" />
+                    <label for="username">Name</label>
+                    <input type="text" id="username" class="form-control" @bind-value="@UpdateStudent.UserName" />
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="text" id="email" class="form-control" @bind="@UpdateUserData.UserEmail" />
+                    <input type="text" id="email" class="form-control" @bind-value="@UpdateStudent.StEmail" />
                 </div>
 
                 <div class="form-group">
-                    <label for="theme">Theme</label>
-                    <input type="text" id="theme" class="form-control" @bind-value="@UpdateUserData.UserTheme" />
-                </div>
-
-                <div class="form-group">
-                    <label for="UserRole">User Role</label>
-                    <input type="text" id="userrole" class="form-control" @bind="@UpdateUserData.UserRole" />
+                    <label for="role">Role</label>
+                    <input type="text" id="role" class="form-control" @bind-value="@UpdateStudent.Role" />
                 </div>
 
                 <div class="text-center p-3 mb-3">
-                    <button class="btn btn-info" @onclick="UpdateUserDataData">Update User Data</button>
+                    <button class="btn btn-info" @onclick="UpdateStudentData">Update Student</button>
                 </div>
             </EditForm>
         </div>
     </div>
-
-
 </div>
 
 @code {
-
-    List<UserData> UsersData = new List<UserData>();
+    private List<Student> Students = new();
+    private Student NewStudent = new Student();
+    private Student UpdateStudent = new Student();
 
     protected override async Task OnInitializedAsync()
     {
-        await RefreshUserData();
+        await LoadStudents();
     }
 
-    private async Task RefreshUserData()
+    private async Task LoadStudents()
     {
-        UsersData = await service.GetUserDataAsync();
+        Students = await DbContext.Students.OrderBy(s => s.UserName).ToListAsync();
     }
 
-
-    public UserData NewUserData { get; set; } = new UserData();
-
-    private async Task AddNewUserData()
+    private async Task AddStudent()
     {
-        await service.AddUserDataAsync(NewUserData);
-        NewUserData = new UserData();
-        await RefreshUserData();
+        // Generate ID if necessary (for SQLite string PK, we just use GUID)
+        if (string.IsNullOrEmpty(NewStudent.StudentId))
+        {
+            NewStudent.StudentId = Guid.NewGuid().ToString();
+        }
+
+        DbContext.Students.Add(NewStudent);
+        await DbContext.SaveChangesAsync();
+
+        NewStudent = new Student();
+        await LoadStudents();
     }
 
-    UserData UpdateUserData = new UserData();
-    private void SetUserDataForUpdate(UserData userData)
+    private void SetStudentForUpdate(Student student)
     {
-        UpdateUserData = userData;
+        // Create a copy so UI edits don't immediately affect the list
+        UpdateStudent = new Student
+        {
+            StudentId = student.StudentId,
+            UserName = student.UserName,
+            StEmail = student.StEmail,
+            Role = student.Role
+        };
     }
 
-    private async Task UpdateUserDataData()
+    private async Task UpdateStudentData()
     {
-        await service.UpdateUserDataAsync(UpdateUserData);
-        await RefreshUserData();
+        var student = await DbContext.Students.FindAsync(UpdateStudent.StudentId);
+        if (student != null)
+        {
+            student.UserName = UpdateStudent.UserName;
+            student.StEmail = UpdateStudent.StEmail;
+            student.Role = UpdateStudent.Role;
+
+            await DbContext.SaveChangesAsync();
+            await LoadStudents();
+        }
     }
 
-    private async Task DeleteUserData(UserData userData)
+    private async Task DeleteStudent(Student student)
     {
-        await service.DeleteUserDataAsync(userData);
-        await RefreshUserData();
+        var s = await DbContext.Students.FindAsync(student.StudentId);
+        if (s != null)
+        {
+            DbContext.Students.Remove(s);
+            await DbContext.SaveChangesAsync();
+            await LoadStudents();
+        }
     }
 }

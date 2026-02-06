@@ -1,7 +1,8 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Linq;
+using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace Honours_Project_CompetencyandSkillTracking.Canvas
 {
@@ -11,7 +12,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            ReadCommentHandling = JsonCommentHandling.Skip
         };
 
         public CanvasService(HttpClient httpClient, IConfiguration config)
@@ -25,51 +28,29 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                 ?? throw new InvalidOperationException("Canvas Token missing");
 
             _http.BaseAddress = new Uri(baseUrl.TrimEnd('/') + "/");
-            _http.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
         public async Task<CanvasProfile> GetMyProfileAsync()
-        {
-            return await GetAsync<CanvasProfile>("api/v1/users/self/profile");
-        }
+            => await GetAsync<CanvasProfile>("api/v1/users/self/profile");
 
         public async Task<List<CanvasCourse>> GetMyCoursesAsync()
-        {
-            return await GetPagedAsync<CanvasCourse>(
-                "api/v1/courses?enrollment_state=active&include[]=syllabus_body&include[]=term");
-        }
+            => await GetPagedAsync<CanvasCourse>("api/v1/courses?enrollment_state=active&include[]=syllabus_body&include[]=term");
 
         public async Task<List<CanvasAssignment>> GetCourseAssignmentsAsync(long courseId)
-        {
-            return await GetPagedAsync<CanvasAssignment>(
-                $"api/v1/courses/{courseId}/assignments?include[]=description");
-        }
-
-        //public async Task<List<CanvasSubmission>> GetAssignmentSubmissionsAsync(long courseId, long assignmentId)
-        //{
-        //    return await GetPagedAsync<CanvasSubmission>(
-        //        $"courses/{courseId}/assignments/{assignmentId}/submissions?student_ids=self");
-        //}
+            => await GetPagedAsync<CanvasAssignment>($"api/v1/courses/{courseId}/assignments?include[]=description");
 
         private async Task<T> GetAsync<T>(string endpoint)
         {
-            var requestUri = new Uri(_http.BaseAddress!, endpoint);
-            Console.WriteLine($">>> Canvas GET: {requestUri}");
-
-            using var response = await _http.GetAsync(endpoint);
-            response.EnsureSuccessStatusCode();
-
-            using var stream = await response.Content.ReadAsStreamAsync();
-            return await JsonSerializer.DeserializeAsync<T>(stream, JsonOptions)
+            Console.WriteLine($">>> Canvas GET: {endpoint}");
+            var json = await _http.GetStringAsync(endpoint);
+            Console.WriteLine(json);
+            return JsonSerializer.Deserialize<T>(json, JsonOptions)
                    ?? throw new InvalidOperationException("Empty Canvas response");
         }
 
         private async Task<List<T>> GetPagedAsync<T>(string endpoint)
         {
-            var requestUri = new Uri(_http.BaseAddress!, endpoint);
-            Console.WriteLine($">>> Canvas GET: {requestUri}");
-
             var results = new List<T>();
             string? url = endpoint;
 
@@ -81,14 +62,16 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
                 response.EnsureSuccessStatusCode();
 
-                using var stream = await response.Content.ReadAsStreamAsync();
-                var page = await JsonSerializer.DeserializeAsync<List<T>>(stream, JsonOptions);
+                var json = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"PAGED ENDPOINT: {url}");
+                Console.WriteLine(json);
+
+                var page = JsonSerializer.Deserialize<List<T>>(json, JsonOptions);
                 if (page != null)
                     results.AddRange(page);
 
                 url = GetNextPageUrl(response);
             }
-
 
             return results;
         }
@@ -113,3 +96,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
     }
 }
 
+
+//public async Task<List<CanvasSubmission>> GetAssignmentSubmissionsAsync(long courseId, long assignmentId)
+//{
+//    return await GetPagedAsync<CanvasSubmission>(
+//        $"courses/{courseId}/assignments/{assignmentId}/submissions?student_ids=self");
+//}

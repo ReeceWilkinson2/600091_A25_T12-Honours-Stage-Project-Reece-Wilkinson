@@ -14,37 +14,34 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-
-
-
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
 builder.Services.AddDbContext<UserInfoDbContext>(option => { option.UseSqlite("Data Source = UserDatabase.db"); });
-builder.Services.AddScoped<UserDataServices>();
 builder.Services.AddSingleton<UserInfoService>();
 builder.Services.AddBlazoredLocalStorage();
-builder.Services.Configure<SmtpConfig>(
-    builder.Configuration.GetSection("Smtp"));
+builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection("Smtp"));
 
 
-var dbPath = Path.Combine(
-    builder.Environment.ContentRootPath,
-    "UserDatabase.db");
+var dbPath = Path.Combine(builder.Environment.ContentRootPath,"UserDatabase.db");
+builder.Services.AddDbContext<AppDbContext>(options =>options.UseSqlite($"Data Source={dbPath}"));
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}"));
 builder.Services.AddScoped<CanvasSyncService>();
 builder.Services.AddHttpClient<CanvasService>();
-
+builder.Services.AddScoped<UserDataServices>();
 builder.Services.AddSyncfusionBlazor();
 builder.Services.AddSingleton<ISyncfusionStringLocalizer, SyncfusionStringLocalizer>();
 
-
-
-
 var app = builder.Build();
+
+// Ensure databases are created at startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -55,12 +52,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 app.Run();
