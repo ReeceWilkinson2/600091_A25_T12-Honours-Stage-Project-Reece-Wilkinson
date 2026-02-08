@@ -18,7 +18,6 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddDbContext<UserInfoDbContext>(option => { option.UseSqlite("Data Source = UserDatabase.db"); });
 builder.Services.AddSingleton<UserInfoService>();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection("Smtp"));
