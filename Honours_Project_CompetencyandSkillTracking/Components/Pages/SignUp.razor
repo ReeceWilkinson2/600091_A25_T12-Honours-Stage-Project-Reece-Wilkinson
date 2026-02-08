@@ -2,13 +2,14 @@
 @rendermode InteractiveServer
 @layout LoggedOutLayout
 @inject NavigationManager NavigationManager
-@inject UserDataServices service
+@inject UserService UserService
 @inject IOptions<SmtpConfig> SmtpConfig
 @using System.Net
 @using System.Net.Mail
 @using Honours_Project_CompetencyandSkillTracking.Components.Layout
 @using Honours_Project_CompetencyandSkillTracking.Components.Services
 @using Honours_Project_CompetencyandSkillTracking.Data
+@using Honours_Project_CompetencyandSkillTracking.Canvas
 @using Honours_Project_CompetencyandSkillTracking.Classes
 @using Microsoft.Extensions.Options
 
@@ -43,9 +44,9 @@
 					<label for="role">Account Type: </label>
 					<InputSelect class="select" id="role" @bind-value="form.Role">
 						<option value="">(select one)</option>
-						<option value="student">Student</option>
-						<option value="staff">Staff</option>
-						<option value="staff">Employer</option>
+						<option value="Student">Student</option>
+						<option value="Staff">Staff</option>
+						<option value="Staff">Employer</option>
 					</InputSelect>
 				</div>
 				@if (form.Role == "staff")
@@ -70,78 +71,142 @@
 </div>
 
 @code {
-	[CascadingParameter]
-	public GlobalUserInfo? userInfo { get; set; }
-
 	SignUpForm form = new SignUpForm();
-	private string Message { get; set; }
 	private string errorMessage = string.Empty;
 
-
-	List<UserData> UsersData = new List<UserData>();
-
-	protected override async Task OnInitializedAsync()
+	private async Task SignupUser()
 	{
-		await RefreshUserData();
-	}
-
-	private async Task RefreshUserData()
-	{
-		UsersData = await service.GetUserDataAsync();
-	}
-
-	public UserData NewUserData { get; set; } = new UserData();
-
-	private async Task AddNewUserData()
-	{
-		await service.AddUserDataAsync(NewUserData);
-		NewUserData = new UserData();
-		await RefreshUserData();
-	}
-
-	public void SignupUser()
-	{
-		if (form.Role == "staff" && form.StaffPassword != "secretpassword")
+		// Staff password validation
+		if (form.Role == "Staff" && form.StaffPassword != "secretpassword")
 		{
 			errorMessage = "The staff password is incorrect.";
 			return;
 		}
-		//string hashedPassword = PasswordHashing.HashPassword(form.Password);
-		NewUserData.UserUsername = (form.FirstName + form.LastName);
-		NewUserData.UserEmail = form.Email;
-		NewUserData.UserPassword = BCrypt.Net.BCrypt.HashPassword(form.Password);
 
-		NewUserData.UserEmailConfirmed = true;
-		NewUserData.UserRole = form.Role;
-		AddNewUserData();
+		// Prevent duplicate email signup
+		var existingUser = await UserService.GetUserByEmailAsync(form.Email);
+		if (existingUser != null)
+		{
+			errorMessage = "An account with that email already exists.";
+			return;
+		}
+
+		// Create new record
+		var newUser = new Student
+		{
+			StudentId = Guid.NewGuid().ToString(), // generate a new ID
+			UserName = $"{form.FirstName} {form.LastName}",
+			StEmail = form.Email,
+			Password = BCrypt.Net.BCrypt.HashPassword(form.Password),
+			Role = form.Role
+		};
+
+		await UserService.AddUserAsync(newUser);
+
+		// Optional: send confirmation email (if you want)
+		await SendEmail(form.Email);
+
 		NavigationManager.NavigateTo("/");
 	}
-	public void SendEmail(EditContext context)
+
+	private async Task SendEmail(string email)
 	{
 		var smtp = SmtpConfig.Value;
+
 		try
 		{
 			using var mail = new MailMessage();
 			mail.From = new MailAddress(smtp.Email);
-			mail.To.Add(form.Email);
+			mail.To.Add(email);
 			mail.Subject = "Account Created Successfully";
-			mail.Body = "<h1>Test</h1>";
+			mail.Body = "<h1>Your account has been created!</h1>";
 			mail.IsBodyHtml = true;
 
-
 			using var client = new SmtpClient(smtp.Host, smtp.Port);
-			client.Credentials = new NetworkCredential(
-				smtp.Email,
-				smtp.Password
-			);
+			client.Credentials = new NetworkCredential(smtp.Email, smtp.Password);
 			client.EnableSsl = true;
 
-			client.Send(mail);
+			await client.SendMailAsync(mail);
 		}
-
 		catch (Exception ex)
 		{
-			Message = ex.Message;
+			errorMessage = ex.Message;
 		}
 	}
+
+
+	// [CascadingParameter]
+	// public GlobalUserInfo? userInfo { get; set; }
+
+	// SignUpForm form = new SignUpForm();
+	// private string Message { get; set; }
+	// private string errorMessage = string.Empty;
+
+
+	// List<UserData> UsersData = new List<UserData>();
+
+	// protected override async Task OnInitializedAsync()
+	// {
+	// 	await RefreshUserData();
+	// }
+
+	// private async Task RefreshUserData()
+	// {
+	// 	UsersData = await service.GetUserDataAsync();
+	// }
+
+	// public UserData NewUserData { get; set; } = new UserData();
+
+	// private async Task AddNewUserData()
+	// {
+	// 	await service.AddUserDataAsync(NewUserData);
+	// 	NewUserData = new UserData();
+	// 	await RefreshUserData();
+	// }
+
+	// public void SignupUser()
+	// {
+	// 	if (form.Role == "staff" && form.StaffPassword != "secretpassword")
+	// 	{
+	// 		errorMessage = "The staff password is incorrect.";
+	// 		return;
+	// 	}
+	// 	string hashedPassword = PasswordHashing.HashPassword(form.Password);
+	// 	NewUserData.UserUsername = (form.FirstName + form.LastName);
+	// 	NewUserData.UserEmail = form.Email;
+	// 	NewUserData.UserPassword = BCrypt.Net.BCrypt.HashPassword(form.Password);
+
+	// 	NewUserData.UserEmailConfirmed = true;
+	// 	NewUserData.UserRole = form.Role;
+	// 	AddNewUserData();
+	// 	NavigationManager.NavigateTo("/");
+	// }
+	// public void SendEmail(EditContext context)
+	// {
+	// 	var smtp = SmtpConfig.Value;
+	// 	try
+	// 	{
+	// 		using var mail = new MailMessage();
+	// 		mail.From = new MailAddress(smtp.Email);
+	// 		mail.To.Add(form.Email);
+	// 		mail.Subject = "Account Created Successfully";
+	// 		mail.Body = "<h1>Test</h1>";
+	// 		mail.IsBodyHtml = true;
+
+
+	// 		using var client = new SmtpClient(smtp.Host, smtp.Port);
+	// 		client.Credentials = new NetworkCredential(
+	// 			smtp.Email,
+	// 			smtp.Password
+	// 		);
+	// 		client.EnableSsl = true;
+
+	// 		client.Send(mail);
+	// 	}
+
+	// 	catch (Exception ex)
+	// 	{
+	// 		Message = ex.Message;
+	// 	}
+	// }
 }

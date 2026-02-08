@@ -29,7 +29,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>options.UseSqlite($"Data S
 
 builder.Services.AddScoped<CanvasSyncService>();
 builder.Services.AddHttpClient<CanvasService>();
-builder.Services.AddScoped<UserDataServices>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddSyncfusionBlazor();
 builder.Services.AddSingleton<ISyncfusionStringLocalizer, SyncfusionStringLocalizer>();
 
