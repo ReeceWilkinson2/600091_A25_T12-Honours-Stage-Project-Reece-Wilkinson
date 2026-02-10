@@ -46,7 +46,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
             Console.WriteLine($">>> Canvas GET: {endpoint}");
 
             var json = await _http.GetStringAsync(endpoint);
-            Console.WriteLine(json);  // Log the raw response for debugging
+            Console.WriteLine(json);
 
             return JsonSerializer.Deserialize<List<CanvasSubmission>>(json, JsonOptions)
                 ?? throw new InvalidOperationException("Empty Canvas response for submissions");

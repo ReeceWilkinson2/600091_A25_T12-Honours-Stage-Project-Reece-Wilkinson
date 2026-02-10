@@ -107,30 +107,38 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     }
 
                     // Get submissions for this assignment
-                    var submissions = await _canvas.GetAssignmentSubmissionsAsync(course.Id, a.Id);
-                    foreach (var s in submissions)
+                    try
                     {
-                        var submission = await _db.Submissions.FindAsync(s.Id);
-                        if (submission == null)
+                        Console.WriteLine($">>> Fetching submissions for assignment {a.Id}");
+                        var submissions = await _canvas.GetAssignmentSubmissionsAsync(course.Id, a.Id);
+                        Console.WriteLine($">>> Got {submissions.Count} submissions");
+
+                        foreach (var s in submissions)
                         {
-                            submission = new Submission
+                            var submission = await _db.Submissions.FindAsync(s.Id);
+                            if (submission == null)
                             {
-                                Id = s.Id,
-                                AssignmentId = a.Id,
-                                Score = s.Score,
-                                //WorkflowState = s.WorkflowState,
-                                SubmittedAt = s.SubmittedAt,
-                                //Comments = string.Join("\n", s.Comments?.Select(cmt => cmt.Comment) ?? Array.Empty<string>())
-                            };
-                            _db.Submissions.Add(submission);
+                                submission = new Submission
+                                {
+                                    Id = s.Id,
+                                    AssignmentId = a.Id,
+                                    Score = s.Score,
+                                    //WorkflowState = s.WorkflowState,
+                                    SubmittedAt = s.SubmittedAt
+                                };
+                                _db.Submissions.Add(submission);
+                            }
+                            else
+                            {
+                                submission.Score = s.Score;
+                                //submission.WorkflowState = s.WorkflowState;
+                                submission.SubmittedAt = s.SubmittedAt;
+                            }
                         }
-                        else
-                        {
-                            submission.Score = s.Score;
-                            //submission.WorkflowState = s.WorkflowState;
-                            submission.SubmittedAt = s.SubmittedAt;
-                            //submission.Comments = string.Join("\n", s.Comments?.Select(cmt => cmt.Comment) ?? Array.Empty<string>());
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($">>> ERROR fetching submissions for assignment {a.Id}: {ex.Message}");
                     }
                 }
 
