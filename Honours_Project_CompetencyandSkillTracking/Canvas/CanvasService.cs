@@ -40,6 +40,19 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         public async Task<List<CanvasAssignment>> GetCourseAssignmentsAsync(long courseId)
             => await GetPagedAsync<CanvasAssignment>($"api/v1/courses/{courseId}/assignments?include[]=description");
 
+        public async Task<List<CanvasSubmission>> GetAssignmentSubmissionsAsync(long courseId, long assignmentId)
+        {
+            string endpoint = $"courses/{courseId}/assignments/{assignmentId}/submissions?student_ids=self";
+            Console.WriteLine($">>> Canvas GET: {endpoint}");
+
+            var json = await _http.GetStringAsync(endpoint);
+            Console.WriteLine(json);  // Log the raw response for debugging
+
+            return JsonSerializer.Deserialize<List<CanvasSubmission>>(json, JsonOptions)
+                ?? throw new InvalidOperationException("Empty Canvas response for submissions");
+        }
+
+
         private async Task<T> GetAsync<T>(string endpoint)
         {
             Console.WriteLine($">>> Canvas GET: {endpoint}");
@@ -95,10 +108,3 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         }
     }
 }
-
-
-//public async Task<List<CanvasSubmission>> GetAssignmentSubmissionsAsync(long courseId, long assignmentId)
-//{
-//    return await GetPagedAsync<CanvasSubmission>(
-//        $"courses/{courseId}/assignments/{assignmentId}/submissions?student_ids=self");
-//}

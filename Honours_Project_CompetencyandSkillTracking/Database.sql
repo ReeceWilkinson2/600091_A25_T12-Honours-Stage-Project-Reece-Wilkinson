@@ -52,3 +52,14 @@ CREATE TABLE IF NOT EXISTS Competencies (
     Description TEXT,
     FOREIGN KEY (CourseId) REFERENCES Courses(CanvasCourseID)
 );
+
+-- AssignmentSubmission table
+CREATE TABLE IF NOT EXISTS Submissions (
+    Id INTEGER NOT NULL PRIMARY KEY,
+    AssignmentId INTEGER NOT NULL,
+    Score REAL,
+    WorkflowState TEXT,
+    SubmittedAt TEXT,
+    Comments TEXT,
+    FOREIGN KEY (AssignmentId) REFERENCES Assignments(CanvasAssignmentId)
+);

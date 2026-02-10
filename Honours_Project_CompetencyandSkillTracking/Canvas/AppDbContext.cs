@@ -8,6 +8,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public DbSet<Student> Students => Set<Student>();
         public DbSet<Course> Courses => Set<Course>();
         public DbSet<Assignment> Assignments => Set<Assignment>();
+        public DbSet<Submission> Submissions => Set<Submission>();
         public DbSet<UserData> UserData => Set<UserData>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -16,4 +17,3 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
 }
 
 
-//public DbSet<Submission> Submissions => Set<Submission>();

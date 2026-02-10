@@ -105,41 +105,38 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                         assignment.Description = a.Description;
                         assignment.DueAt = a.Due_At;
                     }
+
+                    // Get submissions for this assignment
+                    var submissions = await _canvas.GetAssignmentSubmissionsAsync(course.Id, a.Id);
+                    foreach (var s in submissions)
+                    {
+                        var submission = await _db.Submissions.FindAsync(s.Id);
+                        if (submission == null)
+                        {
+                            submission = new Submission
+                            {
+                                Id = s.Id,
+                                AssignmentId = a.Id,
+                                Score = s.Score,
+                                //WorkflowState = s.WorkflowState,
+                                SubmittedAt = s.SubmittedAt,
+                                //Comments = string.Join("\n", s.Comments?.Select(cmt => cmt.Comment) ?? Array.Empty<string>())
+                            };
+                            _db.Submissions.Add(submission);
+                        }
+                        else
+                        {
+                            submission.Score = s.Score;
+                            //submission.WorkflowState = s.WorkflowState;
+                            submission.SubmittedAt = s.SubmittedAt;
+                            //submission.Comments = string.Join("\n", s.Comments?.Select(cmt => cmt.Comment) ?? Array.Empty<string>());
+                        }
+                    }
                 }
 
-                // Save batch per course
-                await _db.SaveChangesAsync();
+            // Save batch per course
+            await _db.SaveChangesAsync();
             }
         }
     }
 }
-
-
-
-//    // Get submissions for this assignment
-//    var submissions = await _canvas.GetAssignmentSubmissionsAsync(course.Id, a.Id);
-//    foreach (var s in submissions)
-//    {
-//        var submission = await _db.Submissions.FindAsync(s.Id);
-//        if (submission == null)
-//        {
-//            submission = new Submission
-//            {
-//                Id = s.Id,
-//                AssignmentId = a.Id,
-//                Score = s.Score,
-//                WorkflowState = s.Workflow_State,
-//                SubmittedAt = s.Submitted_At,
-//                Comments = string.Join("\n", s.Comments?.Select(cmt => cmt.Comment) ?? Array.Empty<string>())
-//            };
-//            _db.Submissions.Add(submission);
-//        }
-//        else
-//        {
-//            submission.Score = s.Score;
-//            submission.WorkflowState = s.Workflow_State;
-//            submission.SubmittedAt = s.Submitted_At;
-//            submission.Comments = string.Join("\n", s.Comments?.Select(cmt => cmt.Comment) ?? Array.Empty<string>());
-//        }
-//    }
-//}
