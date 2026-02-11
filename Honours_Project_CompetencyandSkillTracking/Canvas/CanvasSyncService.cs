@@ -86,6 +86,16 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
                 foreach (var a in assignments)
                 {
+                    // Skip unsupported submission types for student token
+                    if (a.SubmissionTypes == null || a.SubmissionTypes.Contains("none") ||
+                        a.SubmissionTypes.Contains("on_paper") ||
+                        a.SubmissionTypes.Contains("external_tool") ||
+                        a.SubmissionTypes.Contains("quiz"))
+                    {
+                        Console.WriteLine($">>> Skipping assignment {a.Id} (unsupported for student token)");
+                        continue;
+                    }
+
                     var assignment = await _db.Assignments.FindAsync(a.Id);
                     if (assignment == null)
                     {
@@ -109,9 +119,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     // Get submissions for this assignment
                     try
                     {
-                        Console.WriteLine($">>> Fetching submissions for assignment {a.Id}");
                         var submissions = await _canvas.GetAssignmentSubmissionsAsync(course.Id, a.Id);
-                        Console.WriteLine($">>> Got {submissions.Count} submissions");
+                        Console.WriteLine($">>> Got {submissions.Count} submissions for assignment {assignment.Name}");
 
                         foreach (var s in submissions)
                         {
@@ -142,8 +151,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     }
                 }
 
-            // Save batch per course
-            await _db.SaveChangesAsync();
+                // Save batch per course
+                await _db.SaveChangesAsync();
             }
         }
     }

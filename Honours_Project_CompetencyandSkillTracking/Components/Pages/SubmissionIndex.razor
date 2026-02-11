@@ -1,0 +1,185 @@
+﻿@page "/submissionindex"
+@using Microsoft.EntityFrameworkCore
+@using Honours_Project_CompetencyandSkillTracking.Data
+@using Honours_Project_CompetencyandSkillTracking.Canvas
+@inject AppDbContext DbContext
+@rendermode InteractiveServer
+
+<div class="container">
+
+    <!-- ================= TABLE ================= -->
+    <div class="row bg-light mb-4">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Submission ID</th>
+                    <th>Assignment ID</th>
+                    <th>Score</th>
+                    <th>Submitted At</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Submissions.Any())
+                {
+                    @foreach (var submission in Submissions)
+                    {
+                        <tr @onclick="(() => SetSubmissionForUpdate(submission))">
+                            <td>@submission.Id</td>
+                            <td>@submission.AssignmentId</td>
+                            <td>@submission.Score</td>
+                            <td>@submission.SubmittedAt</td>
+                            <td>
+                                <button class="btn btn-danger"
+                                        @onclick="() => DeleteSubmission(submission)"
+                                        @onclick:stopPropagation="true">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="5" class="text-center"><strong>No submissions found</strong></td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================= ADD / UPDATE ================= -->
+    <div class="row m-5">
+
+        <!-- ADD -->
+        <div class="col-5 bg-light m-2">
+            <div class="p-3 mb-3 bg-primary text-white text-center">Add New Submission</div>
+
+            <EditForm Model="@NewSubmission">
+                <div class="form-group">
+                    <label>Assignment ID</label>
+                    <input type="number" class="form-control"
+                           @bind-value="NewSubmission.AssignmentId" />
+                </div>
+
+                <div class="form-group">
+                    <label>Score</label>
+                    <input type="number" step="0.1" class="form-control"
+                           @bind-value="NewSubmission.Score" />
+                </div>
+
+                <div class="form-group">
+                    <label>Submitted At</label>
+                    <input type="datetime-local" class="form-control"
+                           @bind-value="NewSubmission.SubmittedAt" />
+                </div>
+
+                <div class="text-center p-3">
+                    <button class="btn btn-info" @onclick="AddSubmission">
+                        Add Submission
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+
+        <!-- UPDATE -->
+        <div class="col-5 bg-light m-2">
+            <div class="p-3 mb-3 bg-primary text-white text-center">Update Submission</div>
+
+            <EditForm Model="@UpdateSubmission">
+                <div class="form-group">
+                    <label>Submission ID</label>
+                    <input type="number" class="form-control"
+                           @bind-value="UpdateSubmission.Id" disabled />
+                </div>
+
+                <div class="form-group">
+                    <label>Assignment ID</label>
+                    <input type="number" class="form-control"
+                           @bind-value="UpdateSubmission.AssignmentId" />
+                </div>
+
+                <div class="form-group">
+                    <label>Score</label>
+                    <input type="number" step="0.1" class="form-control"
+                           @bind-value="UpdateSubmission.Score" />
+                </div>
+
+                <div class="form-group">
+                    <label>Submitted At</label>
+                    <input type="datetime-local" class="form-control"
+                           @bind-value="UpdateSubmission.SubmittedAt" />
+                </div>
+
+                <div class="text-center p-3">
+                    <button class="btn btn-info" @onclick="UpdateSubmissionData">
+                        Update Submission
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private List<Submission> Submissions = new();
+    private Submission NewSubmission = new Submission();
+    private Submission UpdateSubmission = new Submission();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSubmissions();
+    }
+
+    private async Task LoadSubmissions()
+    {
+        Submissions = await DbContext.Submissions
+            .OrderByDescending(s => s.SubmittedAt)
+            .ToListAsync();
+    }
+
+    private async Task AddSubmission()
+    {
+        DbContext.Submissions.Add(NewSubmission);
+        await DbContext.SaveChangesAsync();
+
+        NewSubmission = new Submission();
+        await LoadSubmissions();
+    }
+
+    private void SetSubmissionForUpdate(Submission submission)
+    {
+        UpdateSubmission = new Submission
+        {
+            Id = submission.Id,
+            AssignmentId = submission.AssignmentId,
+            Score = submission.Score,
+            SubmittedAt = submission.SubmittedAt
+        };
+    }
+
+    private async Task UpdateSubmissionData()
+    {
+        var submission = await DbContext.Submissions.FindAsync(UpdateSubmission.Id);
+        if (submission != null)
+        {
+            submission.AssignmentId = UpdateSubmission.AssignmentId;
+            submission.Score = UpdateSubmission.Score;
+            submission.SubmittedAt = UpdateSubmission.SubmittedAt;
+
+            await DbContext.SaveChangesAsync();
+            await LoadSubmissions();
+        }
+    }
+
+    private async Task DeleteSubmission(Submission submission)
+    {
+        var s = await DbContext.Submissions.FindAsync(submission.Id);
+        if (s != null)
+        {
+            DbContext.Submissions.Remove(s);
+            await DbContext.SaveChangesAsync();
+            await LoadSubmissions();
+        }
+    }
+}

@@ -31,33 +31,52 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
-        public async Task<CanvasProfile> GetMyProfileAsync()
-            => await GetAsync<CanvasProfile>("api/v1/users/self/profile");
+        public async Task<CanvasProfile> GetMyProfileAsync() => await GetAsync<CanvasProfile>("api/v1/users/self/profile");
 
-        public async Task<List<CanvasCourse>> GetMyCoursesAsync()
-            => await GetPagedAsync<CanvasCourse>("api/v1/courses?enrollment_state=active&include[]=syllabus_body&include[]=term");
+        public async Task<List<CanvasCourse>> GetMyCoursesAsync() => await GetPagedAsync<CanvasCourse>("api/v1/courses?enrollment_state=active&include[]=syllabus_body&include[]=term");
 
-        public async Task<List<CanvasAssignment>> GetCourseAssignmentsAsync(long courseId)
-            => await GetPagedAsync<CanvasAssignment>($"api/v1/courses/{courseId}/assignments?include[]=description");
+        public async Task<List<CanvasAssignment>> GetCourseAssignmentsAsync(long courseId) => await GetPagedAsync<CanvasAssignment>($"api/v1/courses/{courseId}/assignments?include[]=description&include[]=submission_types");
 
-        public async Task<List<CanvasSubmission>> GetAssignmentSubmissionsAsync(long courseId, long assignmentId)
+        public async Task<List<CanvasSubmission>> GetAssignmentSubmissionsAsync(long courseId,long assignmentId)
         {
-            string endpoint = $"courses/{courseId}/assignments/{assignmentId}/submissions?student_ids=self";
+            string endpoint = $"api/v1/courses/{courseId}/assignments/{assignmentId}/submissions?student_ids=self";
+
             Console.WriteLine($">>> Canvas GET: {endpoint}");
 
-            var json = await _http.GetStringAsync(endpoint);
-            Console.WriteLine(json);
+            try
+            {
+                var response = await _http.GetAsync(endpoint);
 
-            return JsonSerializer.Deserialize<List<CanvasSubmission>>(json, JsonOptions)
-                ?? throw new InvalidOperationException("Empty Canvas response for submissions");
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine(
+                        $">>> Submission fetch failed: {response.StatusCode}");
+                    return new List<CanvasSubmission>();
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(json);
+
+                return JsonSerializer.Deserialize<List<CanvasSubmission>>(json, JsonOptions)
+                       ?? new List<CanvasSubmission>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($">>> Exception fetching submissions for {assignmentId}: {ex.Message}");
+                return new List<CanvasSubmission>();
+            }
         }
-
 
         private async Task<T> GetAsync<T>(string endpoint)
         {
             Console.WriteLine($">>> Canvas GET: {endpoint}");
-            var json = await _http.GetStringAsync(endpoint);
+
+            var response = await _http.GetAsync(endpoint);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
             Console.WriteLine(json);
+
             return JsonSerializer.Deserialize<T>(json, JsonOptions)
                    ?? throw new InvalidOperationException("Empty Canvas response");
         }
@@ -73,13 +92,19 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     ? await _http.GetAsync(url)
                     : await _http.GetAsync(new Uri(_http.BaseAddress!, url));
 
-                response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($">>> Paged fetch failed: {response.StatusCode}");
+                    break;
+                }
 
                 var json = await response.Content.ReadAsStringAsync();
+
                 Console.WriteLine($"PAGED ENDPOINT: {url}");
                 Console.WriteLine(json);
 
                 var page = JsonSerializer.Deserialize<List<T>>(json, JsonOptions);
+
                 if (page != null)
                     results.AddRange(page);
 
