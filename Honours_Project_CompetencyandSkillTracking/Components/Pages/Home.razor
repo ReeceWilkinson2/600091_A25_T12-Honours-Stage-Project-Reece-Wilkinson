@@ -22,12 +22,14 @@
 @code {
     private string currentUsername = "";
     private string? userId;
+    private string? CurrentUserRole = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
 
         userId = await localStorage.GetItemAsync<string>("UserId");
+		CurrentUserRole = await localStorage.GetItemAsync<string>("UserRole");
 
         // if (string.IsNullOrEmpty(userId))
         // {

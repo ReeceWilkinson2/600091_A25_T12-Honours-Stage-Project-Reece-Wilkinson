@@ -55,6 +55,7 @@
 
 		// Save StudentId (string) to local storage
 		await localStorage.SetItemAsync("UserId", user.StudentId);
+		await localStorage.SetItemAsync("UserRole", user.Role);
 
 		NavigationManager.NavigateTo("/");
 	}
