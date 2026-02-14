@@ -3,13 +3,28 @@
 @using Honours_Project_CompetencyandSkillTracking.Data
 @using Honours_Project_CompetencyandSkillTracking.Classes
 @using Honours_Project_CompetencyandSkillTracking.Components.Layout
-@layout NavMenuStudent
+@* @layout NavMenuStudent *@
 @inject NavigationManager NavigationManager
 @inject UserService service
 
 <NavLink class="nav-link" href="competencyviewer" Match="NavLinkMatch.All">
 	Test Student Competency
 </NavLink>
+
+@* <tabs>
+    <Tab Title="Year 1" Active="true">
+        <Content>
+            <p class="mt-3">This is the placeholder content for the <b>Home</b> tab.</p>
+        </Content>
+    </Tab>
+    <Tab Title="Year 2">
+        <Content>
+            <p class="mt-3">This is the placeholder content for the <b>Profile</b> tab.</p>
+        </Content>
+    </Tab>
+</tabs> *@
+
+
 
 @code {
 
