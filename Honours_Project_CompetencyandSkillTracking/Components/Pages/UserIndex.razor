@@ -124,9 +124,9 @@
 </div>
 
 @code {
-    private List<Student> Students = new();
-    private Student NewStudent = new Student();
-    private Student UpdateStudent = new Student();
+    private List<User> Students = new();
+    private User NewStudent = new User();
+    private User UpdateStudent = new User();
 
     protected override async Task OnInitializedAsync()
     {
@@ -148,14 +148,14 @@
         DbContext.Students.Add(NewStudent);
         await DbContext.SaveChangesAsync();
 
-        NewStudent = new Student();
+        NewStudent = new User();
         await LoadStudents();
     }
 
-    private void SetStudentForUpdate(Student student)
+    private void SetStudentForUpdate(User student)
     {
         // Create a copy so UI edits don't immediately affect the list
-        UpdateStudent = new Student
+        UpdateStudent = new User
         {
             StudentId = student.StudentId,
             UserName = student.UserName,
@@ -178,7 +178,7 @@
         }
     }
 
-    private async Task DeleteStudent(Student student)
+    private async Task DeleteStudent(User student)
     {
         var s = await DbContext.Students.FindAsync(student.StudentId);
         if (s != null)

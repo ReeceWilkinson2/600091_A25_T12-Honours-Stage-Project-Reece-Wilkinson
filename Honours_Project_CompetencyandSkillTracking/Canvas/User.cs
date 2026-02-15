@@ -2,7 +2,7 @@
 
 namespace Honours_Project_CompetencyandSkillTracking.Canvas
 {
-    public class Student
+    public class User
     {
         [Key]
         public string StudentId { get; set; } // Canvas user id, primary key

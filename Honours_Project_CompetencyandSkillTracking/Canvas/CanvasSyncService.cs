@@ -32,7 +32,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
             var student = await _db.Students.FindAsync(profileId);
             if (student == null)
             {
-                student = new Student
+                student = new User
                 {
                     StudentId = profileId,
                     UserName = profile.Name,

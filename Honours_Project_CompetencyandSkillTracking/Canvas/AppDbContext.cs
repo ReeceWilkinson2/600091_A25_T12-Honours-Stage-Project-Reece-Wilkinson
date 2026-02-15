@@ -5,7 +5,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<Student> Students => Set<Student>();
+        public DbSet<User> Students => Set<User>();
         public DbSet<Course> Courses => Set<Course>();
         public DbSet<Assignment> Assignments => Set<Assignment>();
         public DbSet<Submission> Submissions => Set<Submission>();

@@ -60,3 +60,40 @@
     </nav>
 </div>
 
+
+@* @if (!string.IsNullOrEmpty(AuthState.Role))
+{
+    <ul class="nav-menu">
+        <li><NavLink href="/">Home</NavLink></li>
+
+        @if (AuthState.Role.Equals("Student", StringComparison.OrdinalIgnoreCase))
+        {
+            <li><NavLink href="/mycourses">My Courses</NavLink></li>
+        }
+
+        @if (AuthState.Role.Equals("Staff", StringComparison.OrdinalIgnoreCase))
+        {
+            <li><NavLink href="/managecourses">Manage Courses</NavLink></li>
+        }
+
+        @if (AuthState.Role.Equals("Employer", StringComparison.OrdinalIgnoreCase))
+        {
+            <li><NavLink href="/placements">Placements</NavLink></li>
+        }
+
+        <li><a @onclick="Logout" style="cursor:pointer;">Logout</a></li>
+    </ul>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        AuthState.OnChange += StateHasChanged;
+    }
+
+    private void Logout()
+    {
+        AuthState.Clear();
+        NavigationManager.NavigateTo("/signin");
+    }
+} *@

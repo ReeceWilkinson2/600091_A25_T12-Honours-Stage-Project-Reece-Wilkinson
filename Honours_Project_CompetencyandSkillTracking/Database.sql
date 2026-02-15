@@ -20,6 +20,17 @@ CREATE TABLE IF NOT EXISTS Staff (
     Role TEXT NOT NULL
 );
 
+-- Employer table
+CREATE TABLE IF NOT EXISTS Employers (
+    EmployerID TEXT NOT NULL PRIMARY KEY,
+    Username TEXT NOT NULL,
+    Password TEXT NOT NULL,
+    EmployerEmail TEXT NOT NULL,
+    Surname TEXT,
+    Forenames TEXT NOT NULL DEFAULT '',
+    Role TEXT NOT NULL
+);
+
 -- Departments table
 CREATE TABLE IF NOT EXISTS Departments (
     Department TEXT NOT NULL PRIMARY KEY

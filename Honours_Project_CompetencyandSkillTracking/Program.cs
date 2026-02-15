@@ -31,6 +31,7 @@ builder.Services.AddHttpClient<CanvasService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddSyncfusionBlazor();
 builder.Services.AddSingleton<ISyncfusionStringLocalizer, SyncfusionStringLocalizer>();
+builder.Services.AddScoped<AuthStateService>();
 
 var app = builder.Build();
 

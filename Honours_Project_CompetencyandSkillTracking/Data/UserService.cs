@@ -16,7 +16,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
             _db = db;
         }
 
-        public async Task<Student?> AuthenticateAsync(string email, string password)
+        public async Task<User?> AuthenticateAsync(string email, string password)
         {
             return await _db.Students
                 .FirstOrDefaultAsync(u =>
@@ -24,7 +24,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                     u.Password == password);
         }
 
-        public async Task<Student> AddUserAsync(Student user)
+        public async Task<User> AddUserAsync(User user)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
             }
         }
 
-        public async Task<Student> UpdateUserAsync(Student user)
+        public async Task<User> UpdateUserAsync(User user)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
             }
         }
 
-        public async Task DeleteUserAsync(Student user)
+        public async Task DeleteUserAsync(User user)
         {
             try
             {
@@ -65,12 +65,12 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
             }
         }
 
-        public async Task<Student?> GetUserByEmailAsync(string email)
+        public async Task<User?> GetUserByEmailAsync(string email)
         {
             return await _db.Students.FirstOrDefaultAsync(u => u.StEmail == email);
         }
 
-        public async Task<Student?> GetUserByIdAsync(string userId)
+        public async Task<User?> GetUserByIdAsync(string userId)
         {
             return await _db.Students.FindAsync(userId);
         }
