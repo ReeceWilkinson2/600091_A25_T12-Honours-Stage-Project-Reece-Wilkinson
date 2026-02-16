@@ -49,8 +49,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine(
-                        $">>> Submission fetch failed: {response.StatusCode}");
+                    Console.WriteLine($">>> Submission fetch failed: {response.StatusCode}");
                     return new List<CanvasSubmission>();
                 }
 
@@ -66,6 +65,10 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                 return new List<CanvasSubmission>();
             }
         }
+
+        public async Task<List<CanvasOutcome>> GetCourseOutcomesAsync(long courseId) => await GetPagedAsync<CanvasOutcome>($"api/v1/courses/{courseId}/outcomes");
+
+        public async Task<List<CanvasOutcomeResult>> GetOutcomeResultsAsync(long courseId) => await GetPagedAsync<CanvasOutcomeResult>($"api/v1/courses/{courseId}/outcome_results?include[]=outcomes");
 
         private async Task<T> GetAsync<T>(string endpoint)
         {

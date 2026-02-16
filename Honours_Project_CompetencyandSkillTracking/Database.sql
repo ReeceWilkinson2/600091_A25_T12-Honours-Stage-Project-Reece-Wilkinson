@@ -64,6 +64,16 @@ CREATE TABLE IF NOT EXISTS Competencies (
     FOREIGN KEY (CourseId) REFERENCES Courses(CanvasCourseID)
 );
 
+CREATE TABLE IF NOT EXISTS StudentCompetencies (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    StudentId TEXT NOT NULL,
+    CompetencyId INTEGER NOT NULL,
+    Score REAL,
+    Mastery INTEGER, -- 0 or 1
+    FOREIGN KEY (StudentId) REFERENCES Students(StudentID),
+    FOREIGN KEY (CompetencyId) REFERENCES Competencies(CompetencyAssignmentId)
+);
+
 -- AssignmentSubmission table
 CREATE TABLE IF NOT EXISTS Submissions (
     Id INTEGER NOT NULL PRIMARY KEY,
