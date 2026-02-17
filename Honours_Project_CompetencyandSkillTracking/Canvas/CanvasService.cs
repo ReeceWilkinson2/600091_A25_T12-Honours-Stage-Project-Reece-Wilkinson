@@ -66,9 +66,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
             }
         }
 
-        public async Task<List<CanvasOutcome>> GetCourseOutcomesAsync(long courseId) => await GetPagedAsync<CanvasOutcome>($"api/v1/courses/{courseId}/outcomes");
+        public async Task<List<Outcome>> GetCourseOutcomesAsync(long courseId) => await GetPagedAsync<Outcome>($"api/v1/courses/{courseId}/outcomes");
 
-        public async Task<List<CanvasOutcomeResult>> GetOutcomeResultsAsync(long courseId) => await GetPagedAsync<CanvasOutcomeResult>($"api/v1/courses/{courseId}/outcome_results?include[]=outcomes");
+        public async Task<List<OutcomeResult>> GetOutcomeResultsAsync(long courseId) => await GetPagedAsync<OutcomeResult>($"api/v1/courses/{courseId}/outcome_results?include[]=outcomes");
 
         private async Task<T> GetAsync<T>(string endpoint)
         {

@@ -19,6 +19,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         {
             await SyncProfileAsync();
             await SyncCoursesAsync();
+            await SyncOutcomesAndResultsAsync();
         }
 
         private async Task SyncProfileAsync()
@@ -152,6 +153,63 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                 }
 
                 // Save batch per course
+                await _db.SaveChangesAsync();
+            }
+        }
+        private async Task SyncOutcomesAndResultsAsync()
+        {
+            // We sync based on the courses already in our database
+            var localCourses = await _db.Courses.ToListAsync();
+
+            foreach (var course in localCourses)
+            {
+                Console.WriteLine($"Syncing Outcomes for course: {course.Name}...");
+
+                // 1. Sync Outcomes (The Definitions)
+                var canvasOutcomes = await _canvas.GetCourseOutcomesAsync(course.Id);
+                foreach (var co in canvasOutcomes)
+                {
+                    var outcome = await _db.Outcomes.FindAsync(co.Id);
+                    if (outcome == null)
+                    {
+                        co.CourseId = course.Id; // Ensure FK is set
+                        _db.Outcomes.Add(co);
+                    }
+                    else
+                    {
+                        outcome.Title = co.Title;
+                        outcome.Description = co.Description;
+                        outcome.CalculationMethod = co.CalculationMethod;
+                        outcome.MasteryPoints = co.MasteryPoints;
+                    }
+                }
+                // Save outcomes first so results can find them via FK
+                await _db.SaveChangesAsync();
+
+                // 2. Sync Outcome Results (The Student Performance)
+                var results = await _canvas.GetOutcomeResultsAsync(course.Id);
+                Console.WriteLine($"Found {results.Count} outcome results for {course.Name}");
+
+                foreach (var res in results)
+                {
+                    // Canvas OutcomeResults ID can be large, ensure your DB uses long
+                    var existingResult = await _db.OutcomeResults.FindAsync(res.Id);
+
+                    if (existingResult == null)
+                    {
+                        // Ensure the student exists in our DB before linking
+                        var studentExists = await _db.Students.AnyAsync(s => s.StudentId == res.StudentId);
+                        if (!studentExists) continue;
+
+                        _db.OutcomeResults.Add(res);
+                    }
+                    else
+                    {
+                        existingResult.Score = res.Score;
+                        existingResult.Mastery = res.Mastery;
+                        existingResult.AssignmentId = res.AssignmentId;
+                    }
+                }
                 await _db.SaveChangesAsync();
             }
         }
