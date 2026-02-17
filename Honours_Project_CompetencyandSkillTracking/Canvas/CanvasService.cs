@@ -68,7 +68,34 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
         public async Task<List<Outcome>> GetCourseOutcomesAsync(long courseId) => await GetPagedAsync<Outcome>($"api/v1/courses/{courseId}/outcomes");
 
-        public async Task<List<OutcomeResult>> GetOutcomeResultsAsync(long courseId) => await GetPagedAsync<OutcomeResult>($"api/v1/courses/{courseId}/outcome_results?include[]=outcomes");
+        public async Task<List<OutcomeResult>> GetOutcomeResultsAsync(long courseId)
+        {
+            var results = new List<OutcomeResult>();
+            string endpoint = $"api/v1/courses/{courseId}/outcome_results?include[]=outcomes";
+
+            string? url = endpoint;
+
+            while (!string.IsNullOrEmpty(url))
+            {
+                using var response = await _http.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine($"OUTCOME RESULTS JSON: {json}");
+
+                var wrapper = JsonSerializer.Deserialize<CanvasOutcomeResultsResponse>(json, JsonOptions);
+
+                if (wrapper?.OutcomeResults != null)
+                    results.AddRange(wrapper.OutcomeResults);
+
+                url = GetNextPageUrl(response);
+            }
+
+            return results;
+        }
+
+
 
         private async Task<T> GetAsync<T>(string endpoint)
         {

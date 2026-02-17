@@ -1,6 +1,10 @@
-﻿namespace Honours_Project_CompetencyandSkillTracking.Canvas
+﻿using System.Text.Json.Serialization;
+
+namespace Honours_Project_CompetencyandSkillTracking.Canvas
 {
-    public class CanvasOutcomeResultResponse
+    public class CanvasOutcomeResultsResponse
     {
+        [JsonPropertyName("outcome_results")]
+        public List<OutcomeResult> OutcomeResults { get; set; } = new();
     }
 }
