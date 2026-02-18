@@ -8,6 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\ProgrammeConstructionReport_25.06.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\ProgrammeConstructionReport_25.06.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="wwwroot\Images\" />
   </ItemGroup>
 

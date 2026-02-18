@@ -1,0 +1,116 @@
+﻿@page "/moduleindexcsv"
+@using Microsoft.EntityFrameworkCore
+@using Honours_Project_CompetencyandSkillTracking.Data
+@using Honours_Project_CompetencyandSkillTracking.Components.Services
+@rendermode InteractiveServer
+@inject AppDbContext DbContext
+@inject ModuleCSVReading CsvReader
+
+<div class="container">
+
+    <div class="row bg-light mb-4">
+        <div class="p-3 bg-primary text-white text-center">
+            Modules
+        </div>
+
+        <div class="p-3">
+            <button class="btn btn-success" @onclick="ImportCsv">
+                Import Modules From CSV
+            </button>
+
+            @if (!string.IsNullOrEmpty(StatusMessage))
+            {
+                <p class="mt-2"><strong>@StatusMessage</strong></p>
+            }
+        </div>
+
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Course</th>
+                    <th>Programme</th>
+                    <th>Module</th>
+                    <th>Route</th>
+                    <th>Award</th>
+                    <th>Year</th>
+                    <th>Trimester</th>
+                    <th>Status</th>
+                    <th>Level</th>
+                    <th>Credits</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Modules.Any())
+                {
+                    @foreach (var module in Modules)
+                    {
+                        <tr>
+                            <td>@module.Course</td>
+                            <td>@module.Programme</td>
+                            <td>@module.ModuleName</td>
+                            <td>@module.Route</td>
+                            <td>@module.Award</td>
+                            <td>@module.CBOYear</td>
+                            <td>@module.Trimester</td>
+                            <td>@module.SelectionStatus</td>
+                            <td>@module.Level</td>
+                            <td>@module.Credits</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="10" class="text-center">
+                            <strong>No modules found</strong>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<ModuleData> Modules = new();
+    private string? StatusMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadModules();
+    }
+
+    private async Task LoadModules()
+    {
+        Modules = await DbContext.ModulesCSV
+            .OrderBy(m => m.ModuleName)
+            .ToListAsync();
+    }
+
+    private async Task ImportCsv()
+    {
+        try
+        {
+            StatusMessage = "Importing...";
+
+            // Read CSV
+            var csvModules = CsvReader.ReadModules();
+
+            // Clear existing records
+            DbContext.ModulesCSV.RemoveRange(DbContext.ModulesCSV);
+            await DbContext.SaveChangesAsync();
+
+            // Insert new records
+            await DbContext.ModulesCSV.AddRangeAsync(csvModules);
+            await DbContext.SaveChangesAsync();
+
+            await LoadModules();
+
+            StatusMessage = $"Successfully imported {csvModules.Count} modules.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error: {ex.Message}";
+        }
+    }
+}

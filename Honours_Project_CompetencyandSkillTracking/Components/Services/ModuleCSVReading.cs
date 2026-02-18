@@ -28,11 +28,14 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         // Assessment Pattern
         // Diet Element User Help
 
-        public List<ModuleData> ReadModules(string FilePath)
+        public List<ModuleData> ReadModules()
         {
             var Modules = new List<ModuleData>();
 
-            FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Data", "ProgrammeConstructionReport_25.26.csv");
+            var FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Data", "ProgrammeConstructionReport_25.06.csv");
+
+            if (!File.Exists(FilePath))
+                throw new FileNotFoundException($"CSV file not found at: {FilePath}");
 
             var Lines = File.ReadAllLines(FilePath);
 

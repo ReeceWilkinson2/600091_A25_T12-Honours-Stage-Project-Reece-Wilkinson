@@ -35,7 +35,13 @@
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="courseindex">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Module Index
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Module Index(Canvas)
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="moduleindexcsv">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Module Index(CSV)
             </NavLink>
         </div>
 
@@ -47,7 +53,7 @@
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="sync">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Canvas Sync
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Data Sync
             </NavLink>
         </div>
 
@@ -58,7 +64,6 @@
         </div>
     </nav>
 </div>
-
 
 @* @if (!string.IsNullOrEmpty(AuthState.Role))
 {

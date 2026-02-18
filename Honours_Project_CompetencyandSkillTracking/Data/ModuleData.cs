@@ -1,7 +1,11 @@
-﻿namespace Honours_Project_CompetencyandSkillTracking.Data
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Honours_Project_CompetencyandSkillTracking.Data
 {
     public class ModuleData
     {
+        [Key]
+        public int DatabaseID { get; set; }
         public string Course { get; set; } = ""; // Treat it like an ID
         public string Programme { get; set; } = "";
         public string ModuleName { get; set; } = "";

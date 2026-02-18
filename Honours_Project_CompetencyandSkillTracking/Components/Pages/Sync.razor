@@ -11,21 +11,30 @@
 {
     <p>Syncing Canvas data… please wait.</p>
 }
+else if (_isCsvReading)
+{
+    <p>Reading CSV file… please wait.</p>
+}
 else if (_error != null)
 {
     <p style="color:red">Error: @_error</p>
 }
 else if (_completed)
 {
-    <p style="color:green">Canvas sync completed successfully.</p>
+    <p style="color:green">Data sync completed successfully.</p>
 }
 
 <button @onclick="StartSync" disabled="@_isSyncing">
     Start Sync
 </button>
 
+<button @onclick="ReadCsv" >
+    Import Modules from CSV
+</button>
+
 @code {
     private bool _isSyncing;
+    private bool _isCsvReading;
     private bool _completed;
     private string? _error;
 
@@ -51,5 +60,33 @@ else if (_completed)
             _isSyncing = false;
         }
     }
-}
 
+    private async Task ReadCsv()
+    {
+        Console.WriteLine(">>> ReadCsv clicked");
+
+        _isCsvReading = true;
+        _completed = false;
+        _error = null;
+
+        try
+        {
+            var reader = new ModuleCSVReading();
+            var modules = reader.ReadModules();
+
+            Console.WriteLine($"Loaded {modules.Count} modules from CSV.");
+
+            // TODO: Save to database if needed
+
+            _completed = true;
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _isCsvReading = false;
+        }
+    }
+}
