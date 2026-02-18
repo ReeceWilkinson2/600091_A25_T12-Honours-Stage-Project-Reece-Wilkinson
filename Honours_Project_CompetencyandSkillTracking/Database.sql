@@ -46,7 +46,8 @@ CREATE TABLE IF NOT EXISTS Courses (
 
 -- Modules table (CSV Version)
 CREATE TABLE IF NOT EXISTS Modules (
-    Course TEXT NOT NULL PRIMARY KEY,
+    DatabaseID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Course TEXT NOT NULL,
     Programme TEXT NOT NULL,
     ModuleName TEXT NOT NULL,
     Route TEXT NOT NULL,

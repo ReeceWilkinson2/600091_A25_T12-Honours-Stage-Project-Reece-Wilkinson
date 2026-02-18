@@ -19,7 +19,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         {
             await SyncProfileAsync();
             await SyncCoursesAsync();
-            await SyncOutcomesAndResultsAsync();
+            //await SyncOutcomesAndResultsAsync();
         }
 
         private async Task SyncProfileAsync()

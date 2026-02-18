@@ -12,6 +12,5 @@
         public string SelectionStatus { get; set; } = "";
         public string Level { get; set; } = "";
         public string Credits { get; set; } = "";
-
     }
 }
