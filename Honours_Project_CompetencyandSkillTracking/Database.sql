@@ -36,13 +36,26 @@ CREATE TABLE IF NOT EXISTS Departments (
     Department TEXT NOT NULL PRIMARY KEY
 );
 
--- Courses table
+-- Modules table (Canvas Version)
 CREATE TABLE IF NOT EXISTS Courses (
     CanvasCourseID INTEGER NOT NULL PRIMARY KEY,
     Name TEXT NOT NULL,
     Syllabus TEXT,
     Term TEXT NOT NULL
 );
+
+-- Modules table (CSV Version)
+CREATE TABLE IF NOT EXISTS Modules (
+    Course TEXT NOT NULL PRIMARY KEY,
+    Programme TEXT NOT NULL,
+    ModuleName TEXT NOT NULL,
+    Route TEXT NOT NULL,
+    Award TEXT NOT NULL,
+    CBOYear TEXT NOT NULL,
+    Trimester TEXT NOT NULL,
+    SelectionStatus TEXT NOT NULL,
+    Level TEXT NOT NULL,
+    Credits TEXT NOT NULL
 
 -- Assignments table
 CREATE TABLE IF NOT EXISTS Assignments (
@@ -64,6 +77,7 @@ CREATE TABLE IF NOT EXISTS Competencies (
     FOREIGN KEY (CourseId) REFERENCES Courses(CanvasCourseID)
 );
 
+-- Outcomes table
 CREATE TABLE IF NOT EXISTS StudentCompetencies (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     StudentId TEXT NOT NULL,

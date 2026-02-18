@@ -2,11 +2,11 @@
 {
     public class ModuleData
     {
-        public string ModuleID { get; set; } = "";
-        public string ModuleCode { get; set; } = "";
+        public string Course { get; set; } = ""; // Treat it like an ID
+        public string Programme { get; set; } = "";
         public string ModuleName { get; set; } = "";
-        public string RouteID { get; set; } = "";
-        public string AwardID { get; set; } = "";
+        public string Route { get; set; } = "";
+        public string Award { get; set; } = "";
         public string CBOYear { get; set; } = "";
         public string Trimester { get; set; } = "";
         public string SelectionStatus { get; set; } = "";
