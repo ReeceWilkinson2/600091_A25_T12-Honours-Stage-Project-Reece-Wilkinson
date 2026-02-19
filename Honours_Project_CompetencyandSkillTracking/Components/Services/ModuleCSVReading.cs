@@ -90,7 +90,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
                     Level = GetValue("Level"),
                     Credits = GetValue("Credits")
                 };
-
                 Modules.Add(Module);
             }
             return Modules;
