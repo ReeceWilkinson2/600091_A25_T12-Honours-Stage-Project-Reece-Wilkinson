@@ -29,6 +29,7 @@
                 <tr>
                     <th>Course</th>
                     <th>Programme</th>
+                    <th>Title</th>
                     <th>Module</th>
                     <th>Route</th>
                     <th>Award</th>
@@ -47,6 +48,7 @@
                         <tr>
                             <td>@module.Course</td>
                             <td>@module.Programme</td>
+                            <td>@module.Title</td>
                             <td>@module.ModuleName</td>
                             <td>@module.Route</td>
                             <td>@module.Award</td>
@@ -83,7 +85,7 @@
     private async Task LoadModules()
     {
         Modules = await DbContext.ModulesCSV
-            .OrderBy(m => m.ModuleName)
+            .OrderBy(m => m.DatabaseID)
             .ToListAsync();
     }
 
