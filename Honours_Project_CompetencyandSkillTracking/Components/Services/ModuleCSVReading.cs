@@ -80,12 +80,12 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
                 {
                     Course = GetValue("Course"),
                     Programme = GetValue("Programme"),
-                    ModuleName = GetValue("ModuleName"),
+                    ModuleName = GetValue("MAV_Name"),
                     Route = GetValue("Route"),
                     Award = GetValue("Award"),
-                    CBOYear = GetValue("CBOYear"),
+                    CBOYear = GetValue("CBO_Year"),
                     Trimester = GetValue("Trimester"),
-                    SelectionStatus = GetValue("SelectionStatus"),
+                    SelectionStatus = GetValue("Selection_Status"),
                     Level = GetValue("Level"),
                     Credits = GetValue("Credits")
                 };
