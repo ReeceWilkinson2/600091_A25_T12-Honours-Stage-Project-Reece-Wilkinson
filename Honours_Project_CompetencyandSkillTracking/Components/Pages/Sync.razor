@@ -1,11 +1,8 @@
 ﻿@page "/sync"
 @rendermode InteractiveServer
-@using Honours_Project_CompetencyandSkillTracking.Canvas
-@using Honours_Project_CompetencyandSkillTracking.Data
-@using Honours_Project_CompetencyandSkillTracking.Components.Services
 @inject CanvasSyncService CanvasSyncService
 @inject AppDbContext DbContext
-@inject ModuleCSVReading ModuleCSVReading
+@inject ModuleCSVReading CSVReader
 
 <h3>Data Sync</h3>
 
@@ -71,7 +68,7 @@ else if (_completed)
 
         try
         {
-            var modules = ModuleCSVReading.ReadModules();
+            var modules = CSVReader.ReadModules();
 
             // Clear existing records
             DbContext.ModulesCSV.RemoveRange(DbContext.ModulesCSV);
