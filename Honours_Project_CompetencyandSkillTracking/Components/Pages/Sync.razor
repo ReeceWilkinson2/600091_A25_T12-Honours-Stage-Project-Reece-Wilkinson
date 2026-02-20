@@ -1,11 +1,13 @@
 ﻿@page "/sync"
 @rendermode InteractiveServer
 @using Honours_Project_CompetencyandSkillTracking.Canvas
+@using Honours_Project_CompetencyandSkillTracking.Data
 @using Honours_Project_CompetencyandSkillTracking.Components.Services
 @inject CanvasSyncService CanvasSyncService
+@inject AppDbContext DbContext
 @inject ModuleCSVReading ModuleCSVReading
 
-<h3>Canvas Sync</h3>
+<h3>Data Sync</h3>
 
 @if (_isSyncing)
 {
@@ -25,7 +27,7 @@ else if (_completed)
 }
 
 <button @onclick="StartSync" disabled="@_isSyncing">
-    Start Sync
+    Start Canvas Sync
 </button>
 
 <button @onclick="ReadCsv" >
@@ -63,20 +65,21 @@ else if (_completed)
 
     private async Task ReadCsv()
     {
-        Console.WriteLine(">>> ReadCsv clicked");
-
         _isCsvReading = true;
         _completed = false;
         _error = null;
 
         try
         {
-            var reader = new ModuleCSVReading();
-            var modules = reader.ReadModules();
+            var modules = ModuleCSVReading.ReadModules();
 
-            Console.WriteLine($"Loaded {modules.Count} modules from CSV.");
+            // Clear existing records
+            DbContext.ModulesCSV.RemoveRange(DbContext.ModulesCSV);
+            await DbContext.SaveChangesAsync();
 
-            // TODO: Save to database if needed
+            // Insert new records
+            await DbContext.ModulesCSV.AddRangeAsync(modules);
+            await DbContext.SaveChangesAsync();
 
             _completed = true;
         }

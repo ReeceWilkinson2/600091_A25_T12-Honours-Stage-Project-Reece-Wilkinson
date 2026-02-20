@@ -5,8 +5,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
     public class ModuleData
     {
         [Key]
-        public int DatabaseID { get; set; }
-        public string Course { get; set; } = ""; // Treat it like an ID
+        public int DatabaseID { get; set; } // Primary Key - never seen
+        public string Course { get; set; } = "";
         public string Programme { get; set; } = "";
         public string ModuleName { get; set; } = "";
         public string Title { get; set; } = "";

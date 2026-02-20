@@ -11,7 +11,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         // VCO Start Year
         // VCO End Year
         // Online Module Choice
-        // Title
         // CBO Block
         // CBO Occ
         // Block Type
