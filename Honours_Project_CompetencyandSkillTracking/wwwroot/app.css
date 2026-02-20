@@ -58,3 +58,41 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/*Nav bar*/
+
+.page {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #343a40;
+    color: white;
+}
+
+    .sidebar .nav-link {
+        color: #adb5bd;
+    }
+
+        .sidebar .nav-link.active {
+            background-color: #495057;
+            color: white;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: #495057;
+            color: white;
+        }
+
+.nav-scrollable {
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+}
+
+.top-row {
+    height: 56px;
+    display: flex;
+    align-items: center;
+}

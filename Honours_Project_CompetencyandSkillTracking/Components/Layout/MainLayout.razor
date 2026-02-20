@@ -1,31 +1,25 @@
-﻿@using Honours.Services
-@using Honours_Project_CompetencyandSkillTracking.Components.Layout
-@inherits LayoutComponentBase
-@inject UserInfoService userInfoService
+﻿@inherits LayoutComponentBase
+@inject AuthStateService AuthState
 
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
 
-    <main>
-        <div class="top-row px-4">
-            <NavLink class="nav-link" href="settings">
-                <span target="_blank" class="bi bi-gear-fill h1" aria-hidden="true" style="color:#f7f7f7" title="Profile"></span>
-            </NavLink>
-        </div>
-
+    <main class="flex-fill">
         <article class="content px-4">
-            <CascadingValue Value="@userInfoService.UserInfo">
-                @Body
-            </CascadingValue>
-
+            @Body
         </article>
     </main>
 </div>
 
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !AuthState.IsInitialized)
+        {
+            await AuthState.InitializeAsync();
+            StateHasChanged();
+        }
+    }
+}

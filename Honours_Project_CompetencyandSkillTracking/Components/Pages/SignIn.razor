@@ -3,6 +3,7 @@
 @layout LoggedOutLayout
 @inject NavigationManager NavigationManager
 @inject UserService UserService
+@inject AuthStateService AuthState
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <PageTitle>SignIn</PageTitle>
@@ -51,8 +52,12 @@
 		}
 
 		// Save StudentId (string) to local storage
-		await localStorage.SetItemAsync("UserId", user.StudentId);
-		await localStorage.SetItemAsync("UserRole", user.Role);
+		// await localStorage.SetItemAsync("UserId", user.StudentId);
+		// await localStorage.SetItemAsync("UserRole", user.Role);
+
+		// AuthState.SetUser(user.StudentId, user.Role);
+
+		await AuthState.SetUserAsync(user.StudentId, user.Role);
 
 		NavigationManager.NavigateTo("/");
 	}

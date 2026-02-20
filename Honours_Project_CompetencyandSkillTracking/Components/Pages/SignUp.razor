@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject UserService UserService
 @inject IOptions<SmtpConfig> SmtpConfig
+@inject AuthStateService AuthState
 @using System.Net
 @using System.Net.Mail
 @using Microsoft.Extensions.Options
@@ -41,7 +42,7 @@
 						<option value="">(select one)</option>
 						<option value="Student">Student</option>
 						<option value="Staff">Staff</option>
-						<option value="Staff">Employer</option>
+						<option value="Employer">Employer</option>
 					</InputSelect>
 				</div>
 				@if (form.Role == "staff")
@@ -101,6 +102,7 @@
 		// Optional: send confirmation email (if you want)
 		await SendEmail(form.Email);
 
+		await AuthState.SetUserAsync(newUser.StudentId, newUser.Role);
 		NavigationManager.NavigateTo("/");
 	}
 

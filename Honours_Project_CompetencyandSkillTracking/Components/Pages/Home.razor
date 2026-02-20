@@ -1,48 +1,39 @@
 ﻿@page "/"
-@rendermode InteractiveServer
+@inject AuthStateService AuthState
 @inject NavigationManager NavigationManager
 @inject UserService UserService
-@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
-<PageTitle>Home</PageTitle>
-
-<h1>Hello, world!</h1>
-
-<div class="home-wrapper">
-    <div class="home-header">
-        <p><b>Hello @currentUsername</b></p>
-    </div>
-</div>
-
+@if (_authorized)
+{
+    <h1>Hello, world!</h1>
+    <p>Hello @_username</p>
+    <p>Your role: @AuthState.Role</p>
+}
 
 @code {
-    private string currentUsername = "";
-    private string? userId;
-    private string? CurrentUserRole = "";
+    private bool _authorized = false;
+    private string _username = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
 
-        userId = await localStorage.GetItemAsync<string>("UserId");
-		CurrentUserRole = await localStorage.GetItemAsync<string>("UserRole");
+        if (string.IsNullOrEmpty(AuthState.UserId))
+        {
+            NavigationManager.NavigateTo("/signin", true);
+            return;
+        }
 
-        // if (string.IsNullOrEmpty(userId))
-        // {
-        //     NavigationManager.NavigateTo("/signin");
-        //     return;
-        // }
+        var user = await UserService.GetUserByIdAsync(AuthState.UserId);
 
-        var user = await UserService.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            NavigationManager.NavigateTo("/signin", true);
+            return;
+        }
 
-        // if (user == null)
-        // {
-        //     NavigationManager.NavigateTo("/signin");
-        //     return;
-        // }
-
-        // currentUsername = user.UserName;
-
+        _username = user.UserName;
+        _authorized = true;
         StateHasChanged();
     }
 }
