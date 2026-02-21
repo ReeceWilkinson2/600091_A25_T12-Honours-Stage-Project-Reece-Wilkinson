@@ -1,0 +1,52 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Honours_Project_CompetencyandSkillTracking.Components.UI_Elements
+
+<CascadingValue Value="this">
+    <div>
+        <ul class="nav nav-tabs">
+            @foreach (var tab in _tabs)
+            {
+                <li class="nav-item">
+                    <button class="nav-link @(tab.Active ? "active" : "")"
+                            @onclick="() => ActivateTab(tab)">
+                        @tab.Title
+                    </button>
+                </li>
+            }
+        </ul>
+
+        <div class="tab-content mt-3">
+            @if (ActiveTab is not null)
+            {
+                @ActiveTab.ChildContent
+            }
+        </div>
+
+        @ChildContent
+    </div>
+</CascadingValue>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private readonly List<TabItem> _tabs = new();
+    internal TabItem? ActiveTab => _tabs.FirstOrDefault(t => t.Active);
+
+    internal void AddTab(TabItem tab)
+    {
+        if (!_tabs.Any())
+            tab.Active = true;
+
+        _tabs.Add(tab);
+        StateHasChanged();
+    }
+
+    private void ActivateTab(TabItem tab)
+    {
+        foreach (var t in _tabs)
+            t.Active = false;
+
+        tab.Active = true;
+        StateHasChanged();
+    }
+}

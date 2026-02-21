@@ -1,0 +1,21 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Honours_Project_CompetencyandSkillTracking.Components.UI_Elements
+
+@code {
+    [CascadingParameter]
+    public Tabs ParentTabs { get; set; } = default!;
+
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public bool Active { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ParentTabs.AddTab(new TabItem
+        {
+            Title = Title,
+            ChildContent = ChildContent,
+            Active = Active
+        });
+    }
+}
