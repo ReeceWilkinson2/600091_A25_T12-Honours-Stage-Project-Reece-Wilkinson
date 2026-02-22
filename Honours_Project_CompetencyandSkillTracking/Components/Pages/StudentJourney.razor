@@ -7,22 +7,95 @@
     <Tab Title="Year 1" Active="true">
         <ChildContent>
             <p class="mt-3">This is the placeholder content for the <b>Year 1</b> tab.</p>
+            <div>
+                @foreach (var module in Year1Modules)
+                {
+                    if (module.SelectionStatus == "Core" || module.SelectionStatus == "Compulsory")
+                    {
+                        <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
+                    }
+                }
+            </div>
+
+            <div style ="margin-top: 20px">
+                @foreach (var module in Year1Modules)
+                {
+                    if (module.SelectionStatus == "Optional")
+                    {
+                        <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
+                    }
+                }
+            </div>
         </ChildContent>
     </Tab>
 
     <Tab Title="Year 2">
         <ChildContent>
             <p class="mt-3">This is the placeholder content for the <b>Year 2</b> tab.</p>
+            <div>
+                @foreach (var module in Year2Modules)
+                {
+                    if (module.SelectionStatus == "Core" || module.SelectionStatus == "Compulsory")
+                    {
+                        <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
+                    }
+                }
+            </div>
+
+            <div style="margin-top: 20px">
+                @foreach (var module in Year2Modules)
+                {
+                    if (module.SelectionStatus == "Optional")
+                    {
+                        <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
+                    }
+                }
+            </div>
         </ChildContent>
     </Tab>
 
     <Tab Title="Year 3">
         <ChildContent>
             <p class="mt-3">This is the placeholder content for the <b>Year 3</b> tab.</p>
+            <div>
+                @foreach (var module in Year3Modules)
+                {
+                    if (module.SelectionStatus == "Core" || module.SelectionStatus == "Compulsory")
+                    {
+                        <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
+                    }
+                }
+            </div>
+
+            <div style="margin-top: 20px">
+                @foreach (var module in Year3Modules)
+                {
+                    if (module.SelectionStatus == "Optional")
+                    {
+                        <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
+                    }
+                }
+            </div>
         </ChildContent>
     </Tab>
 </Tabs>
 
 @code { 
+    // need to make a service to load modules based on the year and show if they are optional or not.
+    private List<ModuleData> Year1Modules = new List<ModuleData>();
+    private List<ModuleData> Year2Modules = new List<ModuleData>();
+    private List<ModuleData> Year3Modules = new List<ModuleData>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        Year1Modules = await service.GetModuleDataAsync("4");
+        Year2Modules = await service.GetModuleDataAsync("5");
+        Year3Modules = await service.GetModuleDataAsync("6");
+    }
+
+    private void LoadModuleDetails(ModuleData module)
+    {
+        // Needs to get all competencies for the module and show them some way - requires competency data.
+        Console.WriteLine($"Loading details for module: {module.ModuleName}");
+    }
 }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Honours_Project_CompetencyandSkillTracking.Data
@@ -73,6 +74,13 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public async Task<User?> GetUserByIdAsync(string userId)
         {
             return await _db.Students.FindAsync(userId);
+        }
+
+        public async Task<List<ModuleData>> GetModuleDataAsync(string level)
+        {
+            return await _db.ModulesCSV
+                .Where(m => m.Level == level)
+                .ToListAsync();
         }
     }
 }
