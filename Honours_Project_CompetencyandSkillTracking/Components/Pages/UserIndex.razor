@@ -9,9 +9,10 @@
         <table class="table table-bordered">
             <thead class="thead-dark">
                 <tr>
-                    <th>Student ID</th>
+                    <th>User ID</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Password</th>
                     <th>Role</th>
                     <th>Delete</th>
                 </tr>
@@ -63,6 +64,11 @@
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="text" id="email" class="form-control" @bind-value="@NewStudent.StEmail" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="text" id="password" class="form-control" @bind-value="@NewStudent.Password" />
                 </div>
 
                 <div class="form-group">

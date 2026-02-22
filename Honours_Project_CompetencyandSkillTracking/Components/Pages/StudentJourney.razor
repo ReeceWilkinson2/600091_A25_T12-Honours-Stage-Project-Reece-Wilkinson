@@ -60,7 +60,7 @@
             <div>
                 @foreach (var module in Year3Modules)
                 {
-                    if (module.SelectionStatus == "Core" || module.SelectionStatus == "Compulsory")
+                    if (module.SelectionStatus == "Core" || module.SelectionStatus == "Compulsory" || module.SelectionStatus == "Elective - If chosen cannot condone or compenste")
                     {
                         <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
                     }

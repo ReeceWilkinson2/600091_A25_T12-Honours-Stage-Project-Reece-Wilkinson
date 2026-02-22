@@ -7,6 +7,24 @@
     Test Student
 </NavLink>
 
-@code {
+<div>
+    @foreach (var student in Students)
+    {
+        <button @onclick="() => LoadStudentDetails(student)">@student.StudentId, @student.UserName</button>
+    }
+</div>
 
+@code {
+    private List<User> Students = new List<User>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Students = await service.GetStudentDataAsync("Student");
+    }
+
+    private void LoadStudentDetails(User student)
+    {
+        // Needs to get all competencies for the module and show them some way - requires competency data.
+        Console.WriteLine($"Loading details for module: {student.UserName}");
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using Honours_Project_CompetencyandSkillTracking.Canvas;
+using Honours_Project_CompetencyandSkillTracking.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Honours_Project_CompetencyandSkillTracking.Data
+namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 {
     public class UserService
     {
@@ -80,6 +81,13 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         {
             return await _db.ModulesCSV
                 .Where(m => m.Level == level)
+                .ToListAsync();
+        }
+
+        public async Task<List<User>> GetStudentDataAsync(string role)
+        {
+            return await _db.Students
+                .Where(m => m.Role == role)
                 .ToListAsync();
         }
     }
