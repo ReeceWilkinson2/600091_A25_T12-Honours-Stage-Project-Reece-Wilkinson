@@ -77,10 +77,10 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             return await _db.Students.FindAsync(userId);
         }
 
-        public async Task<List<ModuleData>> GetModuleDataAsync(string level)
+        public async Task<List<ModuleData>> GetModuleDataAsync(string courseTitle, string level)
         {
             return await _db.ModulesCSV
-                .Where(m => m.Level == level)
+                .Where(m => m.Title == courseTitle && m.Level == level)
                 .ToListAsync();
         }
 
