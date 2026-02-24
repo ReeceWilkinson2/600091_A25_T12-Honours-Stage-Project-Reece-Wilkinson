@@ -1,16 +1,33 @@
-﻿@page "/studentviewer"
+﻿@page "/studentviewer/{StudentId}"
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 @inject UserService service
 
-<div class="home-body">
-	<h1>Student Viewer</h1>
-		<p>
-			This is a test for student viewing where all the relevant information including achieved competencies will be displayed.
-		</p>
-</div>
+<h3>Student Details</h3>
 
+@if (student != null)
+{
+    <div>
+        <h4>@student.UserName</h4>
+        <p>Student ID: @student.StudentId</p>
+        <p>Email: @student.StEmail</p>
+        <p>Full Name: @student.UserName</p>
+        @* <p>Enrolled Courses: @string.Join(", ", student.Courses)</p> *@
+
+    </div>
+}
+else
+{
+    <p>Loading student details...</p>
+}
 
 @code {
-	// need competency data to complete this.
+    [Parameter] public string StudentId { get; set; }
+    private User student;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch the detailed information for the student using their StudentId
+        student = await service.GetUserByIdAsync(StudentId);
+    }
 }
