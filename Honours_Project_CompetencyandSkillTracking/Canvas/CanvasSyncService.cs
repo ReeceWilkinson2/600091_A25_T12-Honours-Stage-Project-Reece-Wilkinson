@@ -19,7 +19,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         {
             await SyncProfileAsync();
             await SyncCoursesAsync();
-            //await SyncOutcomesAndResultsAsync();
+            await SyncOutcomesAndResultsAsync();
+            await GetOutcomesForJohnWTestCourseAsync();
         }
 
         private async Task SyncProfileAsync()
@@ -211,6 +212,37 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     }
                 }
                 await _db.SaveChangesAsync();
+            }
+        }
+
+        public async Task GetOutcomesForJohnWTestCourseAsync()
+        {
+            // The specific course ID you mentioned
+            long courseId = 77966;
+
+            try
+            {
+                // Step 1: Get outcomes for the course using the course ID
+                var outcomes = await _canvas.GetCourseOutcomesAsync(courseId);
+
+                if (outcomes.Any())
+                {
+                    Console.WriteLine($"Found {outcomes.Count} outcomes for course with ID {courseId}.");
+
+                    // Step 2: Print outcomes details
+                    foreach (var outcome in outcomes)
+                    {
+                        Console.WriteLine($"Outcome: {outcome.Title}, Description: {outcome.Description}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"No outcomes found for course with ID {courseId}.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($">>> ERROR: {ex.Message}");
             }
         }
     }

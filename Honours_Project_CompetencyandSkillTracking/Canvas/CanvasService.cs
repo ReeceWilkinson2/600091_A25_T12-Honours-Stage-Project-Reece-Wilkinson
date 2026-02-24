@@ -37,27 +37,34 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
         public async Task<List<CanvasAssignment>> GetCourseAssignmentsAsync(long courseId) => await GetPagedAsync<CanvasAssignment>($"api/v1/courses/{courseId}/assignments?include[]=description&include[]=submission_types");
 
-        public async Task<List<CanvasSubmission>> GetAssignmentSubmissionsAsync(long courseId,long assignmentId)
+        public async Task<List<CanvasSubmission>> GetAssignmentSubmissionsAsync(long courseId, long assignmentId)
         {
             string endpoint = $"api/v1/courses/{courseId}/assignments/{assignmentId}/submissions?student_ids=self";
-
             Console.WriteLine($">>> Canvas GET: {endpoint}");
 
             try
             {
                 var response = await _http.GetAsync(endpoint);
 
+                // Log the full response headers and status code
+                Console.WriteLine($"Status Code: {response.StatusCode}");
+                foreach (var header in response.Headers)
+                {
+                    Console.WriteLine($"{header.Key}: {string.Join(",", header.Value)}");
+                }
+
                 if (!response.IsSuccessStatusCode)
                 {
                     Console.WriteLine($">>> Submission fetch failed: {response.StatusCode}");
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Response content: {responseContent}");
                     return new List<CanvasSubmission>();
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(json);
 
-                return JsonSerializer.Deserialize<List<CanvasSubmission>>(json, JsonOptions)
-                       ?? new List<CanvasSubmission>();
+                return JsonSerializer.Deserialize<List<CanvasSubmission>>(json, JsonOptions) ?? new List<CanvasSubmission>();
             }
             catch (Exception ex)
             {
@@ -94,8 +101,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
             return results;
         }
-
-
 
         private async Task<T> GetAsync<T>(string endpoint)
         {
