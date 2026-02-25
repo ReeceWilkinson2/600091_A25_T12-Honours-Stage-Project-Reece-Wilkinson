@@ -74,7 +74,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
         public async Task<User?> GetUserByIdAsync(string userId)
         {
-            return await _db.Students.FindAsync(userId);
+            return await _db.Students.Include(s => s.Courses).ThenInclude(c => c.Assignments).ThenInclude(a => a.Submissions).FirstOrDefaultAsync(s => s.StudentId == userId);
         }
 
         public async Task<List<ModuleData>> GetModuleDataAsync(string courseTitle, string level)
