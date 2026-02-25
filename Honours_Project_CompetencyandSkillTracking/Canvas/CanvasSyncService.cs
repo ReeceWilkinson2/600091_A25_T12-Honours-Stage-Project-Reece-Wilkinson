@@ -17,51 +17,54 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
         public async Task SyncAllAsync()
         {
-            await SyncProfileAsync();
-            await SyncCoursesAsync();
-            await SyncOutcomesAndResultsAsync();
+            var student = await SyncProfileAsync();
+            await SyncCoursesAsync(student);
+            //await SyncOutcomesAndResultsAsync(student);
             await GetOutcomesForJohnWTestCourseAsync();
         }
 
-        private async Task SyncProfileAsync()
+        private async Task<User> SyncProfileAsync()
         {
             var profile = await _canvas.GetMyProfileAsync();
-            Console.WriteLine($"Syncing profile: {profile.Id}, {profile.Name}, {profile.Primary_Email}");
+            Console.WriteLine($"Syncing profile: {profile.Id}, {profile.Name}");
 
-            // Store Canvas Id as string to match Student PK
-            string profileId = profile.Id.ToString();
+            string studentId = profile.Id.ToString();
 
-            var student = await _db.Students.FindAsync(profileId);
+            var student = await _db.Students.Include(s => s.Courses).FirstOrDefaultAsync(s => s.StudentId == studentId);
+
             if (student == null)
             {
                 student = new User
                 {
-                    StudentId = profileId,
+                    StudentId = studentId,
                     UserName = profile.Name,
                     StEmail = profile.Primary_Email,
                     Password = "password",
                     Role = "Student"
                 };
+
                 _db.Students.Add(student);
+                await _db.SaveChangesAsync();
             }
             else
             {
                 student.UserName = profile.Name;
                 student.StEmail = profile.Primary_Email;
+                await _db.SaveChangesAsync();
             }
 
-            await _db.SaveChangesAsync();
+            return student;
         }
 
-        private async Task SyncCoursesAsync()
+        private async Task SyncCoursesAsync(User student)
         {
             var courses = await _canvas.GetMyCoursesAsync();
             Console.WriteLine($"Syncing {courses.Count} courses...");
 
             foreach (var c in courses)
             {
-                // Find by Canvas course Id (long)
-                var course = await _db.Courses.FindAsync(c.Id);
+                var course = await _db.Courses.Include(c => c.Students).FirstOrDefaultAsync(x => x.Id == c.Id);
+
                 if (course == null)
                 {
                     course = new Course
@@ -72,6 +75,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                         Syllabus = c.Syllabus_Body,
                         Term = c.Term?.Name ?? ""
                     };
+
                     _db.Courses.Add(course);
                 }
                 else
@@ -82,23 +86,31 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     course.Term = c.Term?.Name ?? "";
                 }
 
-                // Sync assignments
+                // 🔹 Ensure student is linked to course
+                if (!course.Students.Any(s => s.StudentId == student.StudentId))
+                {
+                    course.Students.Add(student);
+                }
+
+                await _db.SaveChangesAsync();
+
                 var assignments = await _canvas.GetCourseAssignmentsAsync(c.Id);
-                Console.WriteLine($"Syncing {assignments.Count} assignments for course {course.Name}...");
+                Console.WriteLine($"Syncing {assignments.Count} assignments for {course.Name}");
 
                 foreach (var a in assignments)
                 {
-                    // Skip unsupported submission types for student token
-                    if (a.SubmissionTypes == null || a.SubmissionTypes.Contains("none") ||
+                    // Skip unsupported submission types
+                    if (a.SubmissionTypes == null ||
+                        a.SubmissionTypes.Contains("none") ||
                         a.SubmissionTypes.Contains("on_paper") ||
                         a.SubmissionTypes.Contains("external_tool") ||
                         a.SubmissionTypes.Contains("quiz"))
                     {
-                        Console.WriteLine($">>> Skipping assignment {a.Id} (unsupported for student token)");
                         continue;
                     }
 
-                    var assignment = await _db.Assignments.FindAsync(a.Id);
+                    var assignment = await _db.Assignments.FirstOrDefaultAsync(x => x.Id == a.Id);
+
                     if (assignment == null)
                     {
                         assignment = new Assignment
@@ -109,71 +121,67 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                             Description = a.Description,
                             DueAt = a.Due_At
                         };
+
                         _db.Assignments.Add(assignment);
+                        await _db.SaveChangesAsync();
                     }
                     else
                     {
                         assignment.Name = a.Name;
                         assignment.Description = a.Description;
                         assignment.DueAt = a.Due_At;
+                        await _db.SaveChangesAsync();
                     }
 
-                    // Get submissions for this assignment
-                    try
-                    {
-                        var submissions = await _canvas.GetAssignmentSubmissionsAsync(course.Id, a.Id);
-                        Console.WriteLine($">>> Got {submissions.Count} submissions for assignment {assignment.Name}");
+                    var submissions = await _canvas.GetAssignmentSubmissionsAsync(course.Id, a.Id);
 
-                        foreach (var s in submissions)
+                    foreach (var s in submissions)
+                    {
+                        var submission = await _db.Submissions.FirstOrDefaultAsync(x => x.Id == s.Id);
+
+                        if (submission == null)
                         {
-                            var submission = await _db.Submissions.FindAsync(s.Id);
-                            if (submission == null)
+                            submission = new Submission
                             {
-                                submission = new Submission
-                                {
-                                    Id = s.Id,
-                                    AssignmentId = a.Id,
-                                    Score = s.Score,
-                                    //WorkflowState = s.WorkflowState,
-                                    SubmittedAt = s.SubmittedAt
-                                };
-                                _db.Submissions.Add(submission);
-                            }
-                            else
-                            {
-                                submission.Score = s.Score;
-                                //submission.WorkflowState = s.WorkflowState;
-                                submission.SubmittedAt = s.SubmittedAt;
-                            }
+                                Id = s.Id,
+                                AssignmentId = assignment.Id,
+                                StudentId = student.StudentId,
+                                Score = s.Score,
+                                SubmittedAt = s.SubmittedAt
+                            };
+
+                            _db.Submissions.Add(submission);
+                        }
+                        else
+                        {
+                            submission.Score = s.Score;
+                            submission.SubmittedAt = s.SubmittedAt;
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($">>> ERROR fetching submissions for assignment {a.Id}: {ex.Message}");
-                    }
-                }
 
-                // Save batch per course
-                await _db.SaveChangesAsync();
+                    await _db.SaveChangesAsync();
+                }
             }
         }
-        private async Task SyncOutcomesAndResultsAsync()
+
+        private async Task SyncOutcomesAndResultsAsync(User student)
         {
-            // We sync based on the courses already in our database
             var localCourses = await _db.Courses.ToListAsync();
 
             foreach (var course in localCourses)
             {
-                Console.WriteLine($"Syncing Outcomes for course: {course.Name}...");
+                Console.WriteLine($"Syncing outcomes for {course.Name}");
 
-                // 1. Sync Outcomes (The Definitions)
+                // Sync Outcome Definitions
                 var canvasOutcomes = await _canvas.GetCourseOutcomesAsync(course.Id);
+
                 foreach (var co in canvasOutcomes)
                 {
                     var outcome = await _db.Outcomes.FindAsync(co.Id);
+
                     if (outcome == null)
                     {
-                        co.CourseId = course.Id; // Ensure FK is set
+                        co.CourseId = course.Id;
                         _db.Outcomes.Add(co);
                     }
                     else
@@ -184,65 +192,62 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                         outcome.MasteryPoints = co.MasteryPoints;
                     }
                 }
-                // Save outcomes first so results can find them via FK
+
                 await _db.SaveChangesAsync();
 
-                // 2. Sync Outcome Results (The Student Performance)
+                // Sync Outcome Results (student scoped by token)
                 var results = await _canvas.GetOutcomeResultsAsync(course.Id);
-                Console.WriteLine($"Found {results.Count} outcome results for {course.Name}");
 
                 foreach (var res in results)
                 {
-                    // Canvas OutcomeResults ID can be large, ensure your DB uses long
-                    var existingResult = await _db.OutcomeResults.FindAsync(res.Id);
+                    var existing = await _db.OutcomeResults.FirstOrDefaultAsync(r => r.Id == res.Id);
 
-                    if (existingResult == null)
+                    if (existing == null)
                     {
-                        // Ensure the student exists in our DB before linking
-                        var studentExists = await _db.Students.AnyAsync(s => s.StudentId == res.StudentId);
-                        if (!studentExists) continue;
-
+                        res.StudentId = student.StudentId; // ensure ownership
                         _db.OutcomeResults.Add(res);
                     }
                     else
                     {
-                        existingResult.Score = res.Score;
-                        existingResult.Mastery = res.Mastery;
-                        existingResult.AssignmentId = res.AssignmentId;
+                        existing.Score = res.Score;
+                        existing.Mastery = res.Mastery;
+                        existing.AssignmentId = res.AssignmentId;
                     }
                 }
+
                 await _db.SaveChangesAsync();
             }
         }
-
         public async Task GetOutcomesForJohnWTestCourseAsync()
         {
-            // The specific course ID you mentioned
             long courseId = 77966;
 
             try
             {
-                // Step 1: Get outcomes for the course using the course ID
                 var outcomes = await _canvas.GetCourseOutcomesAsync(courseId);
 
                 if (outcomes.Any())
                 {
-                    Console.WriteLine($"Found {outcomes.Count} outcomes for course with ID {courseId}.");
+                    Console.WriteLine(
+                        $"Found {outcomes.Count} outcomes for course {courseId}.");
 
-                    // Step 2: Print outcomes details
                     foreach (var outcome in outcomes)
                     {
-                        Console.WriteLine($"Outcome: {outcome.Title}, Description: {outcome.Description}");
+                        Console.WriteLine(
+                            $"Outcome: {outcome.Title} | " +
+                            $"Mastery: {outcome.MasteryPoints} | " +
+                            $"Method: {outcome.CalculationMethod}");
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"No outcomes found for course with ID {courseId}.");
+                    Console.WriteLine(
+                        $"No outcomes found for course {courseId}.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($">>> ERROR: {ex.Message}");
+                Console.WriteLine($">>> ERROR fetching JohnWTest outcomes: {ex.Message}");
             }
         }
     }
