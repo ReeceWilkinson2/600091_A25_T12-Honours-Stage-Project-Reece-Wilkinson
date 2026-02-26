@@ -9,6 +9,7 @@
                 <tr>
                     <th>Submission ID</th>
                     <th>Assignment ID</th>
+                    <th>Student</th>
                     <th>Score</th>
                     <th>Submitted At</th>
                     <th>Delete</th>
@@ -22,6 +23,7 @@
                         <tr @onclick="(() => SetSubmissionForUpdate(submission))">
                             <td>@submission.Id</td>
                             <td>@submission.AssignmentId</td>
+                            <td>@submission.Student.UserName</td>
                             <td>@submission.Score</td>
                             <td>@submission.SubmittedAt</td>
                             <td>
@@ -126,9 +128,7 @@
 
     private async Task LoadSubmissions()
     {
-        Submissions = await DbContext.Submissions
-            .OrderByDescending(s => s.SubmittedAt)
-            .ToListAsync();
+        Submissions = await DbContext.Submissions.Include(s => s.Student).OrderByDescending(s => s.SubmittedAt).ToListAsync();
     }
 
     private async Task AddSubmission()

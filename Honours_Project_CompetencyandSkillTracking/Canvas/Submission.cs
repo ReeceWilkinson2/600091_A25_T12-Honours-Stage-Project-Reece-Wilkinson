@@ -11,5 +11,6 @@
         //public string WorkflowState { get; set; } = "";
         public DateTime? SubmittedAt { get; set; }
         //public string Comments { get; set; } = "";
+        public ICollection<OutcomeResult> OutcomeResults { get; set; } = new List<OutcomeResult>();
     }
 }

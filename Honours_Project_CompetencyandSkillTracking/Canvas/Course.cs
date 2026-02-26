@@ -14,5 +14,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         // Navigation
         public ICollection<User> Students { get; set; } = new List<User>();
         public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
+        public ICollection<Outcome> Outcomes { get; set; } = new List<Outcome>();
     }
 }

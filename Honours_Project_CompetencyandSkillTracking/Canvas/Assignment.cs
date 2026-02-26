@@ -10,5 +10,6 @@
 
         // Navigation
         public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
+        public ICollection<Outcome> Outcomes { get; set; } = new List<Outcome>();
     }
 }

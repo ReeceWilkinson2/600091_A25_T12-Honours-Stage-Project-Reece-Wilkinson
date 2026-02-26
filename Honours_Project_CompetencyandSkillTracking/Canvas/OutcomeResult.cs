@@ -15,5 +15,8 @@
 
         // Optional computed mastery
         public bool ComputedMastery => Outcome != null && Score >= Outcome.MasteryPoints;
+
+        public long? SubmissionId { get; set; }
+        public Submission? Submission { get; set; }
     }
 }
