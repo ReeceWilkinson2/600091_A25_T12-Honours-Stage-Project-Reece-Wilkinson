@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Honours_Project_CompetencyandSkillTracking.Canvas;
+using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
 
 namespace Honours_Project_CompetencyandSkillTracking.Data
 {

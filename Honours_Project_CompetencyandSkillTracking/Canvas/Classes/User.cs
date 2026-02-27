@@ -1,7 +1,7 @@
 ﻿using Honours_Project_CompetencyandSkillTracking.Data;
 using System.ComponentModel.DataAnnotations;
 
-namespace Honours_Project_CompetencyandSkillTracking.Canvas
+namespace Honours_Project_CompetencyandSkillTracking.Canvas.Classes
 {
     public class User
     {

@@ -3,8 +3,9 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using Honours_Project_CompetencyandSkillTracking.Data;
 
-namespace Honours_Project_CompetencyandSkillTracking.Data
+namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 {
     public class CompetencyDataServices
     {

@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Honours_Project_CompetencyandSkillTracking.Canvas
+namespace Honours_Project_CompetencyandSkillTracking.Canvas.DTOs
 {
-    public class CanvasTerm
+    public class CanvasDetails
     {
         [JsonPropertyName("id")]
         public long Id { get; set; }
@@ -12,5 +12,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
         [JsonExtensionData]
         public Dictionary<string, object>? ExtraFields { get; set; }
+
     }
 }

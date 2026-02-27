@@ -1,4 +1,4 @@
-﻿using Honours_Project_CompetencyandSkillTracking.Canvas;
+﻿using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
 using Honours_Project_CompetencyandSkillTracking.Data;
 using Microsoft.EntityFrameworkCore;
 using System;

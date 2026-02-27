@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using System;
 
-namespace Honours_Project_CompetencyandSkillTracking.Canvas
+namespace Honours_Project_CompetencyandSkillTracking.Canvas.DTOs
 {
     public class CanvasSubmission
     {
