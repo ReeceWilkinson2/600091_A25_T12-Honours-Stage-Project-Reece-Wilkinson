@@ -20,8 +20,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         {
             var student = await SyncProfileAsync();
             await SyncCoursesAsync(student);
-            //await SyncOutcomesAndResultsAsync(student);
-            await GetOutcomesForJohnWTestCourseAsync();
+            await SyncOutcomesAndResultsAsync(student);
+            //await GetOutcomesForJohnWTestCourseAsync();
+            //await GetStudentAccessibleOutcomesAsync(77966);
         }
 
         private async Task<User> SyncProfileAsync()
@@ -171,9 +172,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
             foreach (var course in localCourses)
             {
-                Console.WriteLine($"Syncing outcomes for {course.Name}");
-
-                // Sync Outcome Definitions
                 var canvasOutcomes = await _canvas.GetCourseOutcomesAsync(course.Id);
 
                 foreach (var co in canvasOutcomes)
@@ -182,8 +180,17 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
                     if (outcome == null)
                     {
-                        co.CourseId = course.Id;
-                        _db.Outcomes.Add(co);
+                        outcome = new Outcome
+                        {
+                            Id = co.Id,
+                            CourseId = course.Id,
+                            Title = co.Title,
+                            Description = co.Description,
+                            CalculationMethod = co.CalculationMethod,
+                            MasteryPoints = co.MasteryPoints
+                        };
+
+                        _db.Outcomes.Add(outcome);
                     }
                     else
                     {
@@ -196,29 +203,40 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
                 await _db.SaveChangesAsync();
 
-                // Sync Outcome Results (student scoped by token)
                 var results = await _canvas.GetOutcomeResultsAsync(course.Id);
 
                 foreach (var res in results)
                 {
                     var existing = await _db.OutcomeResults.FirstOrDefaultAsync(r => r.Id == res.Id);
 
+                    var assignmentId = res.Links?.Assignment;
+
                     if (existing == null)
                     {
-                        res.StudentId = student.StudentId; // ensure ownership
-                        _db.OutcomeResults.Add(res);
+                        var newResult = new OutcomeResult
+                        {
+                            Id = res.Id,
+                            StudentId = student.StudentId,
+                            OutcomeId = res.Outcome!.Id,
+                            AssignmentId = assignmentId,
+                            Score = res.Score,
+                            Mastery = res.Mastery
+                        };
+
+                        _db.OutcomeResults.Add(newResult);
                     }
                     else
                     {
                         existing.Score = res.Score;
                         existing.Mastery = res.Mastery;
-                        existing.AssignmentId = res.AssignmentId;
+                        existing.AssignmentId = assignmentId;
                     }
                 }
 
                 await _db.SaveChangesAsync();
             }
         }
+
         public async Task GetOutcomesForJohnWTestCourseAsync()
         {
             long courseId = 77966;
@@ -249,6 +267,41 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
             catch (Exception ex)
             {
                 Console.WriteLine($">>> ERROR fetching JohnWTest outcomes: {ex.Message}");
+            }
+        }
+
+        public async Task GetStudentAccessibleOutcomesAsync(long courseId)
+        {
+            try
+            {
+                // Fetch student-accessible outcome results
+                var results = await _canvas.GetOutcomeResultsAsync(courseId);
+
+                if (results == null || !results.Any())
+                {
+                    Console.WriteLine($"No student-accessible outcomes found for course {courseId}.");
+                    return;
+                }
+
+                Console.WriteLine($"Found {results.Count} student-accessible outcomes for course {courseId}.");
+
+                foreach (var res in results)
+                {
+                    if (res.Outcome == null)
+                        continue; // skip results without outcome info
+
+                    Console.WriteLine(
+                        $"Outcome: {res.Outcome.Title} | " +
+                        $"Mastery Points: {res.Outcome.MasteryPoints} | " +
+                        $"Method: {res.Outcome.CalculationMethod} | " +
+                        $"Score: {res.Score} | " +
+                        $"Mastery Achieved: {res.Mastery} | " +
+                        $"Assignment ID: {res.Links?.Assignment}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($">>> ERROR fetching student-accessible outcomes: {ex.Message}");
             }
         }
     }
