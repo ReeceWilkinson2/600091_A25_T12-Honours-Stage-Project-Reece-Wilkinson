@@ -33,6 +33,7 @@ builder.Services.AddSyncfusionBlazor();
 builder.Services.AddSingleton<ISyncfusionStringLocalizer, SyncfusionStringLocalizer>();
 builder.Services.AddScoped<AuthStateService>();
 builder.Services.AddScoped<ModuleCSVReading>();
+builder.Services.AddScoped<CompetencyDataServices>();
 
 var app = builder.Build();
 

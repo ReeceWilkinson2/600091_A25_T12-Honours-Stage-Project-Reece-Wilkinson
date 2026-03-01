@@ -1,53 +1,101 @@
-﻿@page "/CompetencyCreation"
+﻿@page "/competencycreation"
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 @inject CompetencyDataServices service
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject AppDbContext dbContext
 
-@* 
-<div class="body">
-	<div class="form-body">
-		<div class="form-wrapper">
-			<EditForm Model="@form" OnValidSubmit="CreatCompetency">
-				<DataAnnotationsValidator></DataAnnotationsValidator>
-				<ValidationSummary></ValidationSummary>
-				<h1>Login</h1>
-				<div class="input-box">
-					<InputText @bind-Value="@form.Email" id="email" class="input" placeholder="Email" type="email"></InputText>
-					<i class="bx bxs-user"></i>
-				</div>
-				<div class="input-box">
-					<InputText @bind-Value="@form.Password" id="password" class="input" placeholder="Password" type="password"></InputText>
-					<i class="bx bxs-lock"></i>
-				</div>
-				<button type="submit">Login</button>
-			</EditForm>
-		</div>
-	</div>
-</div> *@
+<h3>Add New Competency</h3>
+
+<EditForm Model="@NewCompetency" OnValidSubmit="AddNewCompetencyData">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="CompetencyName">Competency Name</label>
+        <InputText id="CompetencyName" @bind-Value="NewCompetency.CompetencyName" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="CompetencyID">Competency ID</label>
+        <InputText id="CompetencyID" @bind-Value="NewCompetency.CompetencyID" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="Module">Module</label>
+        <select id="Module" class="form-control" value="@SelectedModuleId" @onchange="HandleModuleChange">
+            <option value="">Select Module</option>
+            @foreach (var module in Modules)
+            {
+                <option value="@module.DatabaseID">
+                    @module.ModuleName - @module.Title
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="Course">Course</label>
+        <InputText id="Course" @bind-Value="NewCompetency.Course" class="form-control" disabled />
+    </div>
+
+    <div class="form-group">
+        <label for="Level4Description">Level 4 Description</label>
+        <InputText id="Level4Description" @bind-Value="NewCompetency.Level4Description" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="Level5Description">Level 5 Description</label>
+        <InputText id="Level5Description" @bind-Value="NewCompetency.Level5Description" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="Level6Description">Level 6 Description</label>
+        <InputText id="Level6Description" @bind-Value="NewCompetency.Level6Description" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Competency</button>
+</EditForm>
 
 @code {
-	CompetencyCreationForm form = new CompetencyCreationForm();
-	int idContent;
+    public CompetencyData NewCompetency { get; set; } = new CompetencyData();
+    private List<ModuleData> Modules { get; set; } = new List<ModuleData>();
+    private int? SelectedModuleId;
 
-	List<CompetencyData> CompetencyDatas = new List<CompetencyData>();
 
-	protected override async Task OnInitializedAsync()
-	{
-		await RefreshCompetencyData();
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        Modules = await dbContext.ModulesCSV.ToListAsync();
+    }
 
-	private async Task RefreshCompetencyData()
-	{
-		CompetencyDatas = await service.GetCompetencyDataAsync();
-	}
+    private void HandleModuleChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var id))
+        {
+            SelectedModuleId = id;
+            var selectedModule = Modules
+                .FirstOrDefault(m => m.DatabaseID == id);
+            if (selectedModule != null)
+            {
+                NewCompetency.Module = selectedModule.ModuleName;
+                NewCompetency.Course = selectedModule.Title;
+            }
+        }
+        else
+        {
+            NewCompetency.Module = string.Empty;
+            NewCompetency.Course = string.Empty;
+            SelectedModuleId = null;
+        }
+    }
 
-	public CompetencyData NewCompetency { get; set; } = new CompetencyData();
-
-	private async Task AddNewCompetencyData()
-	{
-		await service.AddCompetencyDataAsync(NewCompetency);
-		NewCompetency = new CompetencyData();
-		await RefreshCompetencyData();
-	}
+    private async Task AddNewCompetencyData()
+    {
+        if (string.IsNullOrEmpty(NewCompetency.Module))
+        {
+            return;
+        }
+        await service.AddCompetencyDataAsync(NewCompetency);
+        NewCompetency = new CompetencyData();
+    }
 }

@@ -1,15 +1,33 @@
-﻿@page "/competencyviewer"
+﻿@page "/competencyviewer/{CompetencyID}"
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
-@inject UserService service
+@inject CompetencyDataServices service
 
-<div class="home-body">
-	<h1>Competency Viewer</h1>
-		<p>
-			This is a test for competnecy viewing where all the relevant information including individual levels will be displayed.
-		</p>
-</div>
+<h3>Competency Details</h3>
+
+@if (Competency != null)
+{
+    <div>
+        <h4>@Competency.CompetencyName</h4>
+        <p>Competency ID: @Competency.CompetencyID</p>
+        <p>Module covered in: @Competency.Module</p>
+        <p>Course covered in: @Competency.Course</p>
+        <p>Level 4: @Competency.Level4Description</p>
+        <p>Level 5: @Competency.Level5Description</p>
+        <p>Level 6: @Competency.Level6Description</p>
+    </div>
+}
+else
+{
+    <p>Loading didn't work</p>
+}
 
 @code {
-	// Need to get competency data to do this.
+	[Parameter] public string CompetencyID { get; set; }
+	private CompetencyData Competency;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Competency = await service.GetCompetencyByIdAsync(CompetencyID);
+    }
 }

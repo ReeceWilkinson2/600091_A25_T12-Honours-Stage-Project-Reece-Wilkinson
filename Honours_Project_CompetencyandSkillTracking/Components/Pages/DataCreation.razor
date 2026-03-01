@@ -1,0 +1,16 @@
+﻿@page "/datacreation"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+<h3>DataCreation</h3>
+
+<button @onclick="NavigateToCompetencyCreation">
+    Competency Creation
+</button>
+
+@code {
+    private void NavigateToCompetencyCreation()
+    {
+        NavigationManager.NavigateTo("/competencycreation");
+    }
+}

@@ -1,12 +1,25 @@
 ﻿@page "/competencyselection"
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
-@inject UserService service
+@inject CompetencyDataServices service
 
-<NavLink class="nav-link" href="competencyviewer" Match="NavLinkMatch.All">
-	Test Competency
-</NavLink>
+<div>
+	@foreach (var competency in Competencies)
+	{
+		<button @onclick="() => LoadCompetencyDetails(competency)">@competency.CompetencyID, @competency.CompetencyName</button>
+	}
+</div>
 
 @code {
-	// need competency data
+	private List<CompetencyData> Competencies = new List<CompetencyData>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		Competencies = await service.GetCompetencyDataAsync();
+	}
+
+	private void LoadCompetencyDetails(CompetencyData competency)
+	{
+		NavigationManager.NavigateTo($"/competencyviewer/{competency.CompetencyID}");
+	}
 }

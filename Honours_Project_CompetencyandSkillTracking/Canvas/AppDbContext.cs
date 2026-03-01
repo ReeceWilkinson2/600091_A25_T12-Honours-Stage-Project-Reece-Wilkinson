@@ -15,6 +15,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
 
         public DbSet<UserData> UserData => Set<UserData>();
 
+        public DbSet<CompetencyData> CompetencyData { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
     }
