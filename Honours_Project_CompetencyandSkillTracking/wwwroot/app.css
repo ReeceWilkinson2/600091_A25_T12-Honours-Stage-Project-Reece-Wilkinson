@@ -96,3 +96,40 @@ h1:focus {
     display: flex;
     align-items: center;
 }
+
+/* Student Journey Layouts*/
+.year-container {
+    display: flex;
+    gap: 60px;
+    margin-top: 20px;
+}
+
+.trimester {
+    flex: 1;
+}
+
+.module-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 15px;
+}
+
+.module-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.module-button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #f8f8f8;
+    cursor: pointer;
+    text-align: left;
+}
+
+    .module-button:hover {
+        background-color: #eaeaea;
+    }

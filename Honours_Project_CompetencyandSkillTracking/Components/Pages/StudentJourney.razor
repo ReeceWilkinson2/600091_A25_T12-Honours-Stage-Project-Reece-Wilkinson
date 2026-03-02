@@ -29,77 +29,193 @@ else
     <button @onclick="ClearSelection">← Back to Courses</button>
 
     <h3>@SelectedCourseName</h3>
-
     <Tabs>
         <Tab Title="Year 1" Active="true">
             <ChildContent>
-                <div>
-                    @foreach (var module in Year1Modules)
+                <h4>Core Modules</h4>
+                <div class="module-group">
+                    @foreach (var module in Year1Modules.Where(m => m.SelectionStatus == "Core"))
                     {
-                        if (module.SelectionStatus == "Core" || module.SelectionStatus == "Compulsory")
-                        {
-                            <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
-                        }
+                        <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                            @module.ModuleName
+                        </button>
                     }
                 </div>
+                <div class="year-container">
+                    <div class="trimester">
+                        <h4>T1</h4>
+                        <div class="module-columns">
+                            <div class="module-group">
+                                <h5>Compulsory</h5>
+                                @foreach (var module in Year1Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
+                                {
+                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                            <div class="module-group">
+                                <h5>Optional</h5>
+                                @foreach (var module in Year1Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
+                                {
+                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
 
-                <div style="margin-top: 20px">
-                    @foreach (var module in Year1Modules)
-                    {
-                        if (module.SelectionStatus == "Optional")
-                        {
-                            <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
-                        }
-                    }
+                    <div class="trimester">
+                        <h4>T2</h4>
+                        <div class="module-columns">
+                            <div class="module-group">
+                                <h5>Compulsory</h5>
+                                @foreach (var module in Year1Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Compulsory"))
+                                {
+                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                            <div class="module-group">
+                                <h5>Optional</h5>
+                                @foreach (var module in Year1Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Optional"))
+                                {
+                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </ChildContent>
         </Tab>
 
         <Tab Title="Year 2">
             <ChildContent>
-                <div>
-                    @foreach (var module in Year2Modules)
+                <h4>Core Modules</h4>
+                <div class="module-group">
+                    @foreach (var module in Year2Modules.Where(m => m.SelectionStatus == "Core"))
                     {
-                        if (module.SelectionStatus == "Core" || module.SelectionStatus == "Compulsory")
-                        {
-                            <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
-                        }
+                        <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                            @module.ModuleName
+                        </button>
                     }
                 </div>
+                <div class="year-container">
+                    <div class="trimester">
+                        <h4>T1</h4>
+                        <div class="module-columns">
+                            <div class="module-group">
+                                <h5>Compulsory</h5>
+                                @foreach (var module in Year2Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
+                                {
+                                    <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                            <div class="module-group">
+                                <h5>Optional</h5>
+                                @foreach (var module in Year2Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
+                                {
+                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
 
-                <div style="margin-top: 20px">
-                    @foreach (var module in Year2Modules)
-                    {
-                        if (module.SelectionStatus == "Optional")
-                        {
-                            <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
-                        }
-                    }
+                    <div class="trimester">
+                        <h4>T2</h4>
+                        <div class="module-columns">
+                            <div class="module-group">
+                                <h5>Compulsory</h5>
+                                @foreach (var module in Year2Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Compulsory"))
+                                {
+                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                            <div class="module-group">
+                                <h5>Optional</h5>
+                                @foreach (var module in Year2Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Optional"))
+                                {
+                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </ChildContent>
         </Tab>
 
         <Tab Title="Year 3">
             <ChildContent>
-                <div>
-                    @foreach (var module in Year3Modules)
+                <h4>Elective Modules</h4>
+                <div class="module-group">
+                    @foreach (var module in Year3Modules.Where(m => m.SelectionStatus == "Elective"))
                     {
-                        if (module.SelectionStatus == "Core" || module.SelectionStatus == "Compulsory" || module.SelectionStatus == "Elective")
-                        {
-                            <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
-                        }
+                        <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                            @module.ModuleName
+                        </button>
                     }
                 </div>
+                <div class="year-container">
+                    <div class="trimester">
+                        <h4>T1</h4>
+                        <div class="module-columns">
+                            <div class="module-group">
+                                <h5>Compulsory</h5>
+                                @foreach (var module in Year3Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
+                                {
+                                    <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                            <div class="module-group">
+                                <h5>Optional</h5>
+                                @foreach (var module in Year3Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
+                                {
+                                    <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
 
-                <div style="margin-top: 20px">
-                    @foreach (var module in Year3Modules)
-                    {
-                        if (module.SelectionStatus == "Optional")
-                        {
-                            <button @onclick="() => LoadModuleDetails(module)">@module.ModuleName, @module.SelectionStatus</button>
-                        }
-                    }
-            </div>
+                    <div class="trimester">
+                        <h4>T2</h4>
+                        <div class="module-columns">
+                            <div class="module-group">
+                                <h5>Compulsory</h5>
+                                @foreach (var module in Year3Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Compulsory"))
+                                {
+                                    <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                            <div class="module-group">
+                                <h5>Optional</h5>
+                                @foreach (var module in Year3Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Optional"))
+                                {
+                                    <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                                        @module.ModuleName
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
         </ChildContent>
     </Tab>
 </Tabs>
