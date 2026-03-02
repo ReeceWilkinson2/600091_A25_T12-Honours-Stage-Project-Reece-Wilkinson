@@ -13,5 +13,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public string Level4Description { get; set; }
         public string Level5Description { get; set; }
         public string Level6Description { get; set; }
+        public string AdditionalNotes { get; set; }
+        public ICollection<CompetencyLevels> Levels { get; set; }
     }
 }

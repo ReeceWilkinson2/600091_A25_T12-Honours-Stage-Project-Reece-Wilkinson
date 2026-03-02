@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
+﻿using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
+using Microsoft.EntityFrameworkCore;
+using static Honours_Project_CompetencyandSkillTracking.Data.CompetencyLevels;
 
 namespace Honours_Project_CompetencyandSkillTracking.Data
 {
@@ -16,6 +17,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public DbSet<UserData> UserData => Set<UserData>();
 
         public DbSet<CompetencyData> CompetencyData { get; set; }
+        public DbSet<CompetencyLevels> CompetencyLevels { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
