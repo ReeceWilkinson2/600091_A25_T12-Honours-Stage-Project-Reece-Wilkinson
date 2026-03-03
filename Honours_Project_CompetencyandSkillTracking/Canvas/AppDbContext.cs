@@ -23,5 +23,3 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
             : base(options) { }
     }
 }
-
-

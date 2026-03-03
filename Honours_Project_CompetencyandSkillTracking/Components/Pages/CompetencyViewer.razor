@@ -11,10 +11,10 @@
         <h3>@Competency.CompetencyName</h3>
         <h4>Competency ID: </h4>
         <p>@Competency.CompetencyID</p>
-        <h4>Module covered in: </h4>
-        <p>@Competency.Module</p>
         <h4>Course covered in: </h4>
         <p>@Competency.Course</p>
+        <h4>Module covered in: </h4>
+        <p>@Competency.Module</p>
         @if (Competency.Levels != null && Competency.Levels.Any())
         {
             @foreach (var level in Competency.Levels.OrderBy(l => l.LevelNumber))

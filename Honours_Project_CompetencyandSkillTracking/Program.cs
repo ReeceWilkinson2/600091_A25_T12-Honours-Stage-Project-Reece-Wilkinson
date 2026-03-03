@@ -43,6 +43,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var db = services.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
+    db.Database.ExecuteSqlRaw("PRAGMA foreign_keys = ON;");
 }
 
 // Configure the HTTP request pipeline.
