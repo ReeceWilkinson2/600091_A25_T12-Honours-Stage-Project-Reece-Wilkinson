@@ -258,15 +258,20 @@ else
     <h3>@SelectedCompetency.CompetencyID - @SelectedCompetency.CompetencyName</h3>
 
     <div class="competency-details">
-        <h4>Level 4</h4>
-        <p>@SelectedCompetency.Level4Description</p>
-
-        <h4>Level 5</h4>
-        <p>@SelectedCompetency.Level5Description</p>
-
-        <h4>Level 6</h4>
-        <p>@SelectedCompetency.Level6Description</p>
-
+        @if (SelectedCompetency.Levels != null && SelectedCompetency.Levels.Any())
+        {
+            @foreach (var level in SelectedCompetency.Levels.OrderBy(l => l.LevelNumber))
+            {
+                <div class="level-section">
+                    <h4>Level @level.LevelNumber</h4>
+                    <p>@level.Description</p>
+                </div>
+            }
+        }
+        else
+        {
+            <p>No level information available.</p>
+        }
         <h4>Additional Notes</h4>
         <p>@SelectedCompetency.AdditionalNotes</p>
     </div>
@@ -309,7 +314,7 @@ else
         Year3Modules.Clear();
     }
 
-    private async void LoadModuleDetails(ModuleData module)
+    private async Task LoadModuleDetails(ModuleData module)
     {
         ActiveModule = module;
         SelectedModule = module.ModuleName;
