@@ -19,10 +19,10 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         public async Task SyncAllAsync()
         {
             var student = await SyncProfileAsync();
-            await SyncCoursesAsync(student);
-            await SyncOutcomesAndResultsAsync(student);
-            await GetOutcomesForJohnWTestCourseAsync();
-            //await GetStudentAccessibleOutcomesAsync(77966);
+            //await SyncCoursesAsync(student);
+            //await SyncOutcomesAndResultsAsync(student);
+            //await GetOutcomesForJohnWTestCourseAsync();
+            await GetStudentAccessibleOutcomesAsync(77966);
         }
 
         private async Task<User> SyncProfileAsync()

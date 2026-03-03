@@ -10,18 +10,13 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 {
     public class CompetencyDataServices
     {
-        #region Private members
         private AppDbContext _db;
-        #endregion
 
-        #region Constructor
         public CompetencyDataServices(AppDbContext db)
         {
             _db = db;
         }
-        #endregion
 
-        #region Public methods
         public async Task<List<CompetencyData>> GetCompetencyDataAsync()
         {
             return await _db.CompetencyData
@@ -46,8 +41,12 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
         public async Task<CompetencyData> GetCompetencyByIdAsync(string id)
         {
-            return await _db.CompetencyData
-                .FirstOrDefaultAsync(c => c.CompetencyID == id);
+            return await _db.CompetencyData.FirstOrDefaultAsync(c => c.CompetencyID == id);
+        }
+
+        public async Task<List<CompetencyData>> GetCompetenciesByModuleAsync(string moduleName)
+        {
+            return await _db.CompetencyData.Where(c => c.Module == moduleName).ToListAsync();
         }
 
         public async Task<CompetencyData> UpdateCompetencyDataAsync(CompetencyData CompetencyData)
@@ -81,6 +80,5 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
                 throw;
             }
         }
-        #endregion
     }
 }

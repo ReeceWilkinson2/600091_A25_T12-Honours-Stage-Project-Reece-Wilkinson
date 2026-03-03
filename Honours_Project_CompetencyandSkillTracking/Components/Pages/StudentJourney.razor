@@ -2,31 +2,34 @@
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 @inject UserService service
+@inject CompetencyDataServices competencyService
 
 
 @if (SelectedCourse == null)
 {
     <h3>Select a Course</h3>
 
-    <button @onclick="@(() => SelectCourse("Computer Science"))">
+    <button class ="module-button" @onclick ="@(() => SelectCourse("Computer Science"))">
         Computer Science
     </button>
 
-    <button @onclick="@(() => SelectCourse("Computer Science for Games Development"))">
+    <button class="module-button" @onclick="@(() => SelectCourse("Computer Science for Games Development"))">
         Computer Science for Games Development
     </button>
 
-    <button @onclick="@(() => SelectCourse("Robotics and Artificial Intelligence"))">
+    <button class="module-button" @onclick="@(() => SelectCourse("Robotics and Artificial Intelligence"))">
         Computer Science for Robotics and Artificial Intelligence
     </button>
 
-    <button @onclick="@(() => SelectCourse("Computing (Software Engineering)"))">
+    <button class="module-button" @onclick="@(() => SelectCourse("Computing (Software Engineering)"))">
         Computer Science (Software Engineering)
     </button>
 }
-else
+else if (SelectedModule == null)
 {
-    <button @onclick="ClearSelection">← Back to Courses</button>
+    <div style="margin-bottom:20px">
+    <button class="module-button" @onclick="ClearSelection">← Back to Courses</button>
+    </div>
 
     <h3>@SelectedCourseName</h3>
     <Tabs>
@@ -218,14 +221,67 @@ else
                 </div>
         </ChildContent>
     </Tab>
-</Tabs>
+    </Tabs>
+}
+else if (SelectedCompetency == null)
+{
+    <div style="margin-bottom:20px">
+        <button class="module-button" @onclick="() => SelectedModule = null">
+            ← Back to Modules
+        </button>
+    </div>
+    <h3>@SelectedModuleName</h3>
+    <h4>Competencies</h4>
+
+    @if (SelectedModuleCompetencies.Any())
+    {
+        @foreach (var competency in SelectedModuleCompetencies)
+        {
+            <button class="module-button" @onclick="() => LoadCompetencyDetails(competency)">
+                @competency.CompetencyID - @competency.CompetencyName @* add levels to this once they are done *@
+            </button>
+        }
+    }
+    else
+    {
+        <p>No competencies found for this module.</p>
+    }
+}
+else
+{
+    <div style="margin-bottom:20px">
+        <button class="module-button" @onclick="() => SelectedCompetency = null">
+            ← Back to Competencies
+        </button>
+    </div>
+
+    <h3>@SelectedCompetency.CompetencyID - @SelectedCompetency.CompetencyName</h3>
+
+    <div class="competency-details">
+        <h4>Level 4</h4>
+        <p>@SelectedCompetency.Level4Description</p>
+
+        <h4>Level 5</h4>
+        <p>@SelectedCompetency.Level5Description</p>
+
+        <h4>Level 6</h4>
+        <p>@SelectedCompetency.Level6Description</p>
+
+        <h4>Additional Notes</h4>
+        <p>@SelectedCompetency.AdditionalNotes</p>
+    </div>
 }
 
 
-@code { 
+@code {
     // need to make a service to load modules based on the year and show if they are optional or not.
     private string? SelectedCourse;
     private string? SelectedCourseName;
+    private string? SelectedModule;
+    private string? SelectedModuleName;
+    private ModuleData? ActiveModule;
+    private List<CompetencyData> SelectedModuleCompetencies = new();
+    private CompetencyData? SelectedCompetency;
 
     private List<ModuleData> Year1Modules = new List<ModuleData>();
     private List<ModuleData> Year2Modules = new List<ModuleData>();
@@ -245,15 +301,25 @@ else
     {
         SelectedCourse = null;
         SelectedCourseName = null;
+        SelectedCompetency = null;
+        SelectedModule = null;
 
         Year1Modules.Clear();
         Year2Modules.Clear();
         Year3Modules.Clear();
     }
 
-    private void LoadModuleDetails(ModuleData module)
+    private async void LoadModuleDetails(ModuleData module)
     {
-        // Needs to get all competencies for the module and show them some way - requires competency data.
-        Console.WriteLine($"Loading details for module: {module.ModuleName}");
+        ActiveModule = module;
+        SelectedModule = module.ModuleName;
+        SelectedModuleName = module.ModuleName;
+
+        SelectedModuleCompetencies = await competencyService.GetCompetenciesByModuleAsync(module.ModuleName);
+    }
+
+    private void LoadCompetencyDetails(CompetencyData competency)
+    {
+        SelectedCompetency = competency;
     }
 }
