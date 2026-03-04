@@ -3,6 +3,10 @@
 @inject NavigationManager NavigationManager
 @inject CompetencyDataServices service
 
+<div style="margin-bottom:20px">
+    <button class="module-button" @onclick=ReturnToSelection>← Back to Selection</button>
+</div>
+
 <h2>Competency Details</h2>
 
 @if (Competency != null)
@@ -45,5 +49,10 @@ else
     protected override async Task OnInitializedAsync()
     {
         Competency = await service.GetCompetencyByIdAsync(CompetencyID);
+    }
+
+    private void ReturnToSelection()
+    {
+        NavigationManager.NavigateTo("/competencyselection");
     }
 }

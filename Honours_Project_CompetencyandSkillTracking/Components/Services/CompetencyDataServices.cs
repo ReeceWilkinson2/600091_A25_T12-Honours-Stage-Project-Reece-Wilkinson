@@ -53,8 +53,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             try
             {
-                var CompetencyDataExist = _db.CompetencyData.FirstOrDefault(p => p.CompetencyDbID == CompetencyData.CompetencyDbID);
-                if (CompetencyDataExist != null)
+                var competencyDataExist = _db.CompetencyData.Include(c => c.Levels).FirstOrDefault(p => p.CompetencyDbID == CompetencyData.CompetencyDbID);
+                if (competencyDataExist != null)
                 {
                     _db.Update(CompetencyData);
                     await _db.SaveChangesAsync();
@@ -62,7 +62,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             }
             catch (Exception)
             {
-
                 throw;
             }
             return CompetencyData;

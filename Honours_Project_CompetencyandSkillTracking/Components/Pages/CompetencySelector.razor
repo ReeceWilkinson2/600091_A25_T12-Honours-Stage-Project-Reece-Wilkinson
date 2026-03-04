@@ -6,7 +6,7 @@
 <div>
 	@foreach (var competency in Competencies)
 	{
-		<button @onclick="() => LoadCompetencyDetails(competency)">@competency.CompetencyID, @competency.CompetencyName</button>
+		<button class="module-button" @onclick="() => LoadCompetencyDetails(competency)">@competency.CompetencyID, @competency.CompetencyName</button>
 	}
 </div>
 
