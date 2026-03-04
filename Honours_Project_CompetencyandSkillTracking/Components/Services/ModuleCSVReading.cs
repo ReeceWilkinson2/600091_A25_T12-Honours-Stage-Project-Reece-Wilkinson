@@ -87,7 +87,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
                     Trimester = GetValue("Trimester"),
                     SelectionStatus = GetValue("Selection_Status"),
                     Level = GetValue("Level"),
-                    Credits = GetValue("Credits")
+                    Credits = GetValue("Credits"),
+                    ModCode = GetValue("Mod Code"),
                 };
                 Modules.Add(Module);
             }

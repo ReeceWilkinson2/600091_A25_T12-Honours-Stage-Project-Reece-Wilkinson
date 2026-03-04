@@ -9,6 +9,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public int LevelNumber { get; set; }
         public string Description { get; set; }
         public int CompetencyDbID { get; set; }
+        public string ModCode { get; set; }
         public CompetencyData Competency { get; set; }
     }
 }

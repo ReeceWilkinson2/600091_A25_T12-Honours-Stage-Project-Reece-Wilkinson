@@ -12,37 +12,25 @@
     <ValidationSummary />
 
     <div class="form-group">
-        <label for="CompetencyName">Competency Name</label>
-        <InputText id="CompetencyName" @bind-Value="NewCompetency.CompetencyName" class="form-control" />
+        <label>Competency Name</label>
+        <InputText @bind-Value="NewCompetency.CompetencyName" class="form-control" />
     </div>
 
     <div class="form-group">
-        <label for="CompetencyID">Competency ID</label>
-        <InputText id="CompetencyID" @bind-Value="NewCompetency.CompetencyID" class="form-control" />
+        <label>Competency ID</label>
+        <InputText @bind-Value="NewCompetency.CompetencyID" class="form-control" />
     </div>
 
     <div class="form-group">
-        <label for="Module">Module</label>
-        <select id="Module" class="form-control" value="@SelectedModuleId" @onchange="HandleModuleChange">
-            <option value="">Select Module</option>
-            @foreach (var module in Modules)
-            {
-                <option value="@module.DatabaseID">
-                    @module.ModuleName - @module.Title
-                </option>
-            }
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="Course">Course</label>
-        <InputText id="Course" @bind-Value="NewCompetency.Course" class="form-control" disabled />
+        <label>Additional Notes</label>
+        <InputTextArea @bind-Value="NewCompetency.AdditionalNotes" class="form-control" />
     </div>
 
-    <h4>Competency Levels</h4>
+    <h4 class="mt-4">Competency Levels</h4>
 
     @foreach (var level in NewLevels)
     {
-        <div class="form-group" style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+        <div class="form-group border p-3 mb-3">
 
             <label>Level Number</label>
             <InputNumber @bind-Value="level.LevelNumber" class="form-control" />
@@ -50,11 +38,27 @@
             <label>Description</label>
             <InputTextArea @bind-Value="level.Description" class="form-control" />
 
+            <label>Module</label>
+            <select class="form-control"
+                    value="@level.ModCode"
+                    @onchange="(e) => HandleModuleChange(e, level)">
+
+                <option value="">Select Module</option>
+
+                @foreach (var module in DistinctModules)
+                {
+                    <option value="@module.ModCode">
+                        @module.ModuleName (@module.ModCode)
+                    </option>
+                }
+            </select>
+
             <button type="button"
                     class="btn btn-danger mt-2"
                     @onclick="() => RemoveLevel(level)">
                 Remove Level
             </button>
+
         </div>
     }
 
@@ -64,45 +68,30 @@
         + Add Level
     </button>
 
-    <div class="form-group">
-        <label for="AdditionalNotes">Additional Notes</label>
-        <InputText id="AdditionalNotes" @bind-Value="NewCompetency.AdditionalNotes" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Add Competency</button>
+    <button type="submit" class="btn btn-primary">
+        Add Competency
+    </button>
 </EditForm>
 
 @code {
-    public CompetencyData NewCompetency { get; set; } = new CompetencyData();
-    private List<ModuleData> Modules { get; set; } = new List<ModuleData>();
-    private List<CompetencyLevels> NewLevels = new();
-    private int? SelectedModuleId;
 
+    public CompetencyData NewCompetency { get; set; } = new();
+
+    private List<CompetencyLevels> NewLevels = new();
+
+    private List<ModuleData> AllModules = new();
+    private List<ModuleData> DistinctModules = new();
 
     protected override async Task OnInitializedAsync()
     {
-        Modules = await dbContext.ModulesCSV.ToListAsync();
-    }
+        AllModules = await dbContext.ModulesCSV.ToListAsync();
 
-    private void HandleModuleChange(ChangeEventArgs e)
-    {
-        if (int.TryParse(e.Value?.ToString(), out var id))
-        {
-            SelectedModuleId = id;
-            var selectedModule = Modules
-                .FirstOrDefault(m => m.DatabaseID == id);
-            if (selectedModule != null)
-            {
-                NewCompetency.Module = selectedModule.ModuleName;
-                NewCompetency.Course = selectedModule.Title;
-            }
-        }
-        else
-        {
-            NewCompetency.Module = string.Empty;
-            NewCompetency.Course = string.Empty;
-            SelectedModuleId = null;
-        }
+        // Remove duplicates using ModCode
+        DistinctModules = AllModules
+            .GroupBy(m => m.ModCode)
+            .Select(g => g.First())
+            .OrderBy(m => m.ModuleName)
+            .ToList();
     }
 
     private void AddLevel()
@@ -120,12 +109,19 @@
         NewLevels.Remove(level);
     }
 
+    private void HandleModuleChange(ChangeEventArgs e, CompetencyLevels level)
+    {
+        level.ModCode = e.Value?.ToString();
+    }
+
     private async Task AddNewCompetencyData()
     {
-        if (string.IsNullOrEmpty(NewCompetency.Module))
-            return;
+        // Attach levels to competency
         NewCompetency.Levels = NewLevels;
+
         await service.AddCompetencyDataAsync(NewCompetency);
+
+        // Reset form
         NewCompetency = new CompetencyData();
         NewLevels = new List<CompetencyLevels>();
     }

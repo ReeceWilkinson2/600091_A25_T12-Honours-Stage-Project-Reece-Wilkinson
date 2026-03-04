@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS Courses (
 -- Modules table (CSV Version)
 CREATE TABLE IF NOT EXISTS Modules (
     DatabaseID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ModCode TEXT NOT NULL,
     Course TEXT NOT NULL,
     Programme TEXT NOT NULL,
     ModuleName TEXT NOT NULL,
@@ -56,7 +57,8 @@ CREATE TABLE IF NOT EXISTS Modules (
     Trimester TEXT NOT NULL,
     SelectionStatus TEXT NOT NULL,
     Level TEXT NOT NULL,
-    Credits TEXT NOT NULL
+    Credits TEXT NOT NULL,
+    UNIQUE(ModCode)
 );
 
 -- Assignments table
@@ -84,8 +86,6 @@ CREATE TABLE IF NOT EXISTS CompetencyData (
     CompetencyDbID INTEGER PRIMARY KEY AUTOINCREMENT,
     CompetencyName TEXT NOT NULL,
     CompetencyID TEXT,
-    Module TEXT,
-    Course TEXT,
     AdditionalNotes TEXT
 );
 
@@ -94,10 +94,13 @@ CREATE TABLE IF NOT EXISTS CompetencyLevels (
     LevelDbID INTEGER PRIMARY KEY AUTOINCREMENT,
     LevelNumber INTEGER NOT NULL,
     Description TEXT,
+    ModCode TEXT NOT NULL,
     CompetencyDbID INTEGER NOT NULL,
     FOREIGN KEY (CompetencyDbID) 
         REFERENCES CompetencyData(CompetencyDbID)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (ModCode)
+        REFERENCES Modules(ModCode)
 );
 
 -- Outcomes table

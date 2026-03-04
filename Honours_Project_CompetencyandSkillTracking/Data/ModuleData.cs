@@ -17,5 +17,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public string SelectionStatus { get; set; } = "";
         public string Level { get; set; } = "";
         public string Credits { get; set; } = "";
+        public string ModCode { get; set; } = "";
     }
 }

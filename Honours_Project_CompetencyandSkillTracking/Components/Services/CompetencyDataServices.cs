@@ -44,9 +44,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             return await _db.CompetencyData.Include(c => c.Levels).FirstOrDefaultAsync(c => c.CompetencyID == id);
         }
 
-        public async Task<List<CompetencyData>> GetCompetenciesByModuleAsync(string moduleName)
+        public async Task<List<CompetencyData>> GetCompetenciesByModuleAsync(string modCode)
         {
-            return await _db.CompetencyData.Include(c => c.Levels).Where(c => c.Module == moduleName).ToListAsync();
+            return await _db.CompetencyData.Include(c => c.Levels).Where(c => c.Levels.Any(l => l.ModCode == modCode)).ToListAsync();
         }
 
         public async Task<CompetencyData> UpdateCompetencyDataAsync(CompetencyData CompetencyData)
