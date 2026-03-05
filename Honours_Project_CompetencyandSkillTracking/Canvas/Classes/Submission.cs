@@ -8,9 +8,8 @@
         public string StudentId { get; set; }
         public User Student { get; set; }
         public double? Score { get; set; }
-        //public string WorkflowState { get; set; } = "";
         public DateTime? SubmittedAt { get; set; }
-        //public string Comments { get; set; } = "";
+        public ICollection<SubmissionComment> Comments { get; set; } = new List<SubmissionComment>();
         public ICollection<OutcomeResult> OutcomeResults { get; set; } = new List<OutcomeResult>();
     }
 }

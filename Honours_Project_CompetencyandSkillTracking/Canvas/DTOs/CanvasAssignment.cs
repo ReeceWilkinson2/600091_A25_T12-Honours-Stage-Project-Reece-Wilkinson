@@ -19,6 +19,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas.DTOs
         [JsonPropertyName("submission_types")]
         public List<string>? SubmissionTypes { get; set; }
 
+        [JsonPropertyName("submission")]
+        public CanvasSubmission? Submission { get; set; }
+
         [JsonExtensionData]
         public Dictionary<string, object>? ExtraFields { get; set; }
     }

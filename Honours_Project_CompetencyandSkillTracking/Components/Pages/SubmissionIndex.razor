@@ -13,9 +13,11 @@
                     <th>Student</th>
                     <th>Score</th>
                     <th>Submitted At</th>
+                    <th>Submission Comments</th>
                     <th>Delete</th>
                 </tr>
             </thead>
+
             <tbody>
                 @if (Submissions.Any())
                 {
@@ -24,14 +26,25 @@
                         <tr @onclick="(() => SetSubmissionForUpdate(submission))">
                             <td>@submission.Id</td>
                             <td>@submission.AssignmentId</td>
-                            <td>@submission.Assignment</td>
-                            <td>@submission.Student.UserName</td>
+                            <td>@submission.Assignment?.Name</td>
+                            <td>@submission.Student?.UserName</td>
                             <td>@submission.Score</td>
-                            <td>@submission.SubmittedAt</td>
+                            <td>@submission.SubmittedAt?.ToString("g")</td>
+
                             <td>
-                                <button class="btn btn-danger"
-                                        @onclick="() => DeleteSubmission(submission)"
-                                        @onclick:stopPropagation="true">
+                                @if (submission.Comments?.Any() == true)
+                                {
+                                    <ul>
+                                        @foreach (var comment in submission.Comments)
+                                        {
+                                            <li>@comment.Comment</li>
+                                        }
+                                    </ul>
+                                }
+                            </td>
+
+                            <td>
+                                <button class="btn btn-danger" @onclick="() => DeleteSubmission(submission)" @onclick:stopPropagation="true">
                                     Delete
                                 </button>
                             </td>
@@ -40,35 +53,41 @@
                 }
                 else
                 {
-                    <tr><td colspan="5" class="text-center"><strong>No submissions found</strong></td></tr>
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <strong>No submissions found</strong>
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>
     </div>
 
     <div class="row m-5">
-
-        <!-- ADD -->
         <div class="col-5 bg-light m-2">
-            <div class="p-3 mb-3 bg-primary text-white text-center">Add New Submission</div>
+            <div class="p-3 mb-3 bg-primary text-white text-center">
+                Add New Submission
+            </div>
 
             <EditForm Model="@NewSubmission">
                 <div class="form-group">
                     <label>Assignment ID</label>
-                    <input type="number" class="form-control"
-                           @bind-value="NewSubmission.AssignmentId" />
+                    <input type="number" class="form-control" @bind-value="NewSubmission.AssignmentId" />
+                </div>
+
+                <div class="form-group">
+                    <label>Student ID</label>
+                    <input type="text" class="form-control" @bind-value="NewSubmission.StudentId" />
                 </div>
 
                 <div class="form-group">
                     <label>Score</label>
-                    <input type="number" step="0.1" class="form-control"
-                           @bind-value="NewSubmission.Score" />
+                    <input type="number" step="0.1" class="form-control" @bind-value="NewSubmission.Score" />
                 </div>
 
                 <div class="form-group">
                     <label>Submitted At</label>
-                    <input type="datetime-local" class="form-control"
-                           @bind-value="NewSubmission.SubmittedAt" />
+                    <input type="datetime-local" class="form-control" @bind-value="NewSubmission.SubmittedAt" />
                 </div>
 
                 <div class="text-center p-3">
@@ -80,19 +99,25 @@
         </div>
 
         <div class="col-5 bg-light m-2">
-            <div class="p-3 mb-3 bg-primary text-white text-center">Update Submission</div>
+            <div class="p-3 mb-3 bg-primary text-white text-center">
+                Update Submission
+            </div>
 
             <EditForm Model="@UpdateSubmission">
+
                 <div class="form-group">
                     <label>Submission ID</label>
-                    <input type="number" class="form-control"
-                           @bind-value="UpdateSubmission.Id" disabled />
+                    <input type="number" class="form-control" @bind-value="UpdateSubmission.Id" disabled />
                 </div>
 
                 <div class="form-group">
                     <label>Assignment ID</label>
-                    <input type="number" class="form-control"
-                           @bind-value="UpdateSubmission.AssignmentId" />
+                    <input type="number" class="form-control" @bind-value="UpdateSubmission.AssignmentId" />
+                </div>
+
+                <div class="form-group">
+                    <label>Student ID</label>
+                    <input type="text" class="form-control" @bind-value="UpdateSubmission.StudentId" />
                 </div>
 
                 <div class="form-group">
@@ -103,12 +128,11 @@
 
                 <div class="form-group">
                     <label>Submitted At</label>
-                    <input type="datetime-local" class="form-control"
-                           @bind-value="UpdateSubmission.SubmittedAt" />
+                    <input type="datetime-local"class="form-control"@bind-value="UpdateSubmission.SubmittedAt" />
                 </div>
 
                 <div class="text-center p-3">
-                    <button class="btn btn-info" @onclick="UpdateSubmissionData">
+                    <button class="btn btn-info"@onclick="UpdateSubmissionData">
                         Update Submission
                     </button>
                 </div>
@@ -118,7 +142,9 @@
     </div>
 </div>
 
+
 @code {
+
     private List<Submission> Submissions = new();
     private Submission NewSubmission = new Submission();
     private Submission UpdateSubmission = new Submission();
@@ -130,7 +156,12 @@
 
     private async Task LoadSubmissions()
     {
-        Submissions = await DbContext.Submissions.Include(s => s.Student).OrderByDescending(s => s.SubmittedAt).ToListAsync();
+        Submissions = await DbContext.Submissions
+            .Include(s => s.Student)
+            .Include(s => s.Assignment)
+            .Include(s => s.Comments)
+            .OrderByDescending(s => s.SubmittedAt)
+            .ToListAsync();
     }
 
     private async Task AddSubmission()
@@ -139,6 +170,7 @@
         await DbContext.SaveChangesAsync();
 
         NewSubmission = new Submission();
+
         await LoadSubmissions();
     }
 
@@ -148,20 +180,24 @@
         {
             Id = submission.Id,
             AssignmentId = submission.AssignmentId,
+            StudentId = submission.StudentId,
             Score = submission.Score,
             SubmittedAt = submission.SubmittedAt
         };
     }
 
+
     private async Task UpdateSubmissionData()
     {
         var submission = await DbContext.Submissions.FindAsync(UpdateSubmission.Id);
+
         if (submission != null)
         {
             submission.AssignmentId = UpdateSubmission.AssignmentId;
+            submission.StudentId = UpdateSubmission.StudentId;
             submission.Score = UpdateSubmission.Score;
             submission.SubmittedAt = UpdateSubmission.SubmittedAt;
-
+            
             await DbContext.SaveChangesAsync();
             await LoadSubmissions();
         }
@@ -170,10 +206,13 @@
     private async Task DeleteSubmission(Submission submission)
     {
         var s = await DbContext.Submissions.FindAsync(submission.Id);
+
         if (s != null)
         {
             DbContext.Submissions.Remove(s);
+
             await DbContext.SaveChangesAsync();
+
             await LoadSubmissions();
         }
     }

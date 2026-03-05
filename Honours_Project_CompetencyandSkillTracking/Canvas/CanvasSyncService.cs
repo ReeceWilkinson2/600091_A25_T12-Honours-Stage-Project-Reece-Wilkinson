@@ -29,9 +29,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         {
             var profile = await _canvas.GetMyProfileAsync();
             Console.WriteLine($"Syncing profile: {profile.Id}, {profile.Name}");
-
             string studentId = profile.Id.ToString();
-
             var student = await _db.Students.Include(s => s.Courses).FirstOrDefaultAsync(s => s.StudentId == studentId);
 
             if (student == null)
@@ -54,7 +52,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                 student.StEmail = profile.Primary_Email;
                 await _db.SaveChangesAsync();
             }
-
             return student;
         }
 
@@ -62,10 +59,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         {
             var courses = await _canvas.GetMyCoursesAsync();
             Console.WriteLine($"Syncing {courses.Count} courses...");
-
             foreach (var c in courses)
             {
-                var course = await _db.Courses.Include(c => c.Students).FirstOrDefaultAsync(x => x.Id == c.Id);
+                var course = await _db.Courses.Include(x => x.Students).FirstOrDefaultAsync(x => x.Id == c.Id);
 
                 if (course == null)
                 {
@@ -77,7 +73,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                         Syllabus = c.Syllabus_Body,
                         Term = c.Term?.Name ?? ""
                     };
-
                     _db.Courses.Add(course);
                 }
                 else
@@ -88,7 +83,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     course.Term = c.Term?.Name ?? "";
                 }
 
-                // 🔹 Ensure student is linked to course
                 if (!course.Students.Any(s => s.StudentId == student.StudentId))
                 {
                     course.Students.Add(student);
@@ -98,10 +92,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
                 var assignments = await _canvas.GetCourseAssignmentsAsync(c.Id);
                 Console.WriteLine($"Syncing {assignments.Count} assignments for {course.Name}");
-
                 foreach (var a in assignments)
                 {
-                    // Skip unsupported submission types
                     if (a.SubmissionTypes == null ||
                         a.SubmissionTypes.Contains("none") ||
                         a.SubmissionTypes.Contains("on_paper") ||
@@ -110,7 +102,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     {
                         continue;
                     }
-
                     var assignment = await _db.Assignments.FirstOrDefaultAsync(x => x.Id == a.Id);
 
                     if (assignment == null)
@@ -123,7 +114,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                             Description = a.Description,
                             DueAt = a.Due_At
                         };
-
                         _db.Assignments.Add(assignment);
                         await _db.SaveChangesAsync();
                     }
@@ -135,33 +125,60 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                         await _db.SaveChangesAsync();
                     }
 
-                    var submissions = await _canvas.GetAssignmentSubmissionsAsync(course.Id, a.Id);
+                    var s = a.Submission;
 
-                    foreach (var s in submissions)
+                    if (s == null)
+                        continue;
+
+                    var submission = await _db.Submissions.FirstOrDefaultAsync(x => x.Id == s.Id);
+
+                    if (submission == null)
                     {
-                        var submission = await _db.Submissions.FirstOrDefaultAsync(x => x.Id == s.Id);
-
-                        if (submission == null)
+                        submission = new Submission
                         {
-                            submission = new Submission
-                            {
-                                Id = s.Id,
-                                AssignmentId = assignment.Id,
-                                StudentId = student.StudentId,
-                                Score = s.Score,
-                                SubmittedAt = s.SubmittedAt
-                            };
-
-                            _db.Submissions.Add(submission);
-                        }
-                        else
-                        {
-                            submission.Score = s.Score;
-                            submission.SubmittedAt = s.SubmittedAt;
-                        }
+                            Id = s.Id,
+                            AssignmentId = assignment.Id,
+                            StudentId = student.StudentId,
+                            Score = s.Score,
+                            SubmittedAt = s.SubmittedAt
+                        };
+                        _db.Submissions.Add(submission);
+                        await _db.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        submission.Score = s.Score;
+                        submission.SubmittedAt = s.SubmittedAt;
+                        await _db.SaveChangesAsync();
                     }
 
-                    await _db.SaveChangesAsync();
+                    if (s.Comments != null)
+                    {
+                        foreach (var cmt in s.Comments)
+                        {
+                            var existingComment = await _db.SubmissionComments.FirstOrDefaultAsync(x => x.Id == cmt.Id);
+
+                            if (existingComment == null)
+                            {
+                                var comment = new SubmissionComment
+                                {
+                                    Id = cmt.Id,
+                                    SubmissionId = submission.Id,
+                                    Comment = cmt.Comment,
+                                    AuthorName = cmt.AuthorName,
+                                    CreatedAt = cmt.CreatedAt
+                                };
+                                _db.SubmissionComments.Add(comment);
+                            }
+                            else
+                            {
+                                existingComment.Comment = cmt.Comment;
+                                existingComment.AuthorName = cmt.AuthorName;
+                                existingComment.CreatedAt = cmt.CreatedAt;
+                            }
+                        }
+                        await _db.SaveChangesAsync();
+                    }
                 }
             }
         }

@@ -14,17 +14,13 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas.DTOs
         [JsonPropertyName("score")]
         public double? Score { get; set; }
 
-        //[JsonPropertyName("workflow_state")]
-        //public string WorkflowState { get; set; } = string.Empty;
-
         [JsonPropertyName("submitted_at")]
         public DateTime? SubmittedAt { get; set; }
 
-        //[JsonPropertyName("comments")]
-        //public string Comments { get; set; } = string.Empty;
+        [JsonPropertyName("submission_comments")]
+        public List<CanvasSubmissionComment>? Comments { get; set; }
 
         [JsonExtensionData]
         public Dictionary<string, object>? ExtraFields { get; set; }
-
     }
 }
