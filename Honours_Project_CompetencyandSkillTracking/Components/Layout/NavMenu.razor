@@ -16,7 +16,7 @@
         }
         else if (!string.IsNullOrEmpty(AuthState.Role))
         {
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="home" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
 
@@ -109,7 +109,7 @@
         }
         else
         {
-            <NavLink class="nav-link" href="signin">
+            <NavLink class="nav-link" href="">
                 <span class="bi bi-box-arrow-in-right"></span> Sign In
             </NavLink>
         }
@@ -125,6 +125,6 @@
     private async Task Logout()
     {
         await AuthState.ClearAsync();
-        NavigationManager.NavigateTo("/signin");
+        NavigationManager.NavigateTo("/");
     }
 }

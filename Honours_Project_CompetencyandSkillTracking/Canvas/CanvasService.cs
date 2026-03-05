@@ -41,19 +41,14 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
         public async Task<List<CanvasSubmission>> GetAssignmentSubmissionsAsync(long courseId, long assignmentId)
         {
-            string endpoint = $"api/v1/courses/{courseId}/assignments/{assignmentId}/submissions?student_ids=self";
+            string endpoint = $"api/v1/courses/{courseId}/assignments/{assignmentId}/submissions/self";
             Console.WriteLine($">>> Canvas GET: {endpoint}");
 
             try
             {
                 var response = await _http.GetAsync(endpoint);
 
-                // Log the full response headers and status code
                 Console.WriteLine($"Status Code: {response.StatusCode}");
-                foreach (var header in response.Headers)
-                {
-                    Console.WriteLine($"{header.Key}: {string.Join(",", header.Value)}");
-                }
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -66,7 +61,11 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                 var json = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(json);
 
-                return JsonSerializer.Deserialize<List<CanvasSubmission>>(json, JsonOptions) ?? new List<CanvasSubmission>();
+                var submission = JsonSerializer.Deserialize<CanvasSubmission>(json, JsonOptions);
+
+                return submission != null
+                    ? new List<CanvasSubmission> { submission }
+                    : new List<CanvasSubmission>();
             }
             catch (Exception ex)
             {

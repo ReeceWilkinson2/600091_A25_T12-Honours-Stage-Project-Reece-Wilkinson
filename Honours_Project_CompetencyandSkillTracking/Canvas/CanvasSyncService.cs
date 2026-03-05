@@ -20,7 +20,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         {
             var student = await SyncProfileAsync();
             await SyncCoursesAsync(student);
-            await SyncOutcomesAndResultsAsync(student);
+            //await SyncOutcomesAndResultsAsync(student);
             //await GetOutcomesForJohnWTestCourseAsync();
             //await GetStudentAccessibleOutcomesAsync(77966);
         }

@@ -1,4 +1,4 @@
-﻿@page "/signin"
+﻿@page "/"
 @rendermode InteractiveServer
 @layout LoggedOutLayout
 @inject NavigationManager NavigationManager
@@ -66,6 +66,6 @@
 
 		await AuthState.SetUserAsync(user.StudentId, user.Role);
 
-		NavigationManager.NavigateTo("/");
+		NavigationManager.NavigateTo("/home");
 	}
 }

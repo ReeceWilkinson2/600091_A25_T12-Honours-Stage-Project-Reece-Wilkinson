@@ -39,10 +39,7 @@
             <InputTextArea @bind-Value="level.Description" class="form-control" />
 
             <label>Module</label>
-            <select class="form-control"
-                    value="@level.ModCode"
-                    @onchange="(e) => HandleModuleChange(e, level)">
-
+            <select class="form-control"value="@level.ModCode"@onchange="(e) => HandleModuleChange(e, level)">
                 <option value="">Select Module</option>
 
                 @foreach (var module in DistinctModules)
@@ -53,22 +50,18 @@
                 }
             </select>
 
-            <button type="button"
-                    class="btn btn-danger mt-2"
-                    @onclick="() => RemoveLevel(level)">
+            <button type="button"class="btn btn-danger mt-2"@onclick="() => RemoveLevel(level)">
                 Remove Level
             </button>
 
         </div>
     }
 
-    <button type="button"
-            class="btn btn-secondary mb-3"
-            @onclick="AddLevel">
+    <button type="button"class="btn btn-secondary mb-3"@onclick="AddLevel">
         + Add Level
     </button>
 
-    <button type="submit" class="btn btn-primary">
+    <button type="submit"  class="btn btn-primary">
         Add Competency
     </button>
 </EditForm>

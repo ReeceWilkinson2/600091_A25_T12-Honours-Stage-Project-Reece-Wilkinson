@@ -9,6 +9,7 @@
                 <tr>
                     <th>Submission ID</th>
                     <th>Assignment ID</th>
+                    <th>Assignment Name</th>
                     <th>Student</th>
                     <th>Score</th>
                     <th>Submitted At</th>
@@ -23,6 +24,7 @@
                         <tr @onclick="(() => SetSubmissionForUpdate(submission))">
                             <td>@submission.Id</td>
                             <td>@submission.AssignmentId</td>
+                            <td>@submission.Assignment</td>
                             <td>@submission.Student.UserName</td>
                             <td>@submission.Score</td>
                             <td>@submission.SubmittedAt</td>
