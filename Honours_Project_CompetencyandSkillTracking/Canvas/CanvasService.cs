@@ -37,43 +37,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
         public async Task<List<CanvasCourse>> GetMyCoursesAsync() => await GetPagedAsync<CanvasCourse>("api/v1/courses?enrollment_state=active&include[]=syllabus_body&include[]=term");
 
-        //public async Task<List<CanvasAssignment>> GetCourseAssignmentsAsync(long courseId) => await GetPagedAsync<CanvasAssignment>($"api/v1/courses/{courseId}/assignments?include[]=description&include[]=submission_types");
         public async Task<List<CanvasAssignment>> GetCourseAssignmentsAsync(long courseId) => await GetPagedAsync<CanvasAssignment>($"api/v1/courses/{courseId}/assignments?include[]=submission&include[]=submission_comments");
-
-        //public async Task<List<CanvasSubmission>> GetAssignmentSubmissionsAsync(long courseId, long assignmentId)
-        //{
-        //    string endpoint = $"api/v1/courses/{courseId}/assignments/{assignmentId}/submissions/self";
-        //    Console.WriteLine($">>> Canvas GET: {endpoint}");
-
-        //    try
-        //    {
-        //        var response = await _http.GetAsync(endpoint);
-
-        //        Console.WriteLine($"Status Code: {response.StatusCode}");
-
-        //        if (!response.IsSuccessStatusCode)
-        //        {
-        //            Console.WriteLine($">>> Submission fetch failed: {response.StatusCode}");
-        //            var responseContent = await response.Content.ReadAsStringAsync();
-        //            Console.WriteLine($"Response content: {responseContent}");
-        //            return new List<CanvasSubmission>();
-        //        }
-
-        //        var json = await response.Content.ReadAsStringAsync();
-        //        Console.WriteLine(json);
-
-        //        var submission = JsonSerializer.Deserialize<CanvasSubmission>(json, JsonOptions);
-
-        //        return submission != null
-        //            ? new List<CanvasSubmission> { submission }
-        //            : new List<CanvasSubmission>();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine($">>> Exception fetching submissions for {assignmentId}: {ex.Message}");
-        //        return new List<CanvasSubmission>();
-        //    }
-        //}
 
         public async Task<List<CanvasOutcome>> GetCourseOutcomesAsync(long courseId)=> await GetPagedAsync<CanvasOutcome>($"api/v1/courses/{courseId}/outcomes");
 
