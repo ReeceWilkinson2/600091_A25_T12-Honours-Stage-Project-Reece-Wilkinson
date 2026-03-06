@@ -15,6 +15,7 @@
                     <th>Name</th>
                     <th>Code</th>
                     <th>Term</th>
+                    <th>Outcomes</th>
                     <th>Delete</th>
                 </tr>
             </thead>
@@ -26,6 +27,11 @@
                         <td>@course.Name</td>
                         <td>@course.Code</td>
                         <td>@course.Term</td>
+                    <td>
+                        @string.Join(", ", OutcomesByCourse.ContainsKey(course.Id)
+                                                ? OutcomesByCourse[course.Id].Select(o => o.Title)
+                                                : Array.Empty<string>())
+                    </td>
                         <td>
                             <button class="btn btn-danger"
                                     @onclick="() => DeleteCourse(course)"
@@ -141,6 +147,8 @@
 
     private Assignment EditAssignment = new();
 
+    private Dictionary<long, List<Outcome>> OutcomesByCourse = new();
+
     protected override async Task OnInitializedAsync()
     {
         await LoadCourses();
@@ -151,6 +159,13 @@
         Courses = await DbContext.Courses
             .OrderBy(c => c.Name)
             .ToListAsync();
+
+        // Load outcomes for each course
+        var allOutcomes = await DbContext.Outcomes.ToListAsync();
+
+        OutcomesByCourse = allOutcomes
+            .GroupBy(o => o.CourseId)
+            .ToDictionary(g => g.Key, g => g.ToList());
     }
 
     private async Task SelectCourse(Course course)

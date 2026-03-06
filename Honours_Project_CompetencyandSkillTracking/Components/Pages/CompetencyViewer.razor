@@ -50,7 +50,7 @@ else
 @code {
     [Parameter] public string CompetencyID { get; set; }
 
-    private CompetencyData Competency;
+    private CompetencyData? Competency;
     private Dictionary<string, string> ModuleLookup = new();
 
     protected override async Task OnInitializedAsync()

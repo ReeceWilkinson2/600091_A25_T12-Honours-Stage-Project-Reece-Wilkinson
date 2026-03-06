@@ -13,8 +13,7 @@
         <p>Email: @student.StEmail</p>
         <p>Full Name: @student.UserName</p>
         <p>Enrolled Courses: @string.Join(", ", student.Courses.Select(c => c.Name))</p>
-        <p>Assignments: @string.Join(", ", student.Submissions.Select(c => c.Id))</p>
-
+        <p>Assignments: @string.Join(", ", student.Submissions.Select(s => $"{s.Assignment.Name} (Score: {s.Score})"))</p>
     </div>
 }
 else
@@ -24,7 +23,7 @@ else
 
 @code {
     [Parameter] public string StudentId { get; set; }
-    private User student;
+    private User? student;
 
     protected override async Task OnInitializedAsync()
     {
