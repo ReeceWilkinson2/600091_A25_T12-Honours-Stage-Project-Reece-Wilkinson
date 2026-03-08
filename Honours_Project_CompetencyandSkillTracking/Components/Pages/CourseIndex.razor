@@ -15,6 +15,7 @@
                     <th>Name</th>
                     <th>Code</th>
                     <th>Term</th>
+                    @* <th>Student</th> *@
                     <th>Outcomes</th>
                     <th>Delete</th>
                 </tr>
@@ -27,6 +28,7 @@
                         <td>@course.Name</td>
                         <td>@course.Code</td>
                         <td>@course.Term</td>
+                        @* <td>@course.Students</td> *@
                     <td>
                         @string.Join(", ", OutcomesByCourse.ContainsKey(course.Id)
                                                 ? OutcomesByCourse[course.Id].Select(o => o.Title)

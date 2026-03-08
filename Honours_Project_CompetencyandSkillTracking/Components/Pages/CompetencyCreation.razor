@@ -5,6 +5,12 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject AppDbContext dbContext
 
+<div style="margin-bottom:10px">
+    <button class="module-button" @onclick="ReturnToSelection">
+        ← Back to Selection
+    </button>
+</div>
+
 <h3>Add New Competency</h3>
 
 <EditForm Model="@NewCompetency" OnValidSubmit="AddNewCompetencyData">
@@ -117,5 +123,10 @@
         // Reset form
         NewCompetency = new CompetencyData();
         NewLevels = new List<CompetencyLevels>();
+    }
+
+    private void ReturnToSelection()
+    {
+        NavigationManager.NavigateTo("/datacreation");
     }
 }

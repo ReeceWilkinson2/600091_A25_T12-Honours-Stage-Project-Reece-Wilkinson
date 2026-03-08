@@ -4,7 +4,7 @@
 @inject CompetencyDataServices service
 @inject AppDbContext dbContext
 
-<div style="margin-bottom:20px">
+<div style="margin-bottom:10px">
     <button class="module-button" @onclick="ReturnToSelection">
         ← Back to Selection
     </button>
@@ -19,6 +19,7 @@
 
         <h4>Competency ID:</h4>
         <p>@Competency.CompetencyID</p>
+        @* <p>@Competency.CompetencyCourses</p> *@
 
         @if (Competency.Levels != null && Competency.Levels.Any())
         {

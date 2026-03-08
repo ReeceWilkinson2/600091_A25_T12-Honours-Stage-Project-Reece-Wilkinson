@@ -3,10 +3,12 @@
 @inject NavigationManager NavigationManager
 @inject UserService service
 
+<h3>Student Selection</h3>
+
 <div>
     @foreach (var student in Students)
     {
-        <button @onclick="() => LoadStudentDetails(student)">@student.StudentId, @student.UserName</button>
+        <button class="module-button" @onclick="() => LoadStudentDetails(student)">@student.StudentId, @student.UserName</button>
     }
 </div>
 

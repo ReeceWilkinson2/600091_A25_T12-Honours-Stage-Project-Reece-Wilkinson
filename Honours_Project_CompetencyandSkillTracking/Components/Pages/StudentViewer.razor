@@ -3,6 +3,13 @@
 @inject NavigationManager NavigationManager
 @inject UserService service
 
+
+<div style="margin-bottom:10px">
+    <button class="module-button" @onclick="ReturnToSelection">
+        ← Back to Selection
+    </button>
+</div>
+
 <h3>Student Details</h3>
 
 @if (student != null)
@@ -12,7 +19,7 @@
         <p>Student ID: @student.StudentId</p>
         <p>Email: @student.StEmail</p>
         <p>Full Name: @student.UserName</p>
-        <p>Enrolled Courses: @string.Join(", ", student.Courses.Select(c => c.Name))</p>
+        <p>Enrolled Modules: @string.Join(", ", student.Courses.Select(c => c.Name))</p>
         <p>Assignments: @string.Join(", ", student.Submissions.Select(s => $"{s.Assignment.Name} (Score: {s.Score})"))</p>
     </div>
 }
@@ -29,5 +36,10 @@ else
     {
         // Fetch the detailed information for the student using their StudentId
         student = await service.GetUserByIdAsync(StudentId);
+    }
+
+    private void ReturnToSelection()
+    {
+        NavigationManager.NavigateTo("/studentselection");
     }
 }

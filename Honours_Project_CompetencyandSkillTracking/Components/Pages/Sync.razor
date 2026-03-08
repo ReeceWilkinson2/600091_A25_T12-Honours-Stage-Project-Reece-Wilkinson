@@ -23,11 +23,11 @@ else if (_completed)
     <p style="color:green">Data sync completed successfully.</p>
 }
 
-<button @onclick="StartSync" disabled="@_isSyncing">
+<button class="module-button" @onclick="StartSync" disabled="@_isSyncing">
     Start Canvas Sync
 </button>
 
-<button @onclick="ReadCsv" >
+<button class="module-button" @onclick="ReadCsv">
     Import Modules from CSV
 </button>
 
