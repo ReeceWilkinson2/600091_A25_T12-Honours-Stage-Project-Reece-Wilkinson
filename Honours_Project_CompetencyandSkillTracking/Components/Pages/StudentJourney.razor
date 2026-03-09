@@ -3,6 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject UserService service
 @inject CompetencyDataServices competencyService
+@inject AuthStateService AuthState
 
 
 @if (SelectedCourse == null)
@@ -218,6 +219,7 @@ else if (SelectedModule == null)
                             </div>
                         </div>
                     </div>
+                    @*Add drop down for all stored comps(use the main title) then highlight every module it appears*@
                 </div>
         </ChildContent>
     </Tab>
@@ -233,6 +235,18 @@ else if (SelectedCompetency == null)
     <h3>@SelectedModuleName</h3>
     <h4>Competencies</h4>
 
+    @if (student != null)
+    {
+        @foreach (var sub in student.Submissions)
+        {
+            <p>
+                Assignment: @sub.Assignment.Name |
+                CourseId: @sub.Assignment.CourseId |
+                StudentId: @sub.StudentId
+            </p>
+        }
+    }
+
     @if (SelectedModuleCompetencies.Any())
     {
         @foreach (var competency in SelectedModuleCompetencies)
@@ -240,6 +254,50 @@ else if (SelectedCompetency == null)
             <button class="module-button" @onclick="() => LoadCompetencyDetails(competency)">
                 @competency.CompetencyID - @competency.CompetencyName
             </button>
+        }
+    }
+    else
+    {
+        <p>No competencies found for this module.</p>
+    }
+    @if (student != null && ActiveModule != null)
+    {
+        <h3>@SelectedModuleName</h3>
+        <h4>Competencies</h4>
+
+        @if (SelectedModuleCompetencies.Any())
+        {
+            @foreach (var competency in SelectedModuleCompetencies)
+            {
+                <button class="module-button" @onclick="() => LoadCompetencyDetails(competency)">
+                    @competency.CompetencyID - @competency.CompetencyName
+                </button>
+            }
+        }
+
+        @* Filter submissions for this module *@
+        var moduleSubmissions = new List<Submission>();
+
+        if (long.TryParse(ActiveModule.ModCode, out long modCodeLong))
+        {
+            moduleSubmissions = student.Submissions?
+                .Where(s => s.Assignment != null && s.Assignment.CourseId == modCodeLong)
+                .ToList();
+        }
+
+        if (moduleSubmissions != null && moduleSubmissions.Any())
+        {
+            <h4>Assignments</h4>
+            <ul>
+                @foreach (var sub in moduleSubmissions)
+                {
+                    <li>@sub.Assignment.Name - Score: @sub.Score</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>No submissions for this module.</p>
         }
     }
     else
@@ -292,6 +350,7 @@ else
     private string? SelectedCourseName;
     private string? SelectedModule;
     private string? SelectedModuleName;
+    private User? student;
     private ModuleData? ActiveModule;
     private List<CompetencyData> SelectedModuleCompetencies = new();
     private CompetencyData? SelectedCompetency;
@@ -299,6 +358,18 @@ else
     private List<ModuleData> Year1Modules = new List<ModuleData>();
     private List<ModuleData> Year2Modules = new List<ModuleData>();
     private List<ModuleData> Year3Modules = new List<ModuleData>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (string.IsNullOrEmpty(AuthState.UserId))
+            return;
+
+        student = await service.GetUserByIdAsync(AuthState.UserId);
+
+        StateHasChanged();
+    }
 
     private async Task SelectCourse(string courseName)
     {
@@ -329,6 +400,11 @@ else
         SelectedModuleName = module.ModuleName;
 
         SelectedModuleCompetencies = await competencyService.GetCompetenciesByModuleAsync(module.ModCode);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthState.InitializeAsync();
     }
 
     private void LoadCompetencyDetails(CompetencyData competency)
