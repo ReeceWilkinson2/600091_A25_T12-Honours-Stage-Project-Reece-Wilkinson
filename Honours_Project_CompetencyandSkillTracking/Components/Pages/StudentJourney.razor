@@ -219,7 +219,6 @@ else if (SelectedModule == null)
                             </div>
                         </div>
                     </div>
-                    @*Add drop down for all stored comps(use the main title) then highlight every module it appears*@
                 </div>
         </ChildContent>
     </Tab>
@@ -252,18 +251,6 @@ else if (SelectedCompetency == null)
     <h3>@SelectedModuleName</h3>
     <h4>Competencies</h4>
 
-    @* @if (student != null)
-    {
-        @foreach (var sub in student.Submissions)
-        {
-            <p>
-                Assignment: @sub.Assignment.Name |
-                CourseId: @sub.Assignment.CourseId |
-                StudentId: @sub.StudentId
-            </p>
-        }
-    } *@
-
     @if (student != null && ActiveModule != null)
     {
         @if (SelectedModuleCompetencies.Any())
@@ -275,35 +262,34 @@ else if (SelectedCompetency == null)
                 </button>
             }
         }
-
-        @* Filter submissions for this module *@
-        @* var moduleSubmissions = new List<Submission>();
-
-        if (long.TryParse(ActiveModule.ModCode, out long modCodeLong))
+        else
         {
-            moduleSubmissions = student.Submissions?
-                .Where(s => s.Assignment != null && s.Assignment.CourseId == modCodeLong)
-                .ToList();
+            <p>No competencies found for this module.</p>
         }
+    }
 
-        if (moduleSubmissions != null && moduleSubmissions.Any())
+    <h4 style="margin-top:30px">Submissions for this module</h4>
+    @if (student != null && ActiveModule != null)
+    {
+        var relevantSubmissions = GetRelevantSubmissionsForModule();
+
+        if (relevantSubmissions.Any())
         {
-            <h4>Assignments</h4>
             <ul>
-                @foreach (var sub in moduleSubmissions)
+                @foreach (var submission in relevantSubmissions)
                 {
-                    <li>@sub.Assignment.Name - Score: @sub.Score</li>
+                    <li>
+                        Assignment: @submission.Assignment.Name |
+                        Score: @submission.Score |
+                        Submitted: @submission.SubmittedAt
+                    </li>
                 }
             </ul>
         }
         else
         {
-            <p>No submissions for this module.</p>
-        } *@
-    }
-    else
-    {
-        <p>No competencies found for this module.</p>
+            <p>No relevant submissions found for this module.</p>
+        }
     }
 }
 else
@@ -443,6 +429,33 @@ else
         SelectedModuleName = module.ModuleName;
 
         SelectedModuleCompetencies = await competencyService.GetCompetenciesByModuleAsync(module.ModCode);
+    }
+
+    private List<Submission> GetRelevantSubmissionsForModule()
+    {
+        if (student == null || ActiveModule == null)
+            return new List<Submission>();
+
+        var targetModCode = ActiveModule.ModCode?.Trim();
+        if (string.IsNullOrWhiteSpace(targetModCode))
+            return new List<Submission>();
+
+        return student.Submissions
+            .Where(sub =>
+            {
+                var courseCode = sub.Assignment?.Course?.Code;
+                if (string.IsNullOrWhiteSpace(courseCode))
+                    return false;
+
+                // Extract the "module" part from the Canvas course code
+                var submissionModCode = courseCode.Split('_')[0].Trim();
+
+                // Compare submission’s module code to the selected module’s ModCode
+                return string.Equals(submissionModCode,
+                                     targetModCode,
+                                     StringComparison.OrdinalIgnoreCase);
+            })
+            .ToList();
     }
 
     protected override async Task OnInitializedAsync()
