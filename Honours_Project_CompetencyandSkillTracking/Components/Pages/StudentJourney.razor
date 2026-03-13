@@ -190,6 +190,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (IsModuleRestricted(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Available</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -205,6 +210,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (IsModuleRestricted(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Available</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -214,6 +224,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (IsModuleRestricted(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Available</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -327,12 +342,7 @@ else
     </div>
 }
 
-
 @code {
-    // need to make a service to load and trim student enrolled modules to use for the module restrictions which will grey out modules that the student can't pick
-    // Parallel and Concurrent programming needs Advanced Programming to pick it (needs 500083 for 600086)
-	// Games Architecture needs Graphics Programming to pick it (needs 551455 for 600098)
-	// Natural Language Processing needs machine learning to pick it (needs 662086 for 662253)
     private string? SelectedCourse;
     private string? SelectedCourseName;
     private string? SelectedModule;
@@ -351,6 +361,13 @@ else
     private List<ModuleData> Year1Modules = new List<ModuleData>();
     private List<ModuleData> Year2Modules = new List<ModuleData>();
     private List<ModuleData> Year3Modules = new List<ModuleData>();
+
+    private Dictionary<string, string> ModuleRestrictions = new Dictionary<string, string>
+    {
+        { "600086", "500083" }, // Parallel and Concurrent Programming needs Advanced Programming
+        { "600098", "551455" }, // Games Architecture needs Graphics Programming
+        { "662253", "662086" }  // Natural Language Processing needs Machine Learning
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -396,15 +413,11 @@ else
     {
         SelectedCompetencyFilterId = e.Value?.ToString();
 
-        var competency = AllCompetencies
-            .FirstOrDefault(c => c.CompetencyID == SelectedCompetencyFilterId);
+        var competency = AllCompetencies.FirstOrDefault(c => c.CompetencyID == SelectedCompetencyFilterId);
 
         if (competency?.Levels != null)
         {
-            FilterCompetencyModuleCodes = competency.Levels
-                .Select(l => l.ModCode)
-                .Where(m => !string.IsNullOrWhiteSpace(m))
-                .ToHashSet();
+            FilterCompetencyModuleCodes = competency.Levels.Select(l => l.ModCode).Where(m => !string.IsNullOrWhiteSpace(m)).ToHashSet();
         }
         else
         {
@@ -451,12 +464,54 @@ else
                 var submissionModCode = courseCode.Split('_')[0].Trim();
 
                 // Compare submission’s module code to the selected module’s ModCode
-                return string.Equals(submissionModCode,
-                                     targetModCode,
-                                     StringComparison.OrdinalIgnoreCase);
+                return string.Equals(submissionModCode,targetModCode,StringComparison.OrdinalIgnoreCase);
             })
             .ToList();
     }
+
+    private bool IsModuleRestricted(ModuleData module)
+    {
+        if (student == null)
+            return false;
+
+        if (string.IsNullOrEmpty(module.ModCode))
+        {
+            return false;
+        }
+
+        foreach (var restriction in ModuleRestrictions)
+        {
+            var restrictedModCode = restriction.Key;
+            var requiredModCode = restriction.Value;
+
+            if (string.Equals(module.ModCode, restrictedModCode, StringComparison.OrdinalIgnoreCase))
+            {
+                var isEnrolledInRequiredModule = student.Courses.Any(course =>
+                    {
+                        var courseModCode = ExtractModCodeFromCourse(course.Code);
+                        return string.Equals(courseModCode, requiredModCode, StringComparison.OrdinalIgnoreCase);
+                    });
+                return !isEnrolledInRequiredModule;
+            }
+        }
+        return false;
+    }
+
+
+    private string ExtractModCodeFromCourse(string courseCode)
+    {
+        if (string.IsNullOrWhiteSpace(courseCode))
+            return string.Empty;
+
+        var trimmed = courseCode.Trim();
+        var digits = new string(trimmed.TakeWhile(char.IsDigit).ToArray());
+
+        if (digits.Length == 6)
+            return digits;
+
+        return string.Empty;
+    }
+
 
     protected override async Task OnInitializedAsync()
     {

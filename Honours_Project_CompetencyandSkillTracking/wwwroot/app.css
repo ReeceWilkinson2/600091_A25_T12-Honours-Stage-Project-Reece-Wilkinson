@@ -140,3 +140,21 @@ h1:focus {
     background-color: #fff3e0;
     font-weight: 600;
 }
+
+
+
+
+.restricted-text {
+    color: red;
+    font-style: italic;
+}
+
+.module-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.module-button-restricted {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
