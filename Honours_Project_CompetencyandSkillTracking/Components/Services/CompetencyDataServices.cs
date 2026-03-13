@@ -49,6 +49,13 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             return await _db.CompetencyData.Include(c => c.Levels).Where(c => c.Levels.Any(l => l.ModCode == modCode)).ToListAsync();
         }
 
+        public async Task<List<CompetencyData>> GetAllCompetenciesAsync()
+        {
+            return await _db.CompetencyData
+                .Include(c => c.Levels)
+                .ToListAsync();
+        }
+
         public async Task<CompetencyData> UpdateCompetencyDataAsync(CompetencyData CompetencyData)
         {
             try

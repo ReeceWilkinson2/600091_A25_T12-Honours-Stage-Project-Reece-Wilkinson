@@ -133,3 +133,10 @@ h1:focus {
     .module-button:hover {
         background-color: #eaeaea;
     }
+
+
+.module-button-highlight {
+    border: 2px solid #ff9800;
+    background-color: #fff3e0;
+    font-weight: 600;
+}

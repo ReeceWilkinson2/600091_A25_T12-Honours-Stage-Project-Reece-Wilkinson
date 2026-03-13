@@ -40,7 +40,7 @@ else if (SelectedModule == null)
                 <div class="module-group">
                     @foreach (var module in Year1Modules.Where(m => m.SelectionStatus == "Core"))
                     {
-                        <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                        <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                             @module.ModuleName
                         </button>
                     }
@@ -53,7 +53,7 @@ else if (SelectedModule == null)
                                 <h5>Compulsory</h5>
                                 @foreach (var module in Year1Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
                                 {
-                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -62,7 +62,7 @@ else if (SelectedModule == null)
                                 <h5>Optional</h5>
                                 @foreach (var module in Year1Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
                                 {
-                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -77,7 +77,7 @@ else if (SelectedModule == null)
                                 <h5>Compulsory</h5>
                                 @foreach (var module in Year1Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Compulsory"))
                                 {
-                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -86,7 +86,7 @@ else if (SelectedModule == null)
                                 <h5>Optional</h5>
                                 @foreach (var module in Year1Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Optional"))
                                 {
-                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -103,7 +103,7 @@ else if (SelectedModule == null)
                 <div class="module-group">
                     @foreach (var module in Year2Modules.Where(m => m.SelectionStatus == "Core"))
                     {
-                        <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                        <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                             @module.ModuleName
                         </button>
                     }
@@ -116,7 +116,7 @@ else if (SelectedModule == null)
                                 <h5>Compulsory</h5>
                                 @foreach (var module in Year2Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
                                 {
-                                    <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -125,7 +125,7 @@ else if (SelectedModule == null)
                                 <h5>Optional</h5>
                                 @foreach (var module in Year2Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
                                 {
-                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -140,7 +140,7 @@ else if (SelectedModule == null)
                                 <h5>Compulsory</h5>
                                 @foreach (var module in Year2Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Compulsory"))
                                 {
-                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -149,7 +149,7 @@ else if (SelectedModule == null)
                                 <h5>Optional</h5>
                                 @foreach (var module in Year2Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Optional"))
                                 {
-                                    <button class="module-button"@onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -166,7 +166,7 @@ else if (SelectedModule == null)
                 <div class="module-group">
                     @foreach (var module in Year3Modules.Where(m => m.SelectionStatus == "Elective"))
                     {
-                        <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                        <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                             @module.ModuleName
                         </button>
                     }
@@ -179,7 +179,7 @@ else if (SelectedModule == null)
                                 <h5>Compulsory</h5>
                                 @foreach (var module in Year3Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
                                 {
-                                    <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -188,7 +188,7 @@ else if (SelectedModule == null)
                                 <h5>Optional</h5>
                                 @foreach (var module in Year3Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
                                 {
-                                    <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -203,7 +203,7 @@ else if (SelectedModule == null)
                                 <h5>Compulsory</h5>
                                 @foreach (var module in Year3Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Compulsory"))
                                 {
-                                    <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -212,7 +212,7 @@ else if (SelectedModule == null)
                                 <h5>Optional</h5>
                                 @foreach (var module in Year3Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Optional"))
                                 {
-                                    <button class="module-button" @onclick="() => LoadModuleDetails(module)">
+                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
                                     </button>
                                 }
@@ -224,6 +224,23 @@ else if (SelectedModule == null)
         </ChildContent>
     </Tab>
     </Tabs>
+    @if (AllCompetencies.Any())
+    {
+        <div class="form-group" style="margin-bottom:15px">
+            <label>Search Competencies:</label>
+            <select class="form-control"
+                    @onchange="OnCompetencyFilterChanged">
+                <option value="">-- None --</option>
+                @foreach (var comp in AllCompetencies.OrderBy(c => c.CompetencyID))
+                {
+                    <option value="@comp.CompetencyID">
+                        @comp.CompetencyID - @comp.CompetencyName
+                    </option>
+                }
+            </select>
+        </div>
+    }
+
 }
 else if (SelectedCompetency == null)
 {
@@ -235,7 +252,7 @@ else if (SelectedCompetency == null)
     <h3>@SelectedModuleName</h3>
     <h4>Competencies</h4>
 
-    @if (student != null)
+    @* @if (student != null)
     {
         @foreach (var sub in student.Submissions)
         {
@@ -245,26 +262,10 @@ else if (SelectedCompetency == null)
                 StudentId: @sub.StudentId
             </p>
         }
-    }
+    } *@
 
-    @if (SelectedModuleCompetencies.Any())
-    {
-        @foreach (var competency in SelectedModuleCompetencies)
-        {
-            <button class="module-button" @onclick="() => LoadCompetencyDetails(competency)">
-                @competency.CompetencyID - @competency.CompetencyName
-            </button>
-        }
-    }
-    else
-    {
-        <p>No competencies found for this module.</p>
-    }
     @if (student != null && ActiveModule != null)
     {
-        <h3>@SelectedModuleName</h3>
-        <h4>Competencies</h4>
-
         @if (SelectedModuleCompetencies.Any())
         {
             @foreach (var competency in SelectedModuleCompetencies)
@@ -276,7 +277,7 @@ else if (SelectedCompetency == null)
         }
 
         @* Filter submissions for this module *@
-        var moduleSubmissions = new List<Submission>();
+        @* var moduleSubmissions = new List<Submission>();
 
         if (long.TryParse(ActiveModule.ModCode, out long modCodeLong))
         {
@@ -298,7 +299,7 @@ else if (SelectedCompetency == null)
         else
         {
             <p>No submissions for this module.</p>
-        }
+        } *@
     }
     else
     {
@@ -355,6 +356,12 @@ else
     private List<CompetencyData> SelectedModuleCompetencies = new();
     private CompetencyData? SelectedCompetency;
 
+    private List<CompetencyData> AllCompetencies = new();
+    private string? SelectedCompetencyFilterId;
+    private CompetencyData? FilterCompetency;
+    private HashSet<string> FilterCompetencyModuleCodes = new();
+
+
     private List<ModuleData> Year1Modules = new List<ModuleData>();
     private List<ModuleData> Year2Modules = new List<ModuleData>();
     private List<ModuleData> Year3Modules = new List<ModuleData>();
@@ -379,6 +386,8 @@ else
         Year1Modules = await service.GetModuleDataAsync(courseName, "4");
         Year2Modules = await service.GetModuleDataAsync(courseName, "5");
         Year3Modules = await service.GetModuleDataAsync(courseName, "6");
+
+        AllCompetencies = await competencyService.GetAllCompetenciesAsync();
     }
 
     private void ClearSelection()
@@ -388,9 +397,43 @@ else
         SelectedCompetency = null;
         SelectedModule = null;
 
+        SelectedCompetencyFilterId = null;
+        FilterCompetency = null;
+        FilterCompetencyModuleCodes.Clear();
+
         Year1Modules.Clear();
         Year2Modules.Clear();
         Year3Modules.Clear();
+    }
+
+    private void OnCompetencyFilterChanged(ChangeEventArgs e)
+    {
+        SelectedCompetencyFilterId = e.Value?.ToString();
+
+        var competency = AllCompetencies
+            .FirstOrDefault(c => c.CompetencyID == SelectedCompetencyFilterId);
+
+        if (competency?.Levels != null)
+        {
+            FilterCompetencyModuleCodes = competency.Levels
+                .Select(l => l.ModCode)
+                .Where(m => !string.IsNullOrWhiteSpace(m))
+                .ToHashSet();
+        }
+        else
+        {
+            FilterCompetencyModuleCodes.Clear();
+        }
+    }
+
+    private string GetModuleButtonClass(ModuleData module)
+    {
+        var baseClass = "module-button";
+
+        if (FilterCompetencyModuleCodes.Contains(module.ModCode))
+            return baseClass + " module-button-highlight";
+
+        return baseClass;
     }
 
     private async Task LoadModuleDetails(ModuleData module)
