@@ -181,6 +181,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (IsModuleRestricted(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Available</span>
+                                        }
                                     </button>
                                 }
                             </div>
