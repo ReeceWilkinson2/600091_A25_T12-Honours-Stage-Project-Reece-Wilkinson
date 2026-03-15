@@ -21,6 +21,7 @@
         <p>Full Name: @student.UserName</p>
         <p>Enrolled Modules: @string.Join(", ", student.Courses.Select(c => c.Name))</p>
         <p>Assignments: @string.Join(", ", student.Submissions.Select(s => $"{s.Assignment.Name} (Score: {s.Score})"))</p>
+        @* <p>Outcomes: @string.Join(", ", student.Submissions.OutcomeResults.Select(s => $"{s.Assignment.Name} (Score: {s.Score})"))</p> *@
     </div>
 }
 else

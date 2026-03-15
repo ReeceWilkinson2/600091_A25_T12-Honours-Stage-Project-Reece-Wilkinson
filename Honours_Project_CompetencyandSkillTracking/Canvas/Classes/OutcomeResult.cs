@@ -14,7 +14,7 @@
         public bool? Mastery { get; set; }
 
         // Optional computed mastery
-        public bool ComputedMastery => Outcome != null && Score >= Outcome.MasteryPoints;
+        public bool ComputedMastery => Outcome != null && Score.HasValue && Outcome.MasteryPoints.HasValue && Score.Value >= Outcome.MasteryPoints.Value;
 
         public long? SubmissionId { get; set; }
         public Submission? Submission { get; set; }

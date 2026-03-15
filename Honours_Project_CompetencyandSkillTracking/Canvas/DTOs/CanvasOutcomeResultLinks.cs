@@ -5,6 +5,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas.DTOs
     public class CanvasOutcomeResultLinks
     {
         [JsonPropertyName("assignment")]
-        public long? Assignment { get; set; }
+        public string? Assignment { get; set; }
     }
 }

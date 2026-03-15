@@ -26,7 +26,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         private async Task<User> SyncProfileAsync()
         {
             var profile = await _canvas.GetMyProfileAsync();
-            Console.WriteLine($"Syncing profile: {profile.Id}, {profile.Name}");
+            //Console.WriteLine($"Syncing profile: {profile.Id}, {profile.Name}");
             string studentId = profile.Id.ToString();
             var student = await _db.Students.Include(s => s.Courses).FirstOrDefaultAsync(s => s.StudentId == studentId);
 
@@ -56,7 +56,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         private async Task SyncCoursesAsync(User student)
         {
             var courses = await _canvas.GetMyCoursesAsync();
-            Console.WriteLine($"Syncing {courses.Count} courses...");
+            //Console.WriteLine($"Syncing {courses.Count} courses...");
             foreach (var c in courses)
             {
                 var course = await _db.Courses.Include(x => x.Students).FirstOrDefaultAsync(x => x.Id == c.Id);
@@ -86,10 +86,10 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     course.Students.Add(student);
                 }
 
-                await _db.SaveChangesAsync();
+                //await _db.SaveChangesAsync();
 
                 var assignments = await _canvas.GetCourseAssignmentsAsync(c.Id);
-                Console.WriteLine($"Syncing {assignments.Count} assignments for {course.Name}");
+                //Console.WriteLine($"Syncing {assignments.Count} assignments for {course.Name}");
                 foreach (var a in assignments)
                 {
                     if (a.SubmissionTypes == null ||
@@ -113,14 +113,14 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                             DueAt = a.Due_At
                         };
                         _db.Assignments.Add(assignment);
-                        await _db.SaveChangesAsync();
+                        //await _db.SaveChangesAsync();
                     }
                     else
                     {
                         assignment.Name = a.Name;
                         assignment.Description = a.Description;
                         assignment.DueAt = a.Due_At;
-                        await _db.SaveChangesAsync();
+                        //await _db.SaveChangesAsync();
                     }
 
                     var s = a.Submission;
@@ -141,13 +141,13 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                             SubmittedAt = s.SubmittedAt
                         };
                         _db.Submissions.Add(submission);
-                        await _db.SaveChangesAsync();
+                        //await _db.SaveChangesAsync();
                     }
                     else
                     {
                         submission.Score = s.Score;
                         submission.SubmittedAt = s.SubmittedAt;
-                        await _db.SaveChangesAsync();
+                        //await _db.SaveChangesAsync();
                     }
 
                     if (s.Comments != null)
@@ -186,7 +186,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
             var localCourses = await _db.Courses.ToListAsync();
             foreach (var course in localCourses)
             {
-                Console.WriteLine($"Syncing outcomes for course {course.Id}");
+                //Console.WriteLine($"Syncing outcomes for course {course.Id}");
                 var wrapper = await _canvas.GetOutcomeResultsWrapperAsync(course.Id);
 
                 if (wrapper == null)
@@ -229,7 +229,12 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                             continue;
 
                         var existing = await _db.OutcomeResults.FirstOrDefaultAsync(r => r.Id == res.Id);
-                        var assignmentId = res.Links?.Assignment;
+                        long? assignmentId = null;
+
+                        if (long.TryParse(res.Links?.Assignment, out var parsedId))
+                        {
+                            assignmentId = parsedId;
+                        }
 
                         if (existing == null)
                         {
@@ -254,7 +259,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                 }
                 else
                 {
-                    Console.WriteLine($"No outcome results yet for course {course.Id}");
+                    //Console.WriteLine($"No outcome results yet for course {course.Id}");
                 }
                 await _db.SaveChangesAsync();
             }
