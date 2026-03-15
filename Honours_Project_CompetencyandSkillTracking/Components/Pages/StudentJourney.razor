@@ -305,6 +305,21 @@ else if (SelectedCompetency == null)
         {
             <p>No relevant submissions found for this module.</p>
         }
+
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ActiveModule?.VideoLink))
+    {
+        <div style="margin-bottom:20px">
+            <h4>Module Introduction:</h4>
+
+            <iframe src="@ActiveModule.VideoLink"
+                    width="560"
+                    height="315"
+                    style="border:0"
+                    allowfullscreen>
+            </iframe>
+        </div>
     }
 }
 else

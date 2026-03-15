@@ -89,6 +89,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
                     Level = GetValue("Level"),
                     Credits = GetValue("Credits"),
                     ModCode = GetValue("Mod Code"),
+                    VideoLink = GetValue("Video_URLs")
                 };
                 Modules.Add(Module);
             }

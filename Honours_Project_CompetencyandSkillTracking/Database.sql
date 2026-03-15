@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS Modules (
     SelectionStatus TEXT NOT NULL,
     Level TEXT NOT NULL,
     Credits TEXT NOT NULL,
+    VideoLink TEXT,
     UNIQUE(ModCode)
 );
 
