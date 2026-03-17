@@ -22,5 +22,21 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    StudentId = "admin-001",
+                    UserName = "wewo",
+                    StEmail = "test@email",
+                    Password = "test",
+                    Role = "Admin"
+                }
+            );
+        }
     }
 }

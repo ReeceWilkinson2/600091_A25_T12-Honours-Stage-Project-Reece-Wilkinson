@@ -77,6 +77,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             return await _db.Students
                 .Include(s => s.Submissions)
                     .ThenInclude(sub => sub.Assignment)
+                .Include(s => s.Submissions)
+                    .ThenInclude(sub => sub.Comments)
                 .Include(s => s.Courses)
                     .ThenInclude(c => c.Assignments)
                 .FirstOrDefaultAsync(s => s.StudentId == userId);

@@ -263,7 +263,9 @@ else if (SelectedModule == null)
             </select>
         </div>
     }
-    <button class="module-button" @onclick="GoToFullView">Go To Full View</button>
+    <div style="margin-top:20px">
+        <button class="module-button" @onclick="GoToFullView">Go To Full View</button>
+    </div>
 }
 else if (SelectedCompetency == null)
 {
@@ -306,6 +308,27 @@ else if (SelectedCompetency == null)
                         Assignment: @submission.Assignment.Name |
                         Score: @submission.Score |
                         Submitted: @submission.SubmittedAt
+                        <br />
+
+                        @if (submission.Comments != null && submission.Comments.Any())
+                        {
+                            <ul>
+                                @foreach (var comment in submission.Comments)
+                                {
+                                    <li>
+                                        @comment.Comment
+                                        @if (!string.IsNullOrEmpty(comment.AuthorName))
+                                        {
+                                            <em>(by @comment.AuthorName)</em>
+                                        }
+                                        @if (comment.CreatedAt.HasValue)
+                                        {
+                                            <small>- @comment.CreatedAt.Value.ToString("g")</small>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
                     </li>
                 }
             </ul>
