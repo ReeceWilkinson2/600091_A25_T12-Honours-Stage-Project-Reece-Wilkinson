@@ -5,13 +5,10 @@ using Honours_Project_CompetencyandSkillTracking.Components;
 using Honours_Project_CompetencyandSkillTracking.Data;
 using Honours_Project_CompetencyandSkillTracking.Components.Services;
 using Microsoft.EntityFrameworkCore;
-using Syncfusion.Blazor;
 using Microsoft.Extensions.Configuration;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
@@ -29,8 +26,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>options.UseSqlite($"Data S
 builder.Services.AddScoped<CanvasSyncService>();
 builder.Services.AddHttpClient<CanvasService>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddSyncfusionBlazor();
-builder.Services.AddSingleton<ISyncfusionStringLocalizer, SyncfusionStringLocalizer>();
 builder.Services.AddScoped<AuthStateService>();
 builder.Services.AddScoped<ModuleCSVReading>();
 builder.Services.AddScoped<CompetencyDataServices>();

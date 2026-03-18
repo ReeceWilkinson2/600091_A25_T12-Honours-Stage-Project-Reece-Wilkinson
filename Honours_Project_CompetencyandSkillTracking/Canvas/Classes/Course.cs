@@ -5,7 +5,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas.Classes
     public class Course
     {
         [Key]
-        public long Id { get; set; }
+        public long Id { get; set; } // Canvas ID
         public string Name { get; set; } = "";
         public string Code { get; set; } = "";
         public string? Syllabus { get; set; }
