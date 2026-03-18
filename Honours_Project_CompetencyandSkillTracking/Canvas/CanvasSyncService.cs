@@ -56,10 +56,10 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         private async Task SyncCoursesAsync(User student)
         {
             var courses = await _canvas.GetMyCoursesAsync();
-            //Console.WriteLine($"Syncing {courses.Count} courses...");
+
             foreach (var c in courses)
             {
-                var course = await _db.Courses.Include(x => x.Students).FirstOrDefaultAsync(x => x.Id == c.Id);
+                var course = await _db.Courses.FirstOrDefaultAsync(x => x.Id == c.Id);
 
                 if (course == null)
                 {
@@ -69,8 +69,10 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                         Name = c.Name,
                         Code = c.Course_Code,
                         Syllabus = c.Syllabus_Body,
-                        Term = c.Term?.Name ?? ""
+                        Term = c.Term?.Name ?? "",
+                        StudentId = student.StudentId
                     };
+
                     _db.Courses.Add(course);
                 }
                 else
@@ -79,17 +81,11 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     course.Code = c.Course_Code;
                     course.Syllabus = c.Syllabus_Body;
                     course.Term = c.Term?.Name ?? "";
+                    course.StudentId = student.StudentId;
                 }
-
-                if (!course.Students.Any(s => s.StudentId == student.StudentId))
-                {
-                    course.Students.Add(student);
-                }
-
-                //await _db.SaveChangesAsync();
 
                 var assignments = await _canvas.GetCourseAssignmentsAsync(c.Id);
-                //Console.WriteLine($"Syncing {assignments.Count} assignments for {course.Name}");
+
                 foreach (var a in assignments)
                 {
                     if (a.SubmissionTypes == null ||
@@ -100,6 +96,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     {
                         continue;
                     }
+
                     var assignment = await _db.Assignments.FirstOrDefaultAsync(x => x.Id == a.Id);
 
                     if (assignment == null)
@@ -113,14 +110,12 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                             DueAt = a.Due_At
                         };
                         _db.Assignments.Add(assignment);
-                        //await _db.SaveChangesAsync();
                     }
                     else
                     {
                         assignment.Name = a.Name;
                         assignment.Description = a.Description;
                         assignment.DueAt = a.Due_At;
-                        //await _db.SaveChangesAsync();
                     }
 
                     var s = a.Submission;
@@ -141,20 +136,19 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                             SubmittedAt = s.SubmittedAt
                         };
                         _db.Submissions.Add(submission);
-                        //await _db.SaveChangesAsync();
                     }
                     else
                     {
                         submission.Score = s.Score;
                         submission.SubmittedAt = s.SubmittedAt;
-                        //await _db.SaveChangesAsync();
                     }
 
                     if (s.Comments != null)
                     {
                         foreach (var cmt in s.Comments)
                         {
-                            var existingComment = await _db.SubmissionComments.FirstOrDefaultAsync(x => x.Id == cmt.Id);
+                            var existingComment = await _db.SubmissionComments
+                                .FirstOrDefaultAsync(x => x.Id == cmt.Id);
 
                             if (existingComment == null)
                             {
@@ -166,6 +160,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                                     AuthorName = cmt.AuthorName,
                                     CreatedAt = cmt.CreatedAt
                                 };
+
                                 _db.SubmissionComments.Add(comment);
                             }
                             else
@@ -175,9 +170,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                                 existingComment.CreatedAt = cmt.CreatedAt;
                             }
                         }
-                        await _db.SaveChangesAsync();
                     }
                 }
+                await _db.SaveChangesAsync();
             }
         }
 
