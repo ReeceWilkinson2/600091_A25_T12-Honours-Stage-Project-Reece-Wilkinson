@@ -1,50 +1,67 @@
 ﻿@page "/studentprogressviewer"
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
-@inject UserService service
+@inject IJSRuntime JS
+@inject AuthStateService AuthState
+@inject AppDbContext DbContext
 
-<div class="home-body">
-	<h1>Competency Viewer</h1>
+<h3>Competency Progress</h3>
 
-	<body>
-		<p>
-			This is where a graph detailing a student's progress in a specific competency over time would be displayed along with relevant information for each level.
-		</p>
-
-	</body>
-
-
-
-</div>
-@* https://blazor.syncfusion.com/documentation/chart/chart-types/line *@
-<SfChart>
-    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
-    <ChartSeriesCollection>
-        <ChartSeries DataSource="@SalesDetails" XName="X" YName="Y" Type="ChartSeriesType.Line">
-        </ChartSeries>
-    </ChartSeriesCollection>
-</SfChart>
+@if (!achievements.Any())
+{
+    <p>No competency data available yet.</p>
+}
+else
+{
+    <canvas id="competencyChart" width="600" height="400"></canvas>
+}
+<p>@achievements.Count data points loaded</p>
 
 @code {
-    public class ChartData
+    private List<CompetencyAchievement> achievements = new();
+    private string[] labels = Array.Empty<string>();
+    private int[] data = Array.Empty<int>();
+
+    protected override async Task OnInitializedAsync()
     {
-        public string X { get; set; }
-        public double Y { get; set; }
+        // Initialize AuthStateService to get the current user details
+        await AuthState.InitializeAsync();
+
+        // Check if the user is authenticated (UserId is available)
+        if (AuthState.UserId != null)
+        {
+            // Filter competency achievements based on the logged-in user's UserId
+            achievements = await DbContext.CompetencyAchievements
+                .Where(a => a.StudentId == AuthState.UserId)  // Filter by UserId
+                .Include(a => a.CompetencyLevel)
+                .OrderBy(a => a.AchievedDate)
+                .ToListAsync();
+
+            // Prepare the labels and data
+            labels = achievements.Select(a => a.AchievedDate.ToString("yyyy-MM-dd")).ToArray();
+            data = achievements.Select(a => a.CompetencyLevel.LevelNumber).ToArray();
+        }
+        else
+        {
+            // Handle the case where there is no authenticated user
+            achievements.Clear();
+        }
     }
 
-    public List<ChartData> SalesDetails = new List<ChartData>
+    private bool chartRendered = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        new ChartData { X= "Jan", Y= 35 },
-        new ChartData { X= "Feb", Y= 28 },
-        new ChartData { X= "Mar", Y= 34 },
-        new ChartData { X= "Apr", Y= 32 },
-        new ChartData { X= "May", Y= 40 },
-        new ChartData { X= "Jun", Y= 32 },
-        new ChartData { X= "Jul", Y= 35 },
-        new ChartData { X= "Aug", Y= 55 },
-        new ChartData { X= "Sep", Y= 38 },
-        new ChartData { X= "Oct", Y= 30 },
-        new ChartData { X= "Nov", Y= 25 },
-        new ChartData { X= "Dec", Y= 32 }
-    };
+        if (!chartRendered && achievements.Any())
+        {
+            chartRendered = true;
+
+            await JS.InvokeVoidAsync(
+                "renderLineChart",
+                "competencyChart",
+                labels,
+                data
+            );
+        }
+    }
 }

@@ -11,5 +11,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public int CompetencyDbID { get; set; }
         public string ModCode { get; set; }
         public CompetencyData Competency { get; set; }
+        // Navigation
+        public ICollection<CompetencyAchievement> Achievements { get; set; } = new List<CompetencyAchievement>();
     }
 }

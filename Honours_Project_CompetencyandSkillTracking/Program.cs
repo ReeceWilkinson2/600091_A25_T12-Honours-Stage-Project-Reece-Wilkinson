@@ -32,13 +32,17 @@ builder.Services.AddScoped<CompetencyDataServices>();
 
 var app = builder.Build();
 
-// Ensure databases are created at startup
+// Ensure database exists
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    var db = services.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.OpenConnection();
     db.Database.ExecuteSqlRaw("PRAGMA foreign_keys = ON;");
+    db.Database.EnsureCreated();
+
+    await DbSeeder.SeedTestData(db);
+
+    db.Database.CloseConnection();
 }
 
 // Configure the HTTP request pipeline.

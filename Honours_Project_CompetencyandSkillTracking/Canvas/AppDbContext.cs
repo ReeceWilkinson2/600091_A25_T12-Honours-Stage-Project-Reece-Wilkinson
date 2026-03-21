@@ -19,6 +19,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
 
         public DbSet<CompetencyData> CompetencyData { get; set; }
         public DbSet<CompetencyLevels> CompetencyLevels { get; set; }
+        public DbSet<CompetencyAchievement> CompetencyAchievements { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
