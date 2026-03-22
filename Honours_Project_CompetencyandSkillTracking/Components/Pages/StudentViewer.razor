@@ -2,7 +2,7 @@
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 @inject UserService service
-
+@inject AppDbContext DbContext
 
 <div style="margin-bottom:10px">
     <button class="module-button" @onclick="ReturnToSelection">
@@ -21,7 +21,25 @@
         <p>Full Name: @student.UserName</p>
         <p>Enrolled Modules: @string.Join(", ", student.Courses.Select(c => c.Name))</p>
         <p>Assignments: @string.Join(", ", student.Submissions.Select(s => $"{s.Assignment.Name} (Score: {s.Score})"))</p>
-        @* <p>Outcomes: @string.Join(", ", student.Submissions.OutcomeResults.Select(s => $"{s.Assignment.Name} (Score: {s.Score})"))</p> *@
+
+        <h4>Achieved Competencies</h4>
+        @if (achievedCompetencies.Any())
+        {
+            <ul>
+                @foreach (var competency in achievedCompetencies)
+                {
+                    <li>
+                        <strong>@competency.CompetencyLevel.Competency.CompetencyName</strong>
+                        <p>Level: @competency.CompetencyLevel.LevelNumber</p>
+                        <p>Achieved on: @competency.AchievedDate.ToString("yyyy-MM-dd")</p>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>No competencies achieved yet.</p>
+        }
     </div>
 }
 else
@@ -32,11 +50,21 @@ else
 @code {
     [Parameter] public string StudentId { get; set; }
     private User? student;
+    private List<CompetencyAchievement> achievedCompetencies = new();
 
     protected override async Task OnInitializedAsync()
     {
-        // Fetch the detailed information for the student using their StudentId
         student = await service.GetUserByIdAsync(StudentId);
+
+        if (student != null)
+        {
+            achievedCompetencies = await DbContext.CompetencyAchievements
+                .Where(a => a.StudentId == student.StudentId)
+                .Include(a => a.CompetencyLevel)
+                    .ThenInclude(cl => cl.Competency)
+                .OrderBy(a => a.AchievedDate)
+                .ToListAsync();
+        }
     }
 
     private void ReturnToSelection()

@@ -3,9 +3,15 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject AuthStateService AuthState
+@inject CompetencyDataServices CompetencyDataServices
 @inject AppDbContext DbContext
+@using Microsoft.AspNetCore.WebUtilities;
 
-<h3>Competency Progress</h3>
+<h3>Competency Progress: @CompetencyName</h3>
+
+<div style="margin-top:20px">
+    <button class="module-button" @onclick="GoToStudentJourney">Go back to student journey</button>
+</div>
 
 @if (!achievements.Any())
 {
@@ -15,45 +21,83 @@ else
 {
     <canvas id="competencyChart" width="600" height="400"></canvas>
 }
-@* <p>@achievements.Count data points loaded</p> *@
+
+@if (competencyLevels.Any())
+{
+    <div>
+        <h4>Competency Levels:</h4>
+        <ul>
+            @foreach (var level in competencyLevels)
+            {
+                <li>
+                    <strong>Level @level.LevelNumber:</strong>
+                    <p>@level.Description</p>
+                    <p><em>Modules covered in: @level.ModCode</em></p>
+                </li>
+            }
+            <li>
+                <strong>Addditional Notes: </strong>
+                <p>@AdditionalNotes</p>
+            </li>
+        </ul>
+    </div>
+}
 
 @code {
     private List<CompetencyAchievement> achievements = new();
     private string[] labels = Array.Empty<string>();
     private int[] data = Array.Empty<int>();
+    private string competencyId = "";
+    private string CompetencyName = string.Empty;
+    private string AdditionalNotes = string.Empty;
+    private List<CompetencyLevels> competencyLevels = new();
+
+    private bool chartRendered = false;
 
     protected override async Task OnInitializedAsync()
     {
-        // Initialize AuthStateService to get the current user details
         await AuthState.InitializeAsync();
 
-        if (AuthState.UserId != null)
+        var queryParams = QueryHelpers.ParseQuery(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).Query);
+        competencyId = queryParams.ContainsKey("competencyId") ? queryParams["competencyId"].ToString() : string.Empty;
+
+        if (AuthState.UserId != null && !string.IsNullOrEmpty(competencyId))
         {
-            // Filter competency achievements based on the logged-in user's UserId
+            // Get achievements for the user and the specified competency
             achievements = await DbContext.CompetencyAchievements
-                .Where(a => a.StudentId == AuthState.UserId)
+                .Where(a => a.StudentId == AuthState.UserId && a.CompetencyLevel.Competency.CompetencyID == competencyId)
                 .Include(a => a.CompetencyLevel)
+                .ThenInclude(cl => cl.Competency)
                 .OrderBy(a => a.AchievedDate)
                 .ToListAsync();
 
+            // Set chart data labels and values
             labels = achievements.Select(a => a.AchievedDate.ToString("yyyy-MM-dd")).ToArray();
             data = achievements.Select(a => a.CompetencyLevel.LevelNumber).ToArray();
+
+            // Load competency details (name, levels, modules)
+            var competency = await CompetencyDataServices.GetCompetencyByIdAsync(competencyId);
+
+            if (competency != null)
+            {
+                CompetencyName = competency.CompetencyName;
+                AdditionalNotes = competency.AdditionalNotes;
+                competencyLevels = competency.Levels.ToList(); // Directly assign levels without a view model
+            }
         }
         else
         {
-            // Handle the case where there is no authenticated user
             achievements.Clear();
         }
-    }
 
-    private bool chartRendered = false;
+        StateHasChanged();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!chartRendered && achievements.Any())
         {
             chartRendered = true;
-
             await JS.InvokeVoidAsync(
                 "renderLineChart",
                 "competencyChart",
@@ -61,5 +105,10 @@ else
                 data
             );
         }
+    }
+
+    private void GoToStudentJourney()
+    {
+        NavigationManager.NavigateTo("/studentjourney");
     }
 }

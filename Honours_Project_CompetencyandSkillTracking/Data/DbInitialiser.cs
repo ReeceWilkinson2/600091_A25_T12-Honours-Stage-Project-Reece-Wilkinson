@@ -88,10 +88,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
 
             foreach (var level in existingLevels)
             {
-                if (!achievementsExist.Contains(level.LevelDbID))
+                if ((level.LevelNumber == 4 || level.LevelNumber == 5) && !achievementsExist.Contains(level.LevelDbID))
                 {
-                    var daysAgo = level.LevelNumber == 4 ? -10 :
-                                  level.LevelNumber == 5 ? -5 : -1;
+                    var daysAgo = level.LevelNumber == 4 ? -10 : -5;  // Set dates for Level 4 and Level 5
 
                     achievementsToAdd.Add(new CompetencyAchievement
                     {

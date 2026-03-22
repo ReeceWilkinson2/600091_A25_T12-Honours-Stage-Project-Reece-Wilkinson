@@ -320,6 +320,11 @@ else
         <h4>Additional Notes</h4>
         <p>@SelectedCompetency.AdditionalNotes</p>
     </div>
+    <div style="margin-bottom:20px">
+        <button class="module-button" @onclick="NavigateToCompetencyProgress">
+            View Achievement for this Competency
+        </button>
+    </div>
 }
 
 @code {
@@ -507,6 +512,14 @@ else
         return string.Empty;
     }
 
+    private void NavigateToCompetencyProgress()
+    {
+        if (SelectedCompetency != null)
+        {
+            // Navigate to the studentprogressviewer page with CompetencyID as a query parameter
+            NavigationManager.NavigateTo($"/studentprogressviewer?competencyId={SelectedCompetency.CompetencyID}");
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
