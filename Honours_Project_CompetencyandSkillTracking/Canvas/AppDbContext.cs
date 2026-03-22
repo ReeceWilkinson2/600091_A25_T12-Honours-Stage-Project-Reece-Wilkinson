@@ -38,6 +38,24 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                     Role = "Admin"
                 }
             );
+
+            modelBuilder.Entity<CompetencyLevels>()
+                .HasOne(c => c.Competency)
+                .WithMany(c => c.Levels)
+                .HasForeignKey(c => c.CompetencyDbID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CompetencyAchievement>()
+                .HasOne(a => a.User)
+                .WithMany(u => u.CompetencyAchievements)
+                .HasForeignKey(a => a.StudentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CompetencyAchievement>()
+                .HasOne(a => a.CompetencyLevel)
+                .WithMany(c => c.Achievements)
+                .HasForeignKey(a => a.CompetencyLevelId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

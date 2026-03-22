@@ -104,6 +104,16 @@ CREATE TABLE IF NOT EXISTS CompetencyLevels (
         REFERENCES Modules(ModCode)
 );
 
+-- StudentCompetencyLevels table
+CREATE TABLE IF NOT EXISTS StudentCompetencyLevels (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    StudentId TEXT NOT NULL,
+    CompetencyLevelId INTEGER NOT NULL,
+    Achieved INTEGER NOT NULL CHECK (Achieved IN (0,1)),
+    FOREIGN KEY (StudentId) REFERENCES Students(StudentID),
+    FOREIGN KEY (CompetencyLevelId) REFERENCES CompetencyLevels(LevelDbID)
+);
+
 -- Outcomes table
 CREATE TABLE IF NOT EXISTS StudentCompetencies (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,

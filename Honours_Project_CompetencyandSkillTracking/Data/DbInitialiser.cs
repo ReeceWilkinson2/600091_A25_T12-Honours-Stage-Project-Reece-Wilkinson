@@ -7,8 +7,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
     {
         public static async Task SeedTestData(AppDbContext context)
         {
-            //Console.WriteLine("Starting DB seeding...");
-
+            // Ensure the student exists
             var user = await context.Students.FirstOrDefaultAsync(u => u.StudentId == "12345");
             if (user == null)
             {
@@ -22,7 +21,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                 };
                 context.Students.Add(user);
                 await context.SaveChangesAsync();
-                //Console.WriteLine("User added.");
             }
 
             var competency = await context.CompetencyData.FirstOrDefaultAsync(c => c.CompetencyID == "COMP001");
@@ -36,79 +34,81 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                 };
                 context.CompetencyData.Add(competency);
                 await context.SaveChangesAsync();
-                //Console.WriteLine("Competency added.");
             }
 
-            var levels = await context.CompetencyLevels.Where(l => l.CompetencyDbID == competency.CompetencyDbID).OrderBy(l => l.LevelNumber).ToListAsync();
+            // Ensure levels exist (idempotent)
+            var existingLevels = await context.CompetencyLevels
+                .Where(l => l.CompetencyDbID == competency.CompetencyDbID)
+                .ToListAsync();
 
-            if (!levels.Any())
-            {
-                var level1 = new CompetencyLevels
+            var existingLevelNumbers = existingLevels.Select(l => l.LevelNumber).ToHashSet();
+
+            var levelsToAdd = new List<CompetencyLevels>();
+
+            if (!existingLevelNumbers.Contains(4))
+                levelsToAdd.Add(new CompetencyLevels
                 {
                     LevelNumber = 4,
                     Description = "Basic understanding",
-                    Competency = competency,  // navigation property
+                    CompetencyDbID = competency.CompetencyDbID,
                     ModCode = "441101"
-                };
-                var level2 = new CompetencyLevels
+                });
+
+            if (!existingLevelNumbers.Contains(5))
+                levelsToAdd.Add(new CompetencyLevels
                 {
                     LevelNumber = 5,
                     Description = "Intermediate application",
-                    Competency = competency,
+                    CompetencyDbID = competency.CompetencyDbID,
                     ModCode = "551462"
-                };
-                var level3 = new CompetencyLevels
+                });
+
+            if (!existingLevelNumbers.Contains(6))
+                levelsToAdd.Add(new CompetencyLevels
                 {
                     LevelNumber = 6,
                     Description = "Advanced proficiency",
-                    Competency = competency,
+                    CompetencyDbID = competency.CompetencyDbID,
                     ModCode = "600091"
-                };
+                });
 
-                context.CompetencyLevels.AddRange(level1, level2, level3);
-                await context.SaveChangesAsync();
-
-                levels = new List<CompetencyLevels> { level1, level2, level3 };
-                //Console.WriteLine("Competency levels added.");
-            }
-
-            var achievementsExist = await context.CompetencyAchievements.AnyAsync(a => a.StudentId == user.StudentId);
-
-            if (!achievementsExist)
+            if (levelsToAdd.Any())
             {
-                var achievements = new List<CompetencyAchievement>
-                {
-                    new CompetencyAchievement
-                    {
-                        User = user,
-                        StudentId = user.StudentId,
-                        CompetencyLevel = levels[0],
-                        CompetencyLevelId = levels[0].LevelDbID,
-                        AchievedDate = DateTime.Now.AddDays(-10)
-                    },
-                    new CompetencyAchievement
-                    {
-                        User = user,
-                        StudentId = user.StudentId,
-                        CompetencyLevel = levels[1],
-                        CompetencyLevelId = levels[1].LevelDbID,
-                        AchievedDate = DateTime.Now.AddDays(-5)
-                    },
-                    new CompetencyAchievement
-                    {
-                        User = user,
-                        StudentId = user.StudentId,
-                        CompetencyLevel = levels[2],
-                        CompetencyLevelId = levels[2].LevelDbID,
-                        AchievedDate = DateTime.Now.AddDays(-1)
-                    }
-                };
-
-                context.CompetencyAchievements.AddRange(achievements);
+                context.CompetencyLevels.AddRange(levelsToAdd);
                 await context.SaveChangesAsync();
-                //Console.WriteLine("Competency achievements added.");
+                existingLevels.AddRange(levelsToAdd);
             }
-            //Console.WriteLine("DB seeding completed successfully!");
+
+            var achievementsExist = await context.CompetencyAchievements
+                .Where(a => a.StudentId == user.StudentId)
+                .Select(a => a.CompetencyLevelId)
+                .ToListAsync();
+
+            var achievementsToAdd = new List<CompetencyAchievement>();
+
+            foreach (var level in existingLevels)
+            {
+                if (!achievementsExist.Contains(level.LevelDbID))
+                {
+                    var daysAgo = level.LevelNumber == 4 ? -10 :
+                                  level.LevelNumber == 5 ? -5 : -1;
+
+                    achievementsToAdd.Add(new CompetencyAchievement
+                    {
+                        User = user,
+                        StudentId = user.StudentId,
+                        CompetencyLevel = level,
+                        CompetencyLevelId = level.LevelDbID,
+                        AchievedDate = DateTime.Now.AddDays(daysAgo)
+                    });
+                }
+            }
+
+            if (achievementsToAdd.Any())
+            {
+                context.CompetencyAchievements.AddRange(achievementsToAdd);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }
