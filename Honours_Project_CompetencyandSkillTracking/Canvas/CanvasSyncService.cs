@@ -26,7 +26,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         private async Task<User> SyncProfileAsync()
         {
             var profile = await _canvas.GetMyProfileAsync();
-            //Console.WriteLine($"Syncing profile: {profile.Id}, {profile.Name}");
             string studentId = profile.Id.ToString();
             var student = await _db.Students.Include(s => s.Courses).FirstOrDefaultAsync(s => s.StudentId == studentId);
 
@@ -50,7 +49,49 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                 student.StEmail = profile.Primary_Email;
                 await _db.SaveChangesAsync();
             }
+
+            // Sync competency achievements after syncing the student profile
+            await SyncCompetencyAchievementsAsync(student);
+
             return student;
+        }
+
+        private async Task SyncCompetencyAchievementsAsync(User student)
+        {
+            // Assuming competency data already exists, and that you want to assign achievements based on student's progress
+            var competencies = await _db.CompetencyData.Include(c => c.Levels).ToListAsync();
+
+            foreach (var competency in competencies)
+            {
+                foreach (var level in competency.Levels)
+                {
+                    // Check if the student has already achieved this competency level
+                    var existingAchievement = await _db.CompetencyAchievements
+                        .FirstOrDefaultAsync(a => a.StudentId == student.StudentId && a.CompetencyLevelId == level.LevelDbID);
+
+                    if (existingAchievement == null)
+                    {
+                        // Here you would determine the achieved date (this could depend on your Canvas data or other criteria)
+                        DateTime achievedDate = DateTime.Now;  // Example: Could be a specific date based on Canvas submission or outcome data
+
+                        var competencyAchievement = new CompetencyAchievement
+                        {
+                            StudentId = student.StudentId,
+                            CompetencyLevelId = level.LevelDbID,
+                            AchievedDate = achievedDate
+                        };
+
+                        _db.CompetencyAchievements.Add(competencyAchievement);
+                    }
+                    else
+                    {
+                        // Optionally, update the existing achievement if necessary (e.g., if the date has changed or other data needs to be updated)
+                        existingAchievement.AchievedDate = DateTime.Now; // Update if needed
+                    }
+                }
+            }
+
+            await _db.SaveChangesAsync();  // Save any new or updated achievements
         }
 
         private async Task SyncCoursesAsync(User student)
