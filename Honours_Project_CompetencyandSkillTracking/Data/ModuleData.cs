@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Honours_Project_CompetencyandSkillTracking.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace Honours_Project_CompetencyandSkillTracking.Data
 {
     public class ModuleData
     {
         [Key]
-        public int DatabaseID { get; set; } // Primary Key - never seen
+        public int DatabaseID { get; set; } // Primary Key
         public string Course { get; set; } = "";
         public string Programme { get; set; } = "";
         public string ModuleName { get; set; } = "";
@@ -21,3 +22,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public string? VideoLink { get; set; } = "";
     }
 }
+
+//    Many-to-many with competency levels
+//    public ICollection<CompetencyLevels> CompetencyLevels { get; set; } = new List<CompetencyLevels>();

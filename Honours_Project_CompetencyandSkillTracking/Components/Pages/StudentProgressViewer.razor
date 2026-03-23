@@ -7,23 +7,20 @@
 @inject AppDbContext DbContext
 @using Microsoft.AspNetCore.WebUtilities;
 
-<h3>Competency Progress: @CompetencyName</h3>
-
-<div style="margin-top:20px">
+<div style="margin-bottom:20px">
     <button class="module-button" @onclick="GoToStudentJourney">Go back to student journey</button>
 </div>
 
+<h3>Competency Progress: @CompetencyName</h3>
+
 @if (!achievements.Any())
 {
-    <p>No competency data available yet.</p>
+    <p>No competency achievements found.</p>
 }
 else
 {
     <canvas id="competencyChart" width="600" height="400"></canvas>
-}
 
-@if (competencyLevels.Any())
-{
     <div>
         <h4>Competency Levels:</h4>
         <ul>
@@ -89,7 +86,6 @@ else
         {
             achievements.Clear();
         }
-
         StateHasChanged();
     }
 
