@@ -70,6 +70,7 @@ else if (SelectedModule == null)
                         <div class="module-columns">
                             <div class="module-group">
                                 <h5>Compulsory</h5>
+                                <h4>Year 1</h4>
                                 @foreach (var module in Year1Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
@@ -84,6 +85,8 @@ else if (SelectedModule == null)
                                     </button>
                                 }
 
+                                <h4>Year 2</h4>
+
                                 @foreach (var module in Year2Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
@@ -97,6 +100,8 @@ else if (SelectedModule == null)
                                         @module.ModuleName
                                     </button>
                                 }
+
+                                <h4>Year 3</h4>
 
                                 @foreach (var module in Year3Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
                                 {
@@ -124,6 +129,7 @@ else if (SelectedModule == null)
                             </div>
                             <div class="module-group">
                                 <h5>Optional</h5>
+                                <h4>Year 1</h4>
                                 @foreach (var module in Year1Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
@@ -138,6 +144,8 @@ else if (SelectedModule == null)
                                     </button>
                                 }
 
+                                <h4>Year 2</h4>
+
                                 @foreach (var module in Year2Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
@@ -151,6 +159,8 @@ else if (SelectedModule == null)
                                         @module.ModuleName
                                     </button>
                                 }
+
+                                <h4>Year 3</h4>
 
                                 @foreach (var module in Year3Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
                                 {
