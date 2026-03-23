@@ -14,8 +14,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public CompetencyData Competency { get; set; }
         // experiment with required fields for ths
         // Navigation
+        public ICollection<ModuleData> Modules { get; set; } = new List<ModuleData>();
         public ICollection<CompetencyAchievement> Achievements { get; set; } = new List<CompetencyAchievement>();
     }
 }
-
-//    public ICollection<ModuleData> Modules { get; set; } = new List<ModuleData>();

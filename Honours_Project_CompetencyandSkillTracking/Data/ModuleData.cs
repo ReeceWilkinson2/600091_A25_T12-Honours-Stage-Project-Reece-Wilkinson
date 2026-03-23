@@ -20,8 +20,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public string Credits { get; set; } = "";
         public string ModCode { get; set; } = "";
         public string? VideoLink { get; set; } = "";
+        // Navigation
+        public ICollection<CompetencyLevels> CompetencyLevels { get; set; } = new List<CompetencyLevels>();
     }
 }
-
-//    Many-to-many with competency levels
-//    public ICollection<CompetencyLevels> CompetencyLevels { get; set; } = new List<CompetencyLevels>();
