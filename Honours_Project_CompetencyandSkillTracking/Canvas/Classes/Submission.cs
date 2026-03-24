@@ -4,9 +4,9 @@
     {
         public long Id { get; set; }
         public long AssignmentId { get; set; }
-        public Assignment Assignment { get; set; }
-        public string StudentId { get; set; }
-        public User Student { get; set; }
+        public Assignment Assignment { get; set; } = null!;
+        public string StudentId { get; set; } = "";
+        public User Student { get; set; } = null!;
         public double? Score { get; set; }
         public DateTime? SubmittedAt { get; set; }
         public ICollection<SubmissionComment> Comments { get; set; } = new List<SubmissionComment>();

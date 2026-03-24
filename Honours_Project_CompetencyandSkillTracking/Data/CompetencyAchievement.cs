@@ -8,9 +8,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         [Key]
         public int Id { get; set; }
         public string StudentId { get; set; } = "";
-        public User User { get; set; }
+        public User User { get; set; } = null!;
         public int CompetencyLevelId { get; set; }
-        public CompetencyLevels CompetencyLevel { get; set; }
+        public CompetencyLevels CompetencyLevel { get; set; } = null!;
         public DateTime AchievedDate { get; set; }
     }
 }

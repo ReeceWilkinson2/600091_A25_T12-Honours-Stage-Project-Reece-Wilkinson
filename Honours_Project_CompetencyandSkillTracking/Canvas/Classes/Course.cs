@@ -10,8 +10,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas.Classes
         public string Code { get; set; } = "";
         public string? Syllabus { get; set; }
         public string Term { get; set; } = "";
-        public string StudentId { get; set; }
-        public User Student { get; set; }
+        public string StudentId { get; set; } = "";
+        public User Student { get; set; } = null!;
 
         public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
         public ICollection<Outcome> Outcomes { get; set; } = new List<Outcome>();
