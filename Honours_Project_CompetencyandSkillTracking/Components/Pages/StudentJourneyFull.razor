@@ -64,131 +64,125 @@ else if (SelectedModule == null)
                         </button>
                     }
                 </div>
+    <div>
+        <div class="trimester">
+            <div class="module-group">
+                <div class="module-row-header">
+                    <div><h4>Compulsory</h4></div>
+                    <div><h4>Optional</h4></div>
+                </div>
+                <h5>Year 1</h5>
 
-                <div class="year-container">
-                    <div class="trimester">
-                        <div class="module-columns">
-                            <div class="module-group">
-                                <h5>Compulsory</h5>
-                                <h4>Year 1</h4>
-                                @foreach (var module in Year1Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                    </button>
-                                }
+                @{
+                    var compulsory1 = Year1Modules.Where(m => m.SelectionStatus == "Compulsory").ToList();
+                    var optional1 = Year1Modules.Where(m => m.SelectionStatus == "Optional").ToList();
+                    // adds white space for aesthetics.
+                    var max1 = Math.Max(compulsory1.Count, optional1.Count);
+                }
 
-                                @foreach (var module in Year1Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Compulsory"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                    </button>
-                                }
-
-                                <h4>Year 2</h4>
-
-                                @foreach (var module in Year2Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                    </button>
-                                }
-
-                                @foreach (var module in Year2Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Compulsory"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                    </button>
-                                }
-
-                                <h4>Year 3</h4>
-
-                                @foreach (var module in Year3Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Compulsory"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                        @if (IsModuleRestricted(module))
-                                        {
-                                            <br />
-                                            <span class="restricted-text">Not Available</span>
-                                        }
-                                    </button>
-                                }
-
-                                @foreach (var module in Year3Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Compulsory"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                        @if (IsModuleRestricted(module))
-                                        {
-                                            <br />
-                                            <span class="restricted-text">Not Available</span>
-                                        }
-                                    </button>
-                                }
-                            </div>
-                            <div class="module-group">
-                                <h5>Optional</h5>
-                                <h4>Year 1</h4>
-                                @foreach (var module in Year1Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                    </button>
-                                }
-
-                                @foreach (var module in Year1Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Optional"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                    </button>
-                                }
-
-                                <h4>Year 2</h4>
-
-                                @foreach (var module in Year2Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                    </button>
-                                }
-
-                                @foreach (var module in Year2Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Optional"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                    </button>
-                                }
-
-                                <h4>Year 3</h4>
-
-                                @foreach (var module in Year3Modules.Where(m => m.Trimester == "T1" && m.SelectionStatus == "Optional"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                        @if (IsModuleRestricted(module))
-                                        {
-                                            <br />
-                                            <span class="restricted-text">Not Available</span>
-                                        }
-                                    </button>
-                                }
-
-                                @foreach (var module in Year3Modules.Where(m => m.Trimester == "T2" && m.SelectionStatus == "Optional"))
-                                {
-                                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                                        @module.ModuleName
-                                        @if (IsModuleRestricted(module))
-                                        {
-                                            <br />
-                                            <span class="restricted-text">Not Available</span>
-                                        }
-                                    </button>
-                                }
-                            </div>
+                @for (int i = 0; i < max1; i++)
+                {
+                    <div class="module-row">
+                        <div>
+                            @if (i < compulsory1.Count)
+                            {
+                                var module = compulsory1[i];
+                                <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
+                                    @module.ModuleName
+                                </button>
+                            }
+                        </div>
+                        <div>
+                            @if (i < optional1.Count)
+                            {
+                                var module = optional1[i];
+                                <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
+                                    @module.ModuleName
+                                </button>
+                            }
                         </div>
                     </div>
-                </div>
+                }
+
+                <h5>Year 2</h5>
+
+                @{
+                    var compulsory2 = Year2Modules.Where(m => m.SelectionStatus == "Compulsory").ToList();
+                    var optional2 = Year2Modules.Where(m => m.SelectionStatus == "Optional").ToList();
+                    var max2 = Math.Max(compulsory2.Count, optional2.Count);
+                }
+
+                @for (int i = 0; i < max2; i++)
+                {
+                    <div class="module-row">
+                        <div>
+                            @if (i < compulsory2.Count)
+                            {
+                                var module = compulsory2[i];
+                                <button class="@GetModuleButtonClass(module)"
+                                        @onclick="() => LoadModuleDetails(module)">
+                                    @module.ModuleName
+                                </button>
+                            }
+                        </div>
+
+                        <div>
+                            @if (i < optional2.Count)
+                            {
+                                var module = optional2[i];
+                                <button class="@GetModuleButtonClass(module)"
+                                        @onclick="() => LoadModuleDetails(module)">
+                                    @module.ModuleName
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+                <h5>Year 3</h5>
+
+                @{
+                    var compulsory3 = Year3Modules.Where(m => m.SelectionStatus == "Compulsory").ToList();
+                    var optional3 = Year3Modules.Where(m => m.SelectionStatus == "Optional").ToList();
+                    var max3 = Math.Max(compulsory3.Count, optional3.Count);
+                }
+
+                @for (int i = 0; i < max3; i++)
+                {
+                    <div class="module-row">
+                        <div>
+                            @if (i < compulsory3.Count)
+                            {
+                                var module = compulsory3[i];
+                                <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
+                                    @module.ModuleName
+                                    @if (IsModuleRestricted(module))
+                                    {
+                                        <br />
+                                        <span class="restricted-text">Not Available</span>
+                                    }
+                                </button>
+                            }
+                        </div>
+
+                        <div>
+                            @if (i < optional3.Count)
+                            {
+                                var module = optional3[i];
+                                <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
+                                    @module.ModuleName
+                                    @if (IsModuleRestricted(module))
+                                    {
+                                        <br />
+                                        <span class="restricted-text">Not Available</span>
+                                    }
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 
     @if (AllCompetencies.Any())
     {

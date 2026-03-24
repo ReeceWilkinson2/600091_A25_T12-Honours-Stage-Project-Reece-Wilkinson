@@ -141,8 +141,15 @@ h1:focus {
     font-weight: 600;
 }
 
-
-
+.module-row-header,
+.module-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+    .module-row div button {
+        width: 100%;
+    }
 
 .restricted-text {
     color: red;
