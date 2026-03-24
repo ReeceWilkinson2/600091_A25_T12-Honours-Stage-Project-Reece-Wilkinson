@@ -28,6 +28,7 @@ builder.Services.AddHttpClient<CanvasService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthStateService>();
 builder.Services.AddScoped<ModuleCSVReading>();
+builder.Services.AddScoped<CSVReaderStartup>();
 builder.Services.AddScoped<CompetencyDataServices>();
 
 var app = builder.Build();
@@ -39,6 +40,15 @@ using (var scope = app.Services.CreateScope())
     db.Database.OpenConnection();
     db.Database.ExecuteSqlRaw("PRAGMA foreign_keys = ON;");
     db.Database.EnsureCreated();
+    try
+    {
+        var CSVService = scope.ServiceProvider.GetRequiredService<CSVReaderStartup>();
+        await CSVService.ReadModuleCSV();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
 
     await DbSeeder.SeedTestData(db);
 
