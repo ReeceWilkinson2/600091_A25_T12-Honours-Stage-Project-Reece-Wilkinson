@@ -1,4 +1,4 @@
-﻿window.renderLineChart = (canvasId, labels, data) => {
+﻿window.renderLineChart = (canvasId, labels, data, moduleTooltips) => {
 
     const canvas = document.getElementById(canvasId);
     const ctx = canvas?.getContext('2d');
@@ -21,8 +21,18 @@
                 tension: 0.1
             }]
         },
-        options: {
-            responsive: true,
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function (context) {
+                                const modules = moduleTooltips[context.dataIndex];
+                                return modules && modules.length ? ["Modules:", ...modules] : "";
+                            }
+                        }
+                    }
+                },
             scales: {
                 y: {
                     min: 3,

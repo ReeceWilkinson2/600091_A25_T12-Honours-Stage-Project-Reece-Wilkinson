@@ -34,7 +34,12 @@ else
                             Modules covered in:
                             @if (level.Modules != null && level.Modules.Any())
                             {
-                                @string.Join(", ", level.Modules.Select(m => $"{m.ModCode} - {m.ModuleName}"))
+                                <ulstyle ="padding-left:0; margin:0;">
+                                    @foreach (var module in level.Modules)
+                                    {
+                                        <li>@module.ModCode - @module.ModuleName</li>
+                                    }
+                                </ulstyle>
                             }
                             else
                             {
@@ -60,6 +65,7 @@ else
     private string CompetencyName = string.Empty;
     private string AdditionalNotes = string.Empty;
     private List<CompetencyLevels> competencyLevels = new();
+    private string[][] moduleTooltips = Array.Empty<string[]>();
 
     private bool chartRendered = false;
 
@@ -76,13 +82,17 @@ else
             achievements = await DbContext.CompetencyAchievements
                 .Where(a => a.StudentId == AuthState.UserId && a.CompetencyLevel.Competency.CompetencyID == competencyId)
                 .Include(a => a.CompetencyLevel)
-                .ThenInclude(cl => cl.Competency)
+                    .ThenInclude(cl => cl.Competency)
+                .Include(a => a.CompetencyLevel)
+                    .ThenInclude(cl => cl.Modules)
                 .OrderBy(a => a.AchievedDate)
                 .ToListAsync();
 
             // Set chart data labels and values
             labels = achievements.Select(a => a.AchievedDate.ToString("yyyy-MM-dd")).ToArray();
             data = achievements.Select(a => a.CompetencyLevel.LevelNumber).ToArray();
+
+            moduleTooltips = achievements.Select(a => a.CompetencyLevel.Modules.Select(m => $"{m.ModCode} - {m.ModuleName}").ToArray()).ToArray();
 
             // Load competency details (name, levels, modules)
             var competency = await CompetencyDataServices.GetCompetencyByIdAsync(competencyId);
@@ -110,7 +120,8 @@ else
                 "renderLineChart",
                 "competencyChart",
                 labels,
-                data
+                data,
+                moduleTooltips
             );
         }
     }
