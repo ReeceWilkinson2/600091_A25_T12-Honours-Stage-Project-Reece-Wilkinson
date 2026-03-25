@@ -421,7 +421,7 @@ else
 
         if (competency?.Levels != null)
         {
-            FilterCompetencyModuleCodes = competency.Levels.Select(l => l.ModCode).Where(m => !string.IsNullOrWhiteSpace(m)).ToHashSet();
+            FilterCompetencyModuleCodes = competency.Levels.SelectMany(l => l.Modules).Select(m => m.ModCode).Where(m => !string.IsNullOrWhiteSpace(m)).ToHashSet();
         }
         else
         {
@@ -444,7 +444,6 @@ else
         ActiveModule = module;
         SelectedModule = module.ModuleName;
         SelectedModuleName = module.ModuleName;
-
         SelectedModuleCompetencies = await competencyService.GetCompetenciesByModuleAsync(module.ModCode);
     }
 

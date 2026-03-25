@@ -12,7 +12,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public int CompetencyDbID { get; set; }
         public string ModCode { get; set; } = "";
         public CompetencyData Competency { get; set; } = null!;
-        // experiment with required fields for ths
         // Navigation
         public ICollection<ModuleData> Modules { get; set; } = new List<ModuleData>();
         public ICollection<CompetencyAchievement> Achievements { get; set; } = new List<CompetencyAchievement>();

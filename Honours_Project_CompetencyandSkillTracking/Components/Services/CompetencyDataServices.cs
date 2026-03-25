@@ -19,9 +19,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
         public async Task<List<CompetencyData>> GetCompetencyDataAsync()
         {
-            return await _db.CompetencyData
-                //.Where(c => c.Course == CourseId)
-                .ToListAsync();
+            return await _db.CompetencyData.Include(c => c.Levels).ThenInclude(l => l.Modules).ToListAsync();
         }
 
         public async Task<CompetencyData> AddCompetencyDataAsync(CompetencyData CompetencyData)
@@ -39,21 +37,19 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             return CompetencyData;
         }
 
-        public async Task<CompetencyData> GetCompetencyByIdAsync(string id)
+        public async Task<CompetencyData?> GetCompetencyByIdAsync(string id)
         {
-            return await _db.CompetencyData.Include(c => c.Levels).FirstOrDefaultAsync(c => c.CompetencyID == id);
+            return await _db.CompetencyData.Include(c => c.Levels).ThenInclude(l => l.Modules).FirstOrDefaultAsync(c => c.CompetencyID == id);
         }
 
         public async Task<List<CompetencyData>> GetCompetenciesByModuleAsync(string modCode)
         {
-            return await _db.CompetencyData.Include(c => c.Levels).Where(c => c.Levels.Any(l => l.ModCode == modCode)).ToListAsync();
+            return await _db.CompetencyData.Include(c => c.Levels).ThenInclude(l => l.Modules).Where(c => c.Levels.Any(l => l.Modules.Any(m => m.ModCode == modCode))).ToListAsync();
         }
 
         public async Task<List<CompetencyData>> GetAllCompetenciesAsync()
         {
-            return await _db.CompetencyData
-                .Include(c => c.Levels)
-                .ToListAsync();
+            return await _db.CompetencyData.Include(c => c.Levels).ThenInclude(l => l.Modules).ToListAsync();
         }
 
         public async Task<CompetencyData> UpdateCompetencyDataAsync(CompetencyData CompetencyData)

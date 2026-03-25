@@ -29,11 +29,23 @@ else
                 <li>
                     <strong>Level @level.LevelNumber:</strong>
                     <p>@level.Description</p>
-                    <p><em>Modules covered in: @level.ModCode</em></p>
+                    <p>
+                        <em>
+                            Modules covered in:
+                            @if (level.Modules != null && level.Modules.Any())
+                            {
+                                @string.Join(", ", level.Modules.Select(m => $"{m.ModCode} - {m.ModuleName}"))
+                            }
+                            else
+                            {
+                                <span>Not Assigned</span>
+                            }
+                        </em>
+                    </p>
                 </li>
             }
             <li>
-                <strong>Addditional Notes: </strong>
+                <strong>Additional Notes: </strong>
                 <p>@AdditionalNotes</p>
             </li>
         </ul>

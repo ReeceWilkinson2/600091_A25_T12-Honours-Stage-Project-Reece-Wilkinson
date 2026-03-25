@@ -367,7 +367,7 @@ else
     <div class="competency-details">
         @if (SelectedCompetency.Levels != null && ActiveModule != null)
         {
-            var relevantLevels = SelectedCompetency.Levels.Where(l => l.ModCode == ActiveModule.ModCode).OrderBy(l => l.LevelNumber);
+            var relevantLevels = SelectedCompetency.Levels.Where(l => l.Modules.Any(m => m.ModCode == ActiveModule.ModCode)).OrderBy(l => l.LevelNumber);
 
             if (relevantLevels.Any())
             {
@@ -384,6 +384,7 @@ else
                 <p>No level information available.</p>
             }
         }
+
         <h4>Additional Notes</h4>
         <p>@SelectedCompetency.AdditionalNotes</p>
     </div>
@@ -484,7 +485,7 @@ else
 
         if (competency?.Levels != null)
         {
-            FilterCompetencyModuleCodes = competency.Levels.Select(l => l.ModCode).Where(m => !string.IsNullOrWhiteSpace(m)).ToHashSet();
+            FilterCompetencyModuleCodes = competency.Levels.SelectMany(l => l.Modules).Select(m => m.ModCode).Where(m => !string.IsNullOrWhiteSpace(m)).ToHashSet();
         }
         else
         {
@@ -507,7 +508,6 @@ else
         ActiveModule = module;
         SelectedModule = module.ModuleName;
         SelectedModuleName = module.ModuleName;
-
         SelectedModuleCompetencies = await competencyService.GetCompetenciesByModuleAsync(module.ModCode);
     }
 

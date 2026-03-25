@@ -19,7 +19,6 @@
 
         <h4>Competency ID:</h4>
         <p>@Competency.CompetencyID</p>
-        @* <p>@Competency.CompetencyCourses</p> *@
 
         @if (Competency.Levels != null && Competency.Levels.Any())
         {
@@ -28,7 +27,20 @@
                 <div class="level-section">
                     <h4>Level @level.LevelNumber</h4>
 
-                    <p><strong>Module:</strong> @GetModuleDisplay(level.ModCode)</p>
+                    @if (level.Modules != null && level.Modules.Any())
+                    {
+                        <p><strong>Modules:</strong></p>
+                        <ul>
+                            @foreach (var module in level.Modules)
+                            {
+                                <li>@module.ModCode - @module.ModuleName</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p><strong>Modules:</strong> Not Assigned</p>
+                    }
 
                     <p>@level.Description</p>
                 </div>
@@ -52,33 +64,10 @@ else
     [Parameter] public string CompetencyID { get; set; }
 
     private CompetencyData? Competency;
-    private Dictionary<string, string> ModuleLookup = new();
 
     protected override async Task OnInitializedAsync()
     {
         Competency = await service.GetCompetencyByIdAsync(CompetencyID);
-
-        // Build ModCode → ModuleName lookup
-        var modules = await dbContext.ModulesCSV
-            .ToListAsync();
-
-        ModuleLookup = modules
-            .GroupBy(m => m.ModCode)
-            .ToDictionary(
-                g => g.Key,
-                g => g.First().ModuleName
-            );
-    }
-
-    private string GetModuleDisplay(string modCode)
-    {
-        if (string.IsNullOrEmpty(modCode))
-            return "Not Assigned";
-
-        if (ModuleLookup.ContainsKey(modCode))
-            return $"{modCode} - {ModuleLookup[modCode]}";
-
-        return modCode;
     }
 
     private void ReturnToSelection()

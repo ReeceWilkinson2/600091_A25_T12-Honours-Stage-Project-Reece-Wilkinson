@@ -56,6 +56,11 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                 .WithMany(c => c.Achievements)
                 .HasForeignKey(a => a.CompetencyLevelId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CompetencyLevels>()
+                .HasMany(cl => cl.Modules)
+                .WithMany(m => m.CompetencyLevels)
+                .UsingEntity(j => j.ToTable("CompetencyLevelModules"));
         }
     }
 }
