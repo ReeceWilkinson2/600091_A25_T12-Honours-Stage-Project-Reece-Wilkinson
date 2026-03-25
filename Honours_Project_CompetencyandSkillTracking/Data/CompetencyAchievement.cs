@@ -11,6 +11,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public User User { get; set; } = null!;
         public int CompetencyLevelId { get; set; }
         public CompetencyLevels CompetencyLevel { get; set; } = null!;
+        public int MasteryPoints { get; set; }
         public DateTime AchievedDate { get; set; }
     }
 }

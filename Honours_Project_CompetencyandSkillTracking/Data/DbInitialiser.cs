@@ -139,6 +139,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                         StudentId = user.StudentId,
                         CompetencyLevel = level,
                         CompetencyLevelId = level.LevelDbID,
+                        MasteryPoints = 6,
                         AchievedDate = DateTime.Now.AddDays(daysAgo)
                     });
                 }

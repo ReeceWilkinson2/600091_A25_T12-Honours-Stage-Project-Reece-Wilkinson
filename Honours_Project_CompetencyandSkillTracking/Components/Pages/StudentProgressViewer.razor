@@ -26,26 +26,41 @@ else
         <ul>
             @foreach (var level in competencyLevels)
             {
+                var matchingAchievements = achievements.Where(a => a.CompetencyLevelId == level.LevelDbID);
                 <li>
                     <strong>Level @level.LevelNumber:</strong>
                     <p>@level.Description</p>
                     <p>
-                        <em>
                             Modules covered in:
                             @if (level.Modules != null && level.Modules.Any())
                             {
-                                <ulstyle ="padding-left:0; margin:0;">
+                                <ul style ="padding-left:0; margin:0;">
                                     @foreach (var module in level.Modules)
                                     {
                                         <li>@module.ModCode - @module.ModuleName</li>
                                     }
-                                </ulstyle>
+                                </ul>
                             }
                             else
                             {
                                 <span>Not Assigned</span>
                             }
-                        </em>
+                        @if (matchingAchievements.Any())
+                        {
+                            <ul>
+                                @foreach (var ach in matchingAchievements)
+                                {
+                                    <li>
+                                        @ach.AchievedDate.ToShortDateString() |
+                                        Mastery Points: @ach.MasteryPoints
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                        <p>No achievements yet</p>
+                    }
                     </p>
                 </li>
             }
@@ -108,7 +123,6 @@ else
         {
             achievements.Clear();
         }
-        StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
