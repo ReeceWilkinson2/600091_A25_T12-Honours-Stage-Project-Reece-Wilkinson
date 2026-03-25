@@ -1,9 +1,6 @@
 ﻿window.renderLineChart = (canvasId, labels, data) => {
-    console.log('Rendering chart with labels:', labels);  // Debugging line
-    console.log('Rendering chart with data:', data);  // Debugging line
 
     const canvas = document.getElementById(canvasId);
-    console.log('Canvas element:', canvas);  // Debugging line
     const ctx = canvas?.getContext('2d');
     if (!ctx) {
         console.error('Canvas context not found!');
