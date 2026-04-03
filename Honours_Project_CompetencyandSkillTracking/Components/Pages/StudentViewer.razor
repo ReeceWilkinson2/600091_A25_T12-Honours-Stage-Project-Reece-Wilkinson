@@ -23,15 +23,27 @@
         <p>Assignments: @string.Join(", ", student.Submissions.Select(s => $"{s.Assignment.Name} (Score: {s.Score})"))</p>
 
         <h4>Achieved Competencies</h4>
-        @if (achievedCompetencies.Any())
+
+        @if (groupedCompetencies.Any())
         {
             <ul>
-                @foreach (var competency in achievedCompetencies)
+                @foreach (var item in groupedCompetencies)
                 {
-                    <li>
-                        <strong>@competency.CompetencyLevel.Competency.CompetencyName</strong>
-                        <p>Level: @competency.CompetencyLevel.LevelNumber</p>
-                        <p>Achieved on: @competency.AchievedDate.ToString("yyyy-MM-dd")</p>
+                    <li style="margin-bottom:15px;">
+                        <strong>
+                            @item.BestAttempt.CompetencyLevel.Competency.CompetencyName
+                        </strong>
+                        <p>Level: @item.BestAttempt.CompetencyLevel.LevelNumber</p>
+                        <p>
+                            Best Score: @item.BestAttempt.MasteryPoints
+                            <br />
+                            Achieved on: @item.BestAttempt.AchievedDate.ToString("yyyy-MM-dd")
+                        </p>
+
+                        <p>
+                            Achieved in modules:
+                            @string.Join(", ", item.Modules.Select(m => $"{m.ModuleName} ({m.ModCode})"))
+                        </p>
                     </li>
                 }
             </ul>
@@ -49,8 +61,10 @@ else
 
 @code {
     [Parameter] public string StudentId { get; set; }
+
     private User? student;
     private List<CompetencyAchievement> achievedCompetencies = new();
+    private List<GroupedCompetencyView> groupedCompetencies = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,13 +76,33 @@ else
                 .Where(a => a.StudentId == student.StudentId)
                 .Include(a => a.CompetencyLevel)
                     .ThenInclude(cl => cl.Competency)
-                .OrderBy(a => a.AchievedDate)
+                .Include(a => a.Module)
+                .OrderByDescending(a => a.AchievedDate)
                 .ToListAsync();
+
+            groupedCompetencies = achievedCompetencies
+                .GroupBy(a => a.CompetencyLevelId)
+                .Select(g => new GroupedCompetencyView
+                {
+                    BestAttempt = g.OrderByDescending(a => a.MasteryPoints).First(),
+
+                    Modules = g.Select(a => a.Module)
+                               .GroupBy(m => m.DatabaseID)
+                               .Select(m => m.First())
+                               .ToList()
+                })
+                .ToList();
         }
     }
-
     private void ReturnToSelection()
     {
         NavigationManager.NavigateTo("/studentselection");
+    }
+
+    // Helper class
+    private class GroupedCompetencyView
+    {
+        public CompetencyAchievement BestAttempt { get; set; } = null!;
+        public List<ModuleData> Modules { get; set; } = new();
     }
 }

@@ -58,26 +58,36 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
         private async Task SyncCompetencyAchievementsAsync(User student)
         {
-            // Assuming competency data already exists, and that you want to assign achievements based on student's progress
-            var competencies = await _db.CompetencyData.Include(c => c.Levels).ToListAsync();
+            var competencies = await _db.CompetencyData
+                .Include(c => c.Levels)
+                    .ThenInclude(l => l.Modules)
+                .ToListAsync();
 
             foreach (var competency in competencies)
             {
                 foreach (var level in competency.Levels)
                 {
-                    // Check if the student has already achieved this competency level
+                    // Skip levels without modules
+                    var module = level.Modules.FirstOrDefault();
+                    if (module == null)
+                        continue;
+
                     var existingAchievement = await _db.CompetencyAchievements
                         .FirstOrDefaultAsync(a => a.StudentId == student.StudentId && a.CompetencyLevelId == level.LevelDbID);
 
                     if (existingAchievement == null)
                     {
-                        // Here you would determine the achieved date (this could depend on your Canvas data or other criteria)
-                        DateTime achievedDate = DateTime.Now;  // Example: Could be a specific date based on Canvas submission or outcome data
+                        var achievedDate = DateTime.Now; // You can modify this based on logic for progress
 
                         var competencyAchievement = new CompetencyAchievement
                         {
                             StudentId = student.StudentId,
+                            User = student,
                             CompetencyLevelId = level.LevelDbID,
+                            CompetencyLevel = level,
+                            ModuleId = module.DatabaseID,
+                            Module = module,
+                            MasteryPoints = 6, // Default value or calculate based on logic
                             AchievedDate = achievedDate
                         };
 
@@ -85,13 +95,15 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     }
                     else
                     {
-                        // Optionally, update the existing achievement if necessary (e.g., if the date has changed or other data needs to be updated)
-                        existingAchievement.AchievedDate = DateTime.Now; // Update if needed
+                        // Update existing achievement if needed
+                        existingAchievement.AchievedDate = DateTime.Now;
+                        existingAchievement.MasteryPoints = 6; // Update if necessary
+                        existingAchievement.ModuleId = module.DatabaseID;
+                        existingAchievement.Module = module;
                     }
                 }
             }
-
-            await _db.SaveChangesAsync();  // Save any new or updated achievements
+            await _db.SaveChangesAsync();
         }
 
         private async Task SyncCoursesAsync(User student)

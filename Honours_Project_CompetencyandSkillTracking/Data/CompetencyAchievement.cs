@@ -13,5 +13,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public CompetencyLevels CompetencyLevel { get; set; } = null!;
         public int MasteryPoints { get; set; }
         public DateTime AchievedDate { get; set; }
+        
+        // Links to specific module
+        public int ModuleId { get; set; }
+        public ModuleData Module { get; set; }
     }
 }

@@ -133,12 +133,22 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                 {
                     var daysAgo = level.LevelNumber == 4 ? -10 : -5;
 
+                    var module = level.Modules.FirstOrDefault();
+
+                    if (module == null)
+                        continue;
+
                     achievementsToAdd.Add(new CompetencyAchievement
                     {
                         User = user,
                         StudentId = user.StudentId,
+
                         CompetencyLevel = level,
                         CompetencyLevelId = level.LevelDbID,
+
+                        Module = module,
+                        ModuleId = module.DatabaseID,
+
                         MasteryPoints = 6,
                         AchievedDate = DateTime.Now.AddDays(daysAgo)
                     });
