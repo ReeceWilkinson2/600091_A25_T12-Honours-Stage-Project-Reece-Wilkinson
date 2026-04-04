@@ -58,51 +58,80 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
 
         private async Task SyncCompetencyAchievementsAsync(User student)
         {
+            // Load all competencies with their levels and associated modules
             var competencies = await _db.CompetencyData
                 .Include(c => c.Levels)
-                    .ThenInclude(l => l.Modules)
+                .ThenInclude(l => l.Modules)
                 .ToListAsync();
 
             foreach (var competency in competencies)
             {
                 foreach (var level in competency.Levels)
                 {
-                    // Skip levels without modules
-                    var module = level.Modules.FirstOrDefault();
-                    if (module == null)
-                        continue;
+                    // Check if student already has an achievement for this competency level
+                    var existingAchievements = await _db.CompetencyAchievements
+                        .Where(a => a.StudentId == student.StudentId && a.CompetencyLevelId == level.LevelDbID)
+                        .ToListAsync();
 
-                    var existingAchievement = await _db.CompetencyAchievements
-                        .FirstOrDefaultAsync(a => a.StudentId == student.StudentId && a.CompetencyLevelId == level.LevelDbID);
-
-                    if (existingAchievement == null)
+                    foreach (var module in level.Modules)
                     {
-                        var achievedDate = DateTime.Now; // You can modify this based on logic for progress
+                        // Check if the student already has an achievement for the current module
+                        var existingAchievement = existingAchievements.FirstOrDefault(a => a.ModuleId == module.DatabaseID);
 
-                        var competencyAchievement = new CompetencyAchievement
+                        if (existingAchievement == null)
                         {
-                            StudentId = student.StudentId,
-                            User = student,
-                            CompetencyLevelId = level.LevelDbID,
-                            CompetencyLevel = level,
-                            ModuleId = module.DatabaseID,
-                            Module = module,
-                            MasteryPoints = 6, // Default value or calculate based on logic
-                            AchievedDate = achievedDate
-                        };
+                            // Create new achievement
+                            var competencyAchievement = new CompetencyAchievement
+                            {
+                                StudentId = student.StudentId,
+                                User = student,
+                                CompetencyLevelId = level.LevelDbID,
+                                CompetencyLevel = level,
+                                ModuleId = module.DatabaseID,
+                                Module = module,
+                                MasteryPoints = 6, // Example value
+                                AchievedDate = DateTime.Now // Or compute based on logic
+                            };
 
-                        _db.CompetencyAchievements.Add(competencyAchievement);
-                    }
-                    else
-                    {
-                        // Update existing achievement if needed
-                        existingAchievement.AchievedDate = DateTime.Now;
-                        existingAchievement.MasteryPoints = 6; // Update if necessary
-                        existingAchievement.ModuleId = module.DatabaseID;
-                        existingAchievement.Module = module;
+                            _db.CompetencyAchievements.Add(competencyAchievement);
+                        }
+                        else
+                        {
+                            // Optional: Update existing achievement only if needed
+                            bool updated = false;
+
+                            // Example: Update the mastery points if necessary (this is a placeholder logic)
+                            if (existingAchievement.MasteryPoints != 6)
+                            {
+                                existingAchievement.MasteryPoints = 6;
+                                updated = true;
+                            }
+
+                            // Update the achievement date if needed
+                            if (existingAchievement.AchievedDate != DateTime.Now)
+                            {
+                                existingAchievement.AchievedDate = DateTime.Now;
+                                updated = true;
+                            }
+
+                            // Update the module if necessary
+                            if (existingAchievement.ModuleId != module.DatabaseID)
+                            {
+                                existingAchievement.ModuleId = module.DatabaseID;
+                                existingAchievement.Module = module;
+                                updated = true;
+                            }
+
+                            if (updated)
+                            {
+                                _db.CompetencyAchievements.Update(existingAchievement);
+                            }
+                        }
                     }
                 }
             }
+
+            // Save all changes
             await _db.SaveChangesAsync();
         }
 

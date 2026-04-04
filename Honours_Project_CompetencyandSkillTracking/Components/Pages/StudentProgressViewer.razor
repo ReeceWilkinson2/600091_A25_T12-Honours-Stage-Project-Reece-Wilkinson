@@ -5,7 +5,8 @@
 @inject AuthStateService AuthState
 @inject CompetencyDataServices CompetencyDataServices
 @inject AppDbContext DbContext
-@using Microsoft.AspNetCore.WebUtilities;
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.EntityFrameworkCore
 
 <div style="margin-bottom:20px">
     <button class="module-button" @onclick="GoToStudentJourney">Go back to student journey</button>
@@ -19,7 +20,29 @@
 }
 else
 {
-    <canvas id="competencyChart" width:"75%" height:"50%"></canvas>
+    <canvas id="competencyChart" width="75%" height="50%"></canvas>
+
+    <div style="margin-top: 20px; width: 75%;">
+        <div style="
+                        height: 15px;
+                        width: 100%;
+                        background: linear-gradient(to right, rgb(0,200,0), rgb(255,200,0), rgb(200,0,0));
+                        border-radius: 5px;">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 5px;">
+            <span>1</span>
+            <span>2</span>
+            <span>3</span>
+            <span>4</span>
+            <span>5</span>
+            <span>6</span>
+        </div>
+
+        <div style="text-align: center; font-size: 13px; margin-top: 5px;">
+            Number of times competency level achieved
+        </div>
+    </div>
 
     <div>
         <h4>Competency Levels:</h4>
@@ -27,24 +50,30 @@ else
             @foreach (var level in competencyLevels)
             {
                 var matchingAchievements = achievements.Where(a => a.CompetencyLevelId == level.LevelDbID);
+
                 <li>
                     <strong>Level @level.LevelNumber:</strong>
                     <p>@level.Description</p>
-                    <p>
-                            Modules covered in:
-                            @if (level.Modules != null && level.Modules.Any())
-                            {
-                                <ul style ="padding-left:0; margin:0;">
-                                    @foreach (var module in level.Modules)
-                                    {
-                                        <li>@module.ModCode - @module.ModuleName</li>
-                                    }
-                                </ul>
-                            }
-                            else
-                            {
-                                <span>Not Assigned</span>
-                            }
+
+                    <div>
+                        <strong>Modules covered in:</strong>
+
+                        @if (level.Modules != null && level.Modules.Any())
+                        {
+                            <ul style="padding-left:0; margin:0;">
+                                @foreach (var module in level.Modules)
+                                {
+                                    <li>@module.ModCode - @module.ModuleName</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span>Not Assigned</span>
+                        }
+                    </div>
+
+                    <div style="margin-top:5px;">
                         @if (matchingAchievements.Any())
                         {
                             <ul>
@@ -59,13 +88,14 @@ else
                         }
                         else
                         {
-                        <p>No achievements yet</p>
-                    }
-                    </p>
+                            <p>No achievements yet</p>
+                        }
+                    </div>
                 </li>
             }
+
             <li>
-                <strong>Additional Notes: </strong>
+                <strong>Additional Notes:</strong>
                 <p>@AdditionalNotes</p>
             </li>
         </ul>
@@ -74,13 +104,14 @@ else
 
 @code {
     private List<CompetencyAchievement> achievements = new();
-    private string[] labels = Array.Empty<string>();
-    private int[] data = Array.Empty<int>();
+    private List<object> chartPoints = new();
+    private string[][] moduleTooltips = Array.Empty<string[]>();
+    private int[] levelCounts = Array.Empty<int>();
+
     private string competencyId = "";
     private string CompetencyName = string.Empty;
     private string AdditionalNotes = string.Empty;
     private List<CompetencyLevels> competencyLevels = new();
-    private string[][] moduleTooltips = Array.Empty<string[]>();
 
     private bool chartRendered = false;
 
@@ -89,35 +120,54 @@ else
         await AuthState.InitializeAsync();
 
         var queryParams = QueryHelpers.ParseQuery(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).Query);
-        competencyId = queryParams.ContainsKey("competencyId") ? queryParams["competencyId"].ToString() : string.Empty;
+        competencyId = queryParams.ContainsKey("competencyId")
+            ? queryParams["competencyId"].ToString()
+            : string.Empty;
 
         if (AuthState.UserId != null && !string.IsNullOrEmpty(competencyId))
         {
-            // Get achievements for the user and the specified competency
             achievements = await DbContext.CompetencyAchievements
-                .Where(a => a.StudentId == AuthState.UserId && a.CompetencyLevel.Competency.CompetencyID == competencyId)
+                .Where(a => a.StudentId == AuthState.UserId &&
+                            a.CompetencyLevel.Competency.CompetencyID == competencyId)
                 .Include(a => a.CompetencyLevel)
                     .ThenInclude(cl => cl.Competency)
                 .Include(a => a.CompetencyLevel)
                     .ThenInclude(cl => cl.Modules)
+                .Include(a => a.Module)
                 .OrderBy(a => a.AchievedDate)
                 .ToListAsync();
 
-            // Set chart data labels and values
-            labels = achievements.Select(a => a.AchievedDate.ToString("yyyy-MM-dd")).ToArray();
-            data = achievements.Select(a => a.CompetencyLevel.LevelNumber).ToArray();
-
-            moduleTooltips = achievements.Select(a => a.CompetencyLevel.Modules.Select(m => $"{m.ModCode} - {m.ModuleName}").ToArray()).ToArray();
-
-            // Load competency details (name, levels, modules)
             var competency = await CompetencyDataServices.GetCompetencyByIdAsync(competencyId);
+            CompetencyName = competency?.CompetencyName ?? string.Empty;
 
-            if (competency != null)
-            {
-                CompetencyName = competency.CompetencyName;
-                AdditionalNotes = competency.AdditionalNotes;
-                competencyLevels = competency.Levels.ToList(); // Directly assign levels without a view model
-            }
+            competencyLevels = competency?.Levels
+                .Where(l => l.LevelNumber >= 4 && l.LevelNumber <= 7)
+                .OrderBy(l => l.LevelNumber)
+                .ToList() ?? new List<CompetencyLevels>();
+
+            var levelGroups = achievements
+                .GroupBy(a => a.CompetencyLevel)
+                .Where(g => g.Key.LevelNumber >= 4 && g.Key.LevelNumber <= 7)
+                .OrderBy(g => g.Key.LevelNumber)
+                .ToList();
+
+            // Fix: Pass JavaScript-friendly Date objects to the chart
+            // Ensure x-values are DateTime strings in a proper format
+            chartPoints = levelGroups
+                .Select(g => new
+                {
+                    x = g.Min(a => a.AchievedDate),  // Pass DateTime directly
+                    y = g.Key.LevelNumber
+                })
+                .ToList<object>(); // Ensure it is a List<object> type, not dynamic
+
+            moduleTooltips = levelGroups
+                .Select(g => g.Select(a => $"{a.Module.ModCode} - {a.Module.ModuleName}").ToArray())
+                .ToArray();
+
+            levelCounts = levelGroups
+                .Select(g => Math.Min(g.Count(), 6)) // Ensure the level counts are correct (maximum of 6)
+                .ToArray();
         }
         else
         {
@@ -127,15 +177,19 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!chartRendered && achievements.Any())
+        if (!chartRendered && chartPoints.Any())
         {
             chartRendered = true;
+
+            // Log chartPoints to the console for debugging
+            Console.WriteLine("chartPoints: " + string.Join(", ", chartPoints.Select(p => p.ToString())));
+
             await JS.InvokeVoidAsync(
                 "renderLineChart",
                 "competencyChart",
-                labels,
-                data,
-                moduleTooltips
+                chartPoints,
+                moduleTooltips,
+                levelCounts
             );
         }
     }

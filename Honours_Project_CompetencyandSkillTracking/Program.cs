@@ -10,7 +10,7 @@ using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -19,10 +19,12 @@ builder.Services.AddSingleton<UserInfoService>();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection("Smtp"));
 
+// Configure SQLite database
+var dbPath = Path.Combine(builder.Environment.ContentRootPath, "UserDatabase.db");
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite($"Data Source={dbPath}"));
 
-var dbPath = Path.Combine(builder.Environment.ContentRootPath,"UserDatabase.db");
-builder.Services.AddDbContext<AppDbContext>(options =>options.UseSqlite($"Data Source={dbPath}"));
-
+// Add scoped services
 builder.Services.AddScoped<CanvasSyncService>();
 builder.Services.AddHttpClient<CanvasService>();
 builder.Services.AddScoped<UserService>();
@@ -33,33 +35,39 @@ builder.Services.AddScoped<CompetencyDataServices>();
 
 var app = builder.Build();
 
-// Ensure database exists
+// Ensure database exists and seed data
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    // Open SQLite connection and enforce foreign keys
     db.Database.OpenConnection();
     db.Database.ExecuteSqlRaw("PRAGMA foreign_keys = ON;");
     db.Database.EnsureCreated();
+
     try
     {
-        var CSVService = scope.ServiceProvider.GetRequiredService<CSVReaderStartup>();
-        await CSVService.ReadModuleCSV();
+        // Read module CSVs
+        var csvService = scope.ServiceProvider.GetRequiredService<CSVReaderStartup>();
+        await csvService.ReadModuleCSV();
+
+        // Seed test data safely (idempotent)
+        await DbSeeder.SeedTestData(db);
     }
     catch (Exception ex)
     {
-        Console.WriteLine(ex.Message);
+        Console.WriteLine($"Seeder error: {ex.Message}");
     }
-
-    await DbSeeder.SeedTestData(db);
-
-    db.Database.CloseConnection();
+    finally
+    {
+        db.Database.CloseConnection();
+    }
 }
 
-// Configure the HTTP request pipeline.
+// Configure HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

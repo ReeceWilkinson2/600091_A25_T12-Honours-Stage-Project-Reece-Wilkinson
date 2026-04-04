@@ -1,4 +1,5 @@
-﻿using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
+﻿using Honours_Project_CompetencyandSkillTracking.Data;
+using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
 using Microsoft.EntityFrameworkCore;
 
 namespace Honours_Project_CompetencyandSkillTracking.Data
@@ -7,12 +8,15 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
     {
         public static async Task SeedTestData(AppDbContext context)
         {
-            var user = await context.Students
+            var random = new Random();
+
+            // 1️⃣ Seed test student if not exists
+            var student = await context.Students
                 .FirstOrDefaultAsync(u => u.StudentId == "12345");
 
-            if (user == null)
+            if (student == null)
             {
-                user = new User
+                student = new User
                 {
                     StudentId = "12345",
                     UserName = "Test Student",
@@ -20,15 +24,15 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                     Password = "test",
                     Role = "Student"
                 };
-
-                context.Students.Add(user);
+                context.Students.Add(student);
                 await context.SaveChangesAsync();
             }
 
-            var competency = context.CompetencyData
+            // 2️⃣ Seed a competency if missing
+            var competency = await context.CompetencyData
                 .Include(c => c.Levels)
                     .ThenInclude(l => l.Modules)
-                .FirstOrDefault(c => c.CompetencyID == "COMP001");
+                .FirstOrDefaultAsync(c => c.CompetencyID == "COMP001");
 
             if (competency == null)
             {
@@ -38,51 +42,42 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                     CompetencyID = "COMP001",
                     AdditionalNotes = "Core programming skills"
                 };
-
                 context.CompetencyData.Add(competency);
                 await context.SaveChangesAsync();
             }
 
+            // 3️⃣ Seed competency levels if missing
             var existingLevels = await context.CompetencyLevels
                 .Include(l => l.Modules)
                 .Where(l => l.CompetencyDbID == competency.CompetencyDbID)
                 .ToListAsync();
 
-            var existingLevelNumbers = existingLevels
-                .Select(l => l.LevelNumber)
-                .ToHashSet();
-
+            var existingLevelNumbers = existingLevels.Select(l => l.LevelNumber).ToHashSet();
             var levelsToAdd = new List<CompetencyLevels>();
 
             if (!existingLevelNumbers.Contains(4))
-            {
                 levelsToAdd.Add(new CompetencyLevels
                 {
                     LevelNumber = 4,
-                    Description = "Basic understanding",
+                    Description = "Year 1 - Basic understanding",
                     CompetencyDbID = competency.CompetencyDbID
                 });
-            }
 
             if (!existingLevelNumbers.Contains(5))
-            {
                 levelsToAdd.Add(new CompetencyLevels
                 {
                     LevelNumber = 5,
-                    Description = "Intermediate application",
+                    Description = "Year 2 - Intermediate application",
                     CompetencyDbID = competency.CompetencyDbID
                 });
-            }
 
             if (!existingLevelNumbers.Contains(6))
-            {
                 levelsToAdd.Add(new CompetencyLevels
                 {
                     LevelNumber = 6,
-                    Description = "Advanced proficiency",
+                    Description = "Year 3 - Advanced proficiency",
                     CompetencyDbID = competency.CompetencyDbID
                 });
-            }
 
             if (levelsToAdd.Any())
             {
@@ -91,75 +86,66 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                 existingLevels.AddRange(levelsToAdd);
             }
 
+            // 4️⃣ Seed module assignments if missing
             var levelModuleMap = new Dictionary<int, List<string>>
-            {
-                { 4, new List<string> { "441101", "441105" } },
-                { 5, new List<string> { "551462", "551457" } },
-                { 6, new List<string> { "600091", "661985" } }
-            };
+    {
+        { 4, new List<string> { "441101", "441102", "441104", "441105", "441108" } },
+        { 5, new List<string> { "551462", "551457", "551460", "500083" } },
+        { 6, new List<string> { "600091", "661985" } }
+    };
 
             var allModuleCodes = levelModuleMap.SelectMany(x => x.Value).Distinct().ToList();
-
             var modules = await context.ModulesCSV.Where(m => allModuleCodes.Contains(m.ModCode)).ToListAsync();
 
             foreach (var level in existingLevels)
             {
-                if (!levelModuleMap.TryGetValue(level.LevelNumber, out var moduleCodes))
-                    continue;
+                if (!levelModuleMap.TryGetValue(level.LevelNumber, out var moduleCodes)) continue;
 
                 foreach (var code in moduleCodes)
                 {
                     var module = modules.FirstOrDefault(m => m.ModCode == code);
-
-                    if (module == null)
-                        continue;
+                    if (module == null) continue;
 
                     if (!level.Modules.Any(m => m.ModCode == code))
-                    {
                         level.Modules.Add(module);
-                    }
                 }
             }
             await context.SaveChangesAsync();
 
-            var achievementsExist = await context.CompetencyAchievements.Where(a => a.StudentId == user.StudentId).Select(a => a.CompetencyLevelId).ToListAsync();
-
-            var achievementsToAdd = new List<CompetencyAchievement>();
-
+            // 5️⃣ Seed competency achievements if missing
             foreach (var level in existingLevels)
             {
-                if ((level.LevelNumber == 4 || level.LevelNumber == 5) &&
-                    !achievementsExist.Contains(level.LevelDbID))
+                if (!level.Modules.Any()) continue;
+
+                foreach (var module in level.Modules)
                 {
-                    var daysAgo = level.LevelNumber == 4 ? -10 : -5;
+                    var existingCount = await context.CompetencyAchievements.CountAsync(a =>
+                        a.StudentId == student.StudentId &&
+                        a.CompetencyLevelId == level.LevelDbID &&
+                        a.ModuleId == module.DatabaseID);
 
-                    var module = level.Modules.FirstOrDefault();
-
-                    if (module == null)
-                        continue;
-
-                    achievementsToAdd.Add(new CompetencyAchievement
+                    if (existingCount == 0) // Only add if no achievements exist
                     {
-                        User = user,
-                        StudentId = user.StudentId,
+                        // Set the year difference based on the level number
+                        int yearDifference = level.LevelNumber - 4;
 
-                        CompetencyLevel = level,
-                        CompetencyLevelId = level.LevelDbID,
-
-                        Module = module,
-                        ModuleId = module.DatabaseID,
-
-                        MasteryPoints = 6,
-                        AchievedDate = DateTime.Now.AddDays(daysAgo)
-                    });
+                        var competencyAchievement = new CompetencyAchievement
+                        {
+                            StudentId = student.StudentId,
+                            User = student,
+                            CompetencyLevelId = level.LevelDbID,
+                            CompetencyLevel = level,
+                            ModuleId = module.DatabaseID,
+                            Module = module,
+                            MasteryPoints = 6,
+                            AchievedDate = DateTime.Now.AddYears(yearDifference) // Adjust date based on level
+                        };
+                        context.CompetencyAchievements.Add(competencyAchievement);
+                    }
                 }
             }
 
-            if (achievementsToAdd.Any())
-            {
-                context.CompetencyAchievements.AddRange(achievementsToAdd);
-                await context.SaveChangesAsync();
-            }
+            await context.SaveChangesAsync();
         }
     }
 }
