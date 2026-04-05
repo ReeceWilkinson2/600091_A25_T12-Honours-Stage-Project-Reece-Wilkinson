@@ -24,10 +24,10 @@ else
 
     <div style="margin-top: 20px; width: 75%;">
         <div style="
-                        height: 15px;
-                        width: 100%;
-                        background: linear-gradient(to right, rgb(0,200,0), rgb(255,200,0), rgb(200,0,0));
-                        border-radius: 5px;">
+                            height: 15px;
+                            width: 100%;
+                            background: linear-gradient(to right, rgb(0,200,0), rgb(255,200,0), rgb(200,0,0));
+                            border-radius: 5px;">
         </div>
 
         <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 5px;">
@@ -151,22 +151,20 @@ else
                 .OrderBy(g => g.Key.LevelNumber)
                 .ToList();
 
-            // Fix: Pass JavaScript-friendly Date objects to the chart
-            // Ensure x-values are DateTime strings in a proper format
             chartPoints = levelGroups
                 .Select(g => new
                 {
-                    x = g.Min(a => a.AchievedDate),  // Pass DateTime directly
+                    x = g.Min(a => a.AchievedDate), // first achieved date
                     y = g.Key.LevelNumber
                 })
-                .ToList<object>(); // Ensure it is a List<object> type, not dynamic
+                .ToList<object>();
 
             moduleTooltips = levelGroups
                 .Select(g => g.Select(a => $"{a.Module.ModCode} - {a.Module.ModuleName}").ToArray())
                 .ToArray();
 
             levelCounts = levelGroups
-                .Select(g => Math.Min(g.Count(), 6)) // Ensure the level counts are correct (maximum of 6)
+                .Select(g => Math.Min(g.Count(), 6))
                 .ToArray();
         }
         else
@@ -181,13 +179,17 @@ else
         {
             chartRendered = true;
 
-            // Log chartPoints to the console for debugging
-            Console.WriteLine("chartPoints: " + string.Join(", ", chartPoints.Select(p => p.ToString())));
+            var labels = chartPoints
+                .Select(p => ((DateTime)((dynamic)p).x).ToString("MMM dd, yyyy"))
+                .ToArray();
+
+            var yValues = chartPoints.Select(p => ((dynamic)p).y).ToArray();
 
             await JS.InvokeVoidAsync(
                 "renderLineChart",
                 "competencyChart",
-                chartPoints,
+                labels,
+                yValues,
                 moduleTooltips,
                 levelCounts
             );
