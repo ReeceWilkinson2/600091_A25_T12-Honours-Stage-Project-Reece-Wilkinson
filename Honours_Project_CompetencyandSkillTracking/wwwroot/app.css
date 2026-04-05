@@ -1,5 +1,17 @@
 html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background: none;
+    overflow: hidden;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
 a, .btn-link {
@@ -167,29 +179,36 @@ h1:focus {
 }
 
 /* sign in styling*/
-html, body {
-    height: 100%;
-    margin: 0;
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-image: url('/Images/myhc_373562.png');
+    background-size: cover;
+    background-position: center;
 }
 
-body {
-    display: grid;
-    place-items: center;
-}
 
-.form-body {
-    width: 90%;
-    max-width: 400px;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.form-wrapper {
-    background-color: rgba(255, 255, 255, 0.95);
-    padding: 50px;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    width: 100%;
-    max-width: 400px;
+.login-page .form-wrapper {
+    width: 480px;       /* fixed width for desktop look */
+    height: 360px;      /* fixed height to maintain 4:3 ratio */
+    padding: 40px 30px;
+    background-color: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* vertically center contents */
+    align-items: center;
     text-align: center;
+}
+
+@media (max-width: 480px) {
+    .login-page .form-wrapper {
+        padding: 30px 20px;
+        border-radius: 12px;
+    }
 }

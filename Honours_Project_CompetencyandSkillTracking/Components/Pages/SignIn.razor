@@ -6,50 +6,42 @@
 @inject AuthStateService AuthState
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
-<style>
-	body {
-		background: url("Images/myhc_373562.png") no-repeat;
-		background-size: cover;
-		background-position: center;
-	}
-	::-ms-reveal {
-	filter: invert(100%);
-}
-</style>
-
 <PageTitle>SignIn</PageTitle>
 
-<div class="body">
-	<div class="form-body">
-		<div class="form-wrapper">
-			<EditForm Model="@form" OnValidSubmit="LogInUser">
-				<DataAnnotationsValidator></DataAnnotationsValidator>
-				<ValidationSummary></ValidationSummary>
-				<h1>Login</h1>
-				<div class="input-box">
-					<InputText @bind-Value="@form.Email" id="email" class="input" placeholder="Email" type="email"></InputText>
-					<i class="bx bxs-user"></i>
-				</div>
-				<div class="input-box">
-					<InputText @bind-Value="@form.Password" id="password" class="input" placeholder="Password" type="password"></InputText>
-					<i class="bx bxs-lock"></i>
-				</div>
-				<div class="remember-forgot">
-					<a href="/PasswordReset">Forgot Password?</a>
-				</div>
-				<button class="module-button" type="submit">Login</button>
-				@if (!string.IsNullOrEmpty(ErrorMessage))
-				{
-					<div class="text-danger mb-2">
-						@ErrorMessage
-					</div>
-				}
-			</EditForm>
-			<div class="register">
-				<p>Don't have an account? <a href="/signup">Sign up here!</a></p>
-			</div>
-		</div>
-	</div>
+<div class="login-page">
+    <div class="form-wrapper">
+        <EditForm Model="@form" OnValidSubmit="LogInUser">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <ValidationSummary></ValidationSummary>
+
+            <h1>Login</h1>
+
+            <div class="input-box">
+                <InputText @bind-Value="@form.Email" id="email" class="input" placeholder="Email" type="email" />
+                <i class="bx bxs-user"></i>
+            </div>
+
+            <div class="input-box">
+                <InputText @bind-Value="@form.Password" id="password" class="input" placeholder="Password" type="password" />
+                <i class="bx bxs-lock"></i>
+            </div>
+
+            <div class="remember-forgot">
+                <a href="/PasswordReset">Forgot Password?</a>
+            </div>
+
+            <button class="module-button" type="submit">Login</button>
+
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <div class="text-danger mb-2">@ErrorMessage</div>
+            }
+        </EditForm>
+
+        <div class="register">
+            <p>Don't have an account? <a href="/signup">Sign up here!</a></p>
+        </div>
+    </div>
 </div>
 
 @code {
