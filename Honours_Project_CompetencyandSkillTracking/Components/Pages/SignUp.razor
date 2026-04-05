@@ -10,7 +10,14 @@
 @using Microsoft.Extensions.Options
 
 <style>
-
+	body {
+		background: url("Images/myhc_373562.png") no-repeat;
+		background-size: cover;
+		background-position: center;
+	}
+	::-ms-reveal {
+	filter: invert(100%);
+}
 </style>
 
 <div class="body">
@@ -40,15 +47,13 @@
 					<label for="role">Account Type: </label>
 					<InputSelect class="select" id="role" @bind-value="form.Role">
 						<option value="">(select one)</option>
-						<option value="Student">Student</option>
-						<option value="Staff">Staff</option>
 						<option value="Employer">Employer</option>
 					</InputSelect>
 				</div>
-				@if (form.Role == "staff")
+				@if (form.Role == "Employer")
 				{
 					<div class="input-box">
-						<InputText class="input" id="staffPassword" placeholder="Enter Staff Password" @bind-Value="form.StaffPassword" type="password"></InputText>
+						<InputText class="input" id="staffPassword" placeholder="Enter Employer Password" @bind-Value="form.StaffPassword" type="password"></InputText>
 					</div>
 				}
 				<div class="terms-and-conditions">

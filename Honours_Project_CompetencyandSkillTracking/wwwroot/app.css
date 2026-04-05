@@ -165,3 +165,31 @@ h1:focus {
     background-color: #f8d7da;
     border: 1px solid #f5c6cb;
 }
+
+/* sign in styling*/
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: grid;
+    place-items: center;
+}
+
+.form-body {
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.form-wrapper {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 50px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
