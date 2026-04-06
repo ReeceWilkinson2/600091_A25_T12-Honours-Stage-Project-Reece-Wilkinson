@@ -5,10 +5,10 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 {
     public class CSVReaderStartup
     {
-        private readonly ModuleCSVReading _CSVReader;
+        private readonly CSVReading _CSVReader;
         private readonly AppDbContext _dbContext;
 
-        public CSVReaderStartup(ModuleCSVReading csvReader, AppDbContext dbContext)
+        public CSVReaderStartup(CSVReading csvReader, AppDbContext dbContext)
         {
             _CSVReader = csvReader;
             _dbContext = dbContext;
@@ -22,6 +22,26 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             await _dbContext.SaveChangesAsync();
 
             await _dbContext.ModulesCSV.AddRangeAsync(modules);
+            await _dbContext.SaveChangesAsync();
+        }
+        public async Task ReadCompetencyCSV()
+        {
+            var competencies = _CSVReader.ReadCompetencies();
+
+            _dbContext.CompetencyData.RemoveRange(_dbContext.CompetencyData);
+            await _dbContext.SaveChangesAsync();
+
+            await _dbContext.CompetencyData.AddRangeAsync(competencies);
+            await _dbContext.SaveChangesAsync();
+        }
+        public async Task ReadCompetencyLevelsCSV()
+        {
+            var competencyLevels = _CSVReader.ReadCompetencyLevels();
+
+            _dbContext.CompetencyLevels.RemoveRange(_dbContext.CompetencyLevels);
+            await _dbContext.SaveChangesAsync();
+
+            await _dbContext.CompetencyLevels.AddRangeAsync(competencyLevels);
             await _dbContext.SaveChangesAsync();
         }
     }

@@ -29,7 +29,7 @@ builder.Services.AddScoped<CanvasSyncService>();
 builder.Services.AddHttpClient<CanvasService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthStateService>();
-builder.Services.AddScoped<ModuleCSVReading>();
+builder.Services.AddScoped<CSVReading>();
 builder.Services.AddScoped<CSVReaderStartup>();
 builder.Services.AddScoped<CompetencyDataServices>();
 
@@ -50,6 +50,8 @@ using (var scope = app.Services.CreateScope())
         // Read module CSVs
         var csvService = scope.ServiceProvider.GetRequiredService<CSVReaderStartup>();
         await csvService.ReadModuleCSV();
+        await csvService.ReadCompetencyCSV();
+        //await csvService.ReadCompetencyLevelsCSV();
 
         // Seed test data safely (idempotent)
         await DbSeeder.SeedTestData(db);

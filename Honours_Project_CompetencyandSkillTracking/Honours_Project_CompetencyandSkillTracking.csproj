@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Data\ProgrammeConstructionReport_25.06.csv">
+    <Content Include="Data\CSV Files\ProgrammeConstructionReport_25.06.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -31,6 +31,15 @@
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		  <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 	  </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Data\CSV Files\Competencies.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\CSV Files\CompetencyLevels.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
