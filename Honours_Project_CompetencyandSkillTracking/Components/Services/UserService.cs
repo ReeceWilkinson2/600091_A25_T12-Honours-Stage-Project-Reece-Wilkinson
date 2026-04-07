@@ -97,5 +97,19 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
                 .Where(m => m.Role == role)
                 .ToListAsync();
         }
+
+        public async Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword)
+        {
+            var user = await _db.Students.FirstOrDefaultAsync(u => u.StudentId == userId && u.Password == oldPassword);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            user.Password = newPassword;
+            await _db.SaveChangesAsync();
+            return true;
+        }
     }
 }
