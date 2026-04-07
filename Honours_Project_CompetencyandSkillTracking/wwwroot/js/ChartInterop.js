@@ -9,12 +9,19 @@
         canvas.chartInstance.destroy();
     }
 
+    // RGB color transitions from (0, 238, 255) to (0, 0, 255)
+    const rgbColors = [
+        [0, 238, 255],  // Level 1
+        [0, 190, 255],  // Level 2
+        [0, 142, 255],  // Level 3
+        [0, 94, 255],  // Level 4
+        [0, 46, 255],   // Level 5
+        [0, 0, 255]]  // Level 6
+
     const pointColors = counts.map(count => {
-        const t = Math.min(count / 6.0, 1);
-        const red = Math.round(255 * t);
-        const green = Math.round(200 * (1 - t));
-        const blue = 0;
-        return `rgb(${red},${green},${blue})`;
+        const index = Math.min(Math.max(count - 1, 0), 5);
+        const color = rgbColors[index];
+        return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;  // Convert to rgb string
     });
 
     canvas.chartInstance = new Chart(ctx, {
@@ -24,8 +31,8 @@
             datasets: [{
                 label: 'Competency Progress',
                 data: yValues,
-                borderColor: 'blue',
-                backgroundColor: 'blue',
+                borderColor: 'black',
+                backgroundColor: 'black',
                 pointBackgroundColor: pointColors,
                 pointBorderColor: pointColors,
                 pointRadius: 6,
