@@ -18,20 +18,20 @@
             @if (AuthState.Role == "Student")
             {
                 <NavLink class="nav-link" href="competencyselection">
-                    <span class="bi bi-list-ul"></span> Competency
+                    <span class="bi bi-list-ul"></span> Competency Catalogue
                 </NavLink>
 
-                <NavLink class="nav-link" href="courseindex">
+                @* <NavLink class="nav-link" href="courseindex">
                     <span class="bi bi-list-nested"></span> My Modules
-                </NavLink>
+                </NavLink> *@
 
                 <NavLink class="nav-link" href="studentjourney">
                     <span class="bi bi-graph-up"></span> Student Progress
                 </NavLink>
 
-                <NavLink class="nav-link" href="submissionindex">
+                @* <NavLink class="nav-link" href="submissionindex">
                     <span class="bi bi-file-earmark-text"></span> My Submissions
-                </NavLink>
+                </NavLink> *@
             }
 
             @if (AuthState.Role == "Staff")
@@ -42,10 +42,6 @@
 
                 <NavLink class="nav-link" href="studentselection">
                     <span class="bi bi-people"></span> Student Search
-                </NavLink>
-
-                <NavLink class="nav-link" href="userindex">
-                    <span class="bi bi-person-badge"></span> User Index
                 </NavLink>
 
                 <NavLink class="nav-link" href="datacreation">

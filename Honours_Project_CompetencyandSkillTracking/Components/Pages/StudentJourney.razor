@@ -8,21 +8,22 @@
 
 @if (SelectedCourse == null)
 {
-    <h3>Select a Course</h3>
+    <h3>Student Journey</h3>
+    <p>Please select your course</p>
 
-    <button class ="module-button" @onclick ="@(() => SelectCourse("Computer Science"))">
+    <button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick="@(() => SelectCourse("Computer Science"))">
         Computer Science
     </button>
 
-    <button class="module-button" @onclick="@(() => SelectCourse("Computer Science for Games Development"))">
+    <button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick="@(() => SelectCourse("Computer Science for Games Development"))">
         Computer Science for Games Development
     </button>
 
-    <button class="module-button" @onclick="@(() => SelectCourse("Robotics and Artificial Intelligence"))">
+    <button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick="@(() => SelectCourse("Robotics and Artificial Intelligence"))">
         Computer Science for Robotics and Artificial Intelligence
     </button>
 
-    <button class="module-button" @onclick="@(() => SelectCourse("Computing (Software Engineering)"))">
+    <button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick="@(() => SelectCourse("Computing (Software Engineering)"))">
         Computer Science (Software Engineering)
     </button>
 

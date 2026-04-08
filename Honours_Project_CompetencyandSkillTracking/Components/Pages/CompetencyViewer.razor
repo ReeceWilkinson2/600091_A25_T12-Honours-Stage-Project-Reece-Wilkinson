@@ -10,26 +10,24 @@
     </button>
 </div>
 
-<h2>Competency Details</h2>
-
 @if (Competency != null)
 {
     <div>
-        <h3>@Competency.CompetencyName</h3>
+        <h3>Competency Details: @Competency.CompetencyName</h3>
 
-        <h4>Competency ID:</h4>
-        <p>@Competency.CompetencyID</p>
+        <h4>Competency ID: @Competency.CompetencyID</h4>
 
         @if (Competency.Levels != null && Competency.Levels.Any())
         {
             @foreach (var level in Competency.Levels.OrderBy(l => l.LevelNumber))
             {
                 <div class="level-section">
-                    <h4>Level @level.LevelNumber</h4>
+                    <h5>Level @level.LevelNumber</h5>
 
                     @if (level.Modules != null && level.Modules.Any())
                     {
-                        <p><strong>Modules:</strong></p>
+                        <p>@level.Description</p>
+                        <p><strong>Modules covered in:</strong></p>
                         <ul>
                             @foreach (var module in level.Modules)
                             {
@@ -41,8 +39,6 @@
                     {
                         <p><strong>Modules:</strong> Not Assigned</p>
                     }
-
-                    <p>@level.Description</p>
                 </div>
             }
         }

@@ -4,11 +4,12 @@
 @inject CompetencyDataServices service
 
 <h3>Competency Catalogue</h3>
+<p>Please select a competency to view:</p>
 
 <div>
 	@foreach (var competency in Competencies)
 	{
-		<button class="module-button" @onclick="() => LoadCompetencyDetails(competency)">@competency.CompetencyID, @competency.CompetencyName</button>
+		<button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick ="() => LoadCompetencyDetails(competency)">@competency.CompetencyID, @competency.CompetencyName</button>
 	}
 </div>
 

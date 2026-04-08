@@ -20,9 +20,9 @@
 }
 else
 {
-    <canvas id="competencyChart" width="75%" height="50%"></canvas>
+    <canvas id="competencyChart" style="width: 75%; height: 300px;"></canvas>
 
-    <div style="margin-top: 20px; width: 75%;">
+    <div style="margin-top: 20px; width: 100%;">
         <div style="
             height: 15px;
             width: 100%;
@@ -73,15 +73,16 @@ else
                         }
                     </div>
 
-                    <div style="margin-top:5px;">
+                    <div>
                         @if (matchingAchievements.Any())
                         {
+                            <strong>Achievements:</strong>
                             <ul>
                                 @foreach (var ach in matchingAchievements)
                                 {
                                     <li>
                                         @ach.AchievedDate.ToShortDateString() |
-                                        Mastery Points: @ach.MasteryPoints
+                                        Mastery Points: @ach.MasteryPoints | Achieved in: @ach.Module.ModuleName
                                     </li>
                                 }
                             </ul>
@@ -139,6 +140,7 @@ else
 
             var competency = await CompetencyDataServices.GetCompetencyByIdAsync(competencyId);
             CompetencyName = competency?.CompetencyName ?? string.Empty;
+            AdditionalNotes = competency?.AdditionalNotes ?? string.Empty;
 
             competencyLevels = competency?.Levels
                 .Where(l => l.LevelNumber >= 4 && l.LevelNumber <= 7)

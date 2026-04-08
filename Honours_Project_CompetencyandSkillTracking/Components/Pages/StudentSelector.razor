@@ -4,11 +4,12 @@
 @inject UserService service
 
 <h3>Student Selection</h3>
+<p>Please select a student to view:</p>
 
 <div>
     @foreach (var student in Students)
     {
-        <button class="module-button" @onclick="() => LoadStudentDetails(student)">@student.StudentId, @student.UserName</button>
+        <button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick="() => LoadStudentDetails(student)">@student.StudentId, @student.UserName</button>
     }
 </div>
 

@@ -10,15 +10,12 @@
     </button>
 </div>
 
-<h3>Student Details</h3>
-
 @if (student != null)
 {
     <div>
-        <h4>@student.UserName</h4>
+        <h3>Student Details: @student.UserName</h3>
         <p>Student ID: @student.StudentId</p>
         <p>Email: @student.StEmail</p>
-        <p>Full Name: @student.UserName</p>
         <p>Enrolled Modules: @string.Join(", ", student.Courses.Select(c => c.Name))</p>
         <p>Assignments: @string.Join(", ", student.Submissions.Select(s => $"{s.Assignment.Name} (Score: {s.Score})"))</p>
 
