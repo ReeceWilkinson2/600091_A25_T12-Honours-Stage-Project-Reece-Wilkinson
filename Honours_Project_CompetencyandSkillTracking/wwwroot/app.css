@@ -71,17 +71,47 @@ h1:focus {
     text-align: start;
 }
 
-/*Nav bar*/
+/* Overall layout */
+.layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
 
+/* Top bar */
+.top-row {
+    height: 56px;
+    flex-shrink: 0;
+}
+
+/* Main area */
+.main-area {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/*Nav bar */
 .page {
     display: flex;
     min-height: 100vh;
 }
 
+.flex-fill {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.content {
+    padding-top: 1rem;
+}
+
 .sidebar {
     width: 250px;
-    background-color: #343a40;
+    background-color: #0E1647;
     color: white;
+    flex-shrink: 0;
+    overflow-y: auto;
 }
 
     .sidebar .nav-link {
@@ -89,21 +119,22 @@ h1:focus {
     }
 
         .sidebar .nav-link.active {
-            background-color: #495057;
-            color: white;
+            background-color: #C4E06B;
+            color: black;
         }
 
         .sidebar .nav-link:hover {
-            background-color: #495057;
-            color: white;
+            background-color: #C4E06B;
+            color: black;
         }
 
 .nav-scrollable {
-    height: calc(100vh - 56px);
+    height: 100%;
     overflow-y: auto;
 }
 
 .top-row {
+    width: 100vw;
     height: 56px;
     display: flex;
     align-items: center;
@@ -143,7 +174,7 @@ h1:focus {
 }
 
     .module-button:hover {
-        background-color: #eaeaea;
+        background-color: #C4E06B;
     }
 
 
@@ -190,8 +221,8 @@ h1:focus {
 
 
 .login-page .form-wrapper {
-    width: 480px;       /* fixed width for desktop look */
-    height: 360px;      /* fixed height to maintain 4:3 ratio */
+    width: 480px;
+    height: 360px;
     padding: 40px 30px;
     background-color: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
@@ -199,7 +230,7 @@ h1:focus {
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
-    justify-content: center; /* vertically center contents */
+    justify-content: center;
     align-items: center;
     text-align: center;
 }

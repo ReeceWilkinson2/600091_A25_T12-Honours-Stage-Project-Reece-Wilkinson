@@ -1,16 +1,27 @@
 ﻿@inherits LayoutComponentBase
 @inject AuthStateService AuthState
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
+<div class="layout">
+
+    <div class="top-row navbar navbar-dark" style="background-color: #0E1647;">
+        <div class="container-fluid">
+            <span class="navbar-brand">Hull Uni Competency Tracker</span>
+        </div>
     </div>
 
-    <main class="flex-fill">
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+    <div class="main-area">
+
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+
+        <main class="flex-fill">
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
+
+    </div>
 </div>
 
 @code {

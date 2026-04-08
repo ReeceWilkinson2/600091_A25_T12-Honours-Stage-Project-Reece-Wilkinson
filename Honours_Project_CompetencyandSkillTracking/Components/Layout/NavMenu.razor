@@ -1,14 +1,9 @@
 ﻿@inject AuthStateService AuthState
 @inject NavigationManager NavigationManager
 
-<div class="top-row ps-3 navbar navbar-dark bg-dark">
-    <div class="container-fluid">
-        <span class="navbar-brand">Skill Tracker</span>
-    </div>
-</div>
+<div class="nav-scrollable sidebar">
 
-<div class="nav-scrollable">
-    <nav class="nav flex-column nav-pills p-2">
+    <nav class="nav flex-column nav-pills p-1">
 
         @if (!AuthState.IsInitialized)
         {
@@ -17,21 +12,21 @@
         else if (!string.IsNullOrEmpty(AuthState.Role))
         {
             <NavLink class="nav-link" href="home" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
             </NavLink>
 
             @if (AuthState.Role == "Student")
             {
                 <NavLink class="nav-link" href="competencyselection">
-                    <span class="bi bi-list-ul"></span> Competency Catalogue
+                    <span class="bi bi-list-ul"></span> Competency
                 </NavLink>
 
                 <NavLink class="nav-link" href="courseindex">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> My Modules
+                    <span class="bi bi-list-nested"></span> My Modules
                 </NavLink>
 
                 <NavLink class="nav-link" href="studentjourney">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Student Progress
+                    <span class="bi bi-graph-up"></span> Student Progress
                 </NavLink>
 
                 <NavLink class="nav-link" href="submissionindex">
@@ -42,7 +37,7 @@
             @if (AuthState.Role == "Staff")
             {
                 <NavLink class="nav-link" href="competencyselection">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> CompetencyCatalogue
+                    <span class="bi bi-list-nested"></span> Competency Catalogue
                 </NavLink>
 
                 <NavLink class="nav-link" href="studentselection">
@@ -54,14 +49,14 @@
                 </NavLink>
 
                 <NavLink class="nav-link" href="datacreation">
-                    <span class="bi bi-person-badge"></span> Data Creation
+                    <span class="bi bi-file-plus"></span> Data Creation
                 </NavLink>
             }
 
             @if (AuthState.Role == "Employer")
             {
                 <NavLink class="nav-link" href="competencyselection">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> CompetencyCatalogue
+                    <span class="bi bi-list-nested"></span> Competency Catalogue
                 </NavLink>
 
                 <NavLink class="nav-link" href="studentselection">
@@ -72,37 +67,38 @@
             @if (AuthState.Role == "Admin")
             {
                 <NavLink class="nav-link" href="competencyselection">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> CompetencyCatalogue
+                    <span class="bi bi-list-nested"></span> Competency Catalogue
                 </NavLink>
 
                 <NavLink class="nav-link" href="studentselection">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> StudentSearch
+                    <span class="bi bi-list-nested"></span> Student Search
                 </NavLink>
 
                 <NavLink class="nav-link" href="userindex">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> User Index
+                    <span class="bi bi-person-badge"></span> User Index
                 </NavLink>
 
                 <NavLink class="nav-link" href="courseindex">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Module Index(Canvas)
+                    <span class="bi bi-list-nested"></span> Module Index (Canvas)
                 </NavLink>
 
                 <NavLink class="nav-link" href="moduleindexcsv">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Module Index(CSV)
+                    <span class="bi bi-list-nested"></span> Module Index (CSV)
                 </NavLink>
 
                 <NavLink class="nav-link" href="submissionindex">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Submission Index
+                    <span class="bi bi-list-nested"></span> Submission Index
                 </NavLink>
 
                 <NavLink class="nav-link" href="sync">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Data Sync
+                    <span class="bi bi-arrow-repeat"></span> Data Sync
                 </NavLink>
 
                 <NavLink class="nav-link" href="datacreation">
-                    <span class="bi bi-person-badge"></span> Data Creation
+                    <span class="bi bi-file-plus"></span> Data Creation
                 </NavLink>
             }
+
             <a class="nav-link text-danger" style="cursor:pointer;" @onclick="Logout">
                 <span class="bi bi-box-arrow-right"></span> Logout
             </a>
@@ -113,18 +109,19 @@
                 <span class="bi bi-box-arrow-in-right"></span> Sign In
             </NavLink>
         }
+
     </nav>
 </div>
 
 @code {
-    protected override void OnInitialized()
-    {
-        AuthState.OnChange += StateHasChanged;
-    }
-
     private async Task Logout()
     {
         await AuthState.ClearAsync();
         NavigationManager.NavigateTo("/");
+    }
+
+    protected override void OnInitialized()
+    {
+        AuthState.OnChange += StateHasChanged;
     }
 }
