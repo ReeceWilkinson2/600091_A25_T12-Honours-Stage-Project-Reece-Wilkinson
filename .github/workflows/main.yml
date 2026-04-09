@@ -11,20 +11,15 @@ jobs:
       - uses: actions/checkout@v2
       - name: Checkout Repo
         run: powershell Copy-Item -Path C:\Users\actions-runner\* -Destination C:\inetpub\wwwroot -force
-
-  
-      - name: Install Test Platform
-        working-directory:
-        run: dotnet add package Microsoft.TestPlatform --version 17.5.0
-  
+        
       - name: Restore
-        working-directory:
+        working-directory: ./HonoursUnitTests
         run: dotnet restore
   
       - name: Build
-        working-directory:
+        working-directory: ./HonoursUnitTests
         run: dotnet build
   
       - name: Test
-        working-directory:
-        run: dotnet test MyBlazorTests.csproj
+        working-directory: ./HonoursUnitTests
+        run: dotnet test --no-build
