@@ -1,9 +1,11 @@
 ﻿using Honours_Project_CompetencyandSkillTracking.Data;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace Honours_Project_CompetencyandSkillTracking.Canvas.Classes
 {
-    public class User
+    [Index(nameof(StudentId), IsUnique = true)]
+        public class User
     {
         [Key]
         public string StudentId { get; set; } // Canvas user id, primary key

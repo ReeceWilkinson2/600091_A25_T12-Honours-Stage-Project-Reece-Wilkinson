@@ -13,6 +13,8 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
     {
         private readonly AppDbContext _db;
 
+        private static readonly Random _random = new Random();
+
         public UserService(AppDbContext db)
         {
             _db = db;
@@ -20,10 +22,30 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
         public async Task<User?> AuthenticateAsync(string email, string password)
         {
-            return await _db.Students
-                .FirstOrDefaultAsync(u =>
-                    u.StEmail == email &&
-                    u.Password == password);
+            var user = await _db.Students
+                .FirstOrDefaultAsync(u => u.StEmail == email);
+
+            if (user == null)
+                return null;
+
+            // Check if password is hashed
+            if (user.Password.StartsWith("$2"))
+            {
+                if (BCrypt.Net.BCrypt.Verify(password, user.Password))
+                    return user;
+            }
+            else
+            {
+                if (user.Password == password)
+                {
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(password);
+                    await _db.SaveChangesAsync();
+
+                    return user;
+                }
+            }
+
+            return null;
         }
 
         public async Task<User> AddUserAsync(User user)
@@ -110,6 +132,19 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             user.Password = newPassword;
             await _db.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<string> GenerateUniqueStudentIdAsync()
+        {
+            string id;
+
+            do
+            {
+                id = _random.Next(100000, 999999).ToString();
+            }
+            while (await _db.Students.AnyAsync(u => u.StudentId == id));
+
+            return id;
         }
     }
 }

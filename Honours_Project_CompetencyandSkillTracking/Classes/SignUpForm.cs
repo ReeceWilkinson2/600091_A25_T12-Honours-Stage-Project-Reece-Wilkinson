@@ -9,7 +9,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Classes
         [Required]
         public string LastName { get; set; }
         [Required]
-        [HullEmailOnly]
+        //[HullEmailOnly]
         public string Email { get; set; }
         public string Password { get; set; }
         public string Role { get; set; }

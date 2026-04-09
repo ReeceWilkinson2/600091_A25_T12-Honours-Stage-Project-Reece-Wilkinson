@@ -78,7 +78,7 @@
 	private async Task SignupUser()
 	{
 		// Staff password validation
-		if (form.Role == "Staff" && form.StaffPassword != "secretpassword")
+		if (form.Role == "Employer" && form.StaffPassword != "secretpassword")
 		{
 			errorMessage = "The staff password is incorrect.";
 			return;
@@ -95,7 +95,7 @@
 		// Create new record
 		var newUser = new User
 		{
-			StudentId = Guid.NewGuid().ToString(), // generate a new ID
+			StudentId = await UserService.GenerateUniqueStudentIdAsync(), // generate a new ID
 			UserName = $"{form.FirstName} {form.LastName}",
 			StEmail = form.Email,
 			Password = BCrypt.Net.BCrypt.HashPassword(form.Password),
@@ -104,7 +104,6 @@
 
 		await UserService.AddUserAsync(newUser);
 
-		// Optional: send confirmation email (if you want)
 		await SendEmail(form.Email);
 
 		await AuthState.SetUserAsync(newUser.StudentId, newUser.Role);
