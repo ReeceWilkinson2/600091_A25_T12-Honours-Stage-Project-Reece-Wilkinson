@@ -15,8 +15,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public DbSet<Outcome> Outcomes => Set<Outcome>();
         public DbSet<OutcomeResult> OutcomeResults => Set<OutcomeResult>();
 
-        public DbSet<UserData> UserData => Set<UserData>();
-
         public DbSet<CompetencyData> CompetencyData { get; set; }
         public DbSet<CompetencyLevels> CompetencyLevels { get; set; }
         public DbSet<CompetencyAchievement> CompetencyAchievements { get; set; }
