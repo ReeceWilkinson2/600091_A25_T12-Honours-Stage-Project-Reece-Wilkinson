@@ -7,6 +7,10 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
     public class CSVReading
     {
         private readonly AppDbContext _dbContext;
+        public CSVReading(AppDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
         // what to ignore:
         // VCO Seqn
         // Scheme
@@ -46,7 +50,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
             var HeaderValues = ParseCsvLine(Lines[0]);
 
-            // Build dictionary: column name -> index
             var ColumnIndex = new Dictionary<string, int>();
 
             for (int i = 0; i < HeaderValues.Count; i++)
@@ -103,7 +106,12 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             var competencies = new List<CompetencyData>();
 
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Data","CSV Files","Competencies.csv");
+            var filePath = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Data",
+                "CSV Files",
+                "Competencies.csv"
+            );
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"CSV file not found at: {filePath}");
@@ -115,32 +123,26 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
             var headerValues = ParseCsvLine(lines[0]);
 
-            // Build column index map
             var columnIndex = new Dictionary<string, int>();
 
             for (int i = 0; i < headerValues.Count; i++)
             {
                 var header = headerValues[i].Trim();
                 if (!columnIndex.ContainsKey(header))
-                {
                     columnIndex.Add(header, i);
-                }
             }
 
-            // Helper function
             string GetValue(List<string> values, string columnName)
             {
                 if (columnIndex.ContainsKey(columnName))
                 {
                     int index = columnIndex[columnName];
-
                     if (index < values.Count)
                         return values[index].Trim();
                 }
                 return "";
             }
 
-            // Process rows
             for (int i = 1; i < lines.Length; i++)
             {
                 if (string.IsNullOrWhiteSpace(lines[i]))
@@ -161,16 +163,11 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             return competencies;
         }
 
-        public List<CompetencyLevels> ReadCompetencyLevels()
+        public List<CompetencyLevels> ReadCompetencyLevels(List<CompetencyData> competencies)
         {
             var competencyLevels = new List<CompetencyLevels>();
 
-            var filePath = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Data",
-                "CSV Files",
-                "CompetencyLevels.csv" // Ensure this is the correct path to your CSV
-            );
+            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Data","CSV Files","CompetencyLevels.csv");
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"CSV file not found at: {filePath}");
@@ -182,33 +179,28 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
             var headerValues = ParseCsvLine(lines[0]);
 
-            // Build column index map
             var columnIndex = new Dictionary<string, int>();
 
             for (int i = 0; i < headerValues.Count; i++)
             {
                 var header = headerValues[i].Trim();
                 if (!columnIndex.ContainsKey(header))
-                {
                     columnIndex.Add(header, i);
-                }
             }
 
-            // Helper function to get the value of a column
             string GetValue(List<string> values, string columnName)
             {
                 if (columnIndex.ContainsKey(columnName))
                 {
                     int index = columnIndex[columnName];
-
                     if (index < values.Count)
                         return values[index].Trim();
                 }
                 return "";
             }
 
-            // Process rows (competency levels)
-            // Process rows (competency levels)
+            var competencyLookup = competencies.Where(c => !string.IsNullOrWhiteSpace(c.CompetencyID)).ToDictionary(c => c.CompetencyID.Trim(), c => c);
+
             for (int i = 1; i < lines.Length; i++)
             {
                 if (string.IsNullOrWhiteSpace(lines[i]))
@@ -216,81 +208,52 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
                 var values = ParseCsvLine(lines[i]);
 
-                // Extract values from the current row
-                string competencyId = GetValue(values, "CompetencyID");
+                string competencyId = (GetValue(values, "CompetencyID") ?? "").Trim().Replace("\r", "").Replace("\n", "");
                 string modCode = GetValue(values, "ModCode");
 
-                // Check if the competencyId and modCode are valid
                 if (string.IsNullOrWhiteSpace(competencyId) || string.IsNullOrWhiteSpace(modCode))
                 {
-                    Console.WriteLine($"CompetencyID or ModCode is missing or malformed at row {i}. Skipping this row.");
-                    continue; // Skip this row if there's no valid CompetencyID or ModCode
+                    Console.WriteLine($"Missing CompetencyID or ModCode at row {i}");
+                    continue;
                 }
 
-                try
+                // Use dictionary instead of DB
+                if (!competencyLookup.TryGetValue(competencyId, out var competency))
                 {
-                    // Trim the CompetencyID to avoid spaces causing issues
-                    competencyId = competencyId.Trim();
-
-                    // Find the corresponding Competency in the database
-                    var competency = _dbContext.CompetencyData
-                        .FirstOrDefault(c => c.CompetencyID == competencyId);
-
-                    // Check if the competency is null
-                    if (competency == null)
-                    {
-                        Console.WriteLine($"Competency not found for CompetencyID: {competencyId} at row {i}. Skipping this row.");
-                        continue; // Skip if the competency doesn't exist in the database
-                    }
-
-                    // Log for debugging
-                    Console.WriteLine($"Found Competency: {competency.CompetencyName} for CompetencyID: {competencyId}");
-
-                    // Now, create the CompetencyLevel object
-                    var competencyLevel = new CompetencyLevels
-                    {
-                        LevelNumber = int.Parse(GetValue(values, "LevelNumber")),
-                        Description = GetValue(values, "Description"),
-                        CompetencyDbID = competency.CompetencyDbID, // Link to the correct Competency
-                    };
-
-                    // Now associate this CompetencyLevel with its modules
-                    var modCodes = modCode.Split('-'); // Split ModCode by dash if there are multiple codes
-
-                    foreach (var mod in modCodes)
-                    {
-                        var trimmedMod = mod.Trim(); // Ensure no extra spaces
-
-                        // Look for the module matching the trimmed ModCode
-                        var module = _dbContext.ModulesCSV
-                            .FirstOrDefault(m => m.ModCode == trimmedMod);
-
-                        // If module is null, log and skip the module
-                        if (module == null)
-                        {
-                            Console.WriteLine($"Module with ModCode {trimmedMod} not found in database. Skipping this module.");
-                            continue; // Skip this module if not found in the database
-                        }
-
-                        // Log the module that is being added
-                        Console.WriteLine($"Adding Module {module.ModuleName} with ModCode {module.ModCode} to CompetencyLevel {competencyLevel.LevelNumber}");
-
-                        // Add module to the competency level
-                        competencyLevel.Modules.Add(module);
-                    }
-
-                    // Add the competencyLevel to the list
-                    competencyLevels.Add(competencyLevel);
-
+                    Console.WriteLine($"Competency not found for ID {competencyId} at row {i}");
+                    continue;
                 }
-                catch (Exception ex)
+
+                if (!int.TryParse(GetValue(values, "LevelNumber"), out int levelNumber))
                 {
-                    // Log the exact error
-                    Console.WriteLine($"Error processing row {i} for CompetencyID: {competencyId} and ModCode: {modCode}. Error: {ex.Message}");
-                    Console.WriteLine($"StackTrace: {ex.StackTrace}");
-                    // Optionally, you can skip this row or handle it further.
-                    continue;  // Continue processing the next rows
+                    Console.WriteLine($"Invalid LevelNumber at row {i}");
+                    continue;
                 }
+
+                var competencyLevel = new CompetencyLevels
+                {
+                    LevelNumber = levelNumber,
+                    Description = GetValue(values, "Description"),
+                    CompetencyDbID = competency.CompetencyDbID,
+                    Competency = competency
+                };
+
+                var modCodes = modCode.Split('-');
+
+                foreach (var mod in modCodes)
+                {
+                    var trimmedMod = mod.Trim();
+                    var module = _dbContext.ModulesCSV.FirstOrDefault(m => m.ModCode == trimmedMod);
+
+                    if (module == null)
+                    {
+                        Console.WriteLine($"Module {trimmedMod} not found");
+                        continue;
+                    }
+                    competencyLevel.Modules.Add(module);
+                }
+
+                competencyLevels.Add(competencyLevel);
             }
 
             return competencyLevels;
@@ -302,39 +265,33 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             bool inQuotes = false;
             var currentValue = new StringBuilder();
 
-            // Iterate through the characters in the line
             for (int i = 0; i < line.Length; i++)
             {
                 char c = line[i];
 
-                if (c == '"') // Handle quoted text
+                if (c == '"')
                 {
-                    // If it's a quote, toggle the inQuotes flag
-                    if (i + 1 < line.Length && line[i + 1] == '"') // Handle double quotes within quoted text
+                    if (i + 1 < line.Length && line[i + 1] == '"')
                     {
                         currentValue.Append(c);
-                        i++; // Skip the next quote
+                        i++;
                     }
                     else
                     {
-                        inQuotes = !inQuotes; // Toggle the flag
+                        inQuotes = !inQuotes;
                     }
                 }
-                else if (c == ',' && !inQuotes) // Not in quotes and it's a comma, so it's a delimiter
+                else if (c == ',' && !inQuotes)
                 {
                     values.Add(currentValue.ToString().Trim());
                     currentValue.Clear();
                 }
                 else
                 {
-                    // Otherwise, append the character to the current value
                     currentValue.Append(c);
                 }
             }
-
-            // Add the last value
             values.Add(currentValue.ToString().Trim());
-
             return values;
         }
     }

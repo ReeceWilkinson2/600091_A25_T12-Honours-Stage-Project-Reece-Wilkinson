@@ -47,11 +47,9 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
-        // Read module CSVs
+        // Read CSVs
         var csvService = scope.ServiceProvider.GetRequiredService<CSVReaderStartup>();
-        await csvService.ReadModuleCSV();
-        await csvService.ReadCompetencyCSV();
-        //await csvService.ReadCompetencyLevelsCSV();
+        await csvService.SeedAllAsync();
 
         // Seed test data safely (idempotent)
         await DbSeeder.SeedTestData(db);

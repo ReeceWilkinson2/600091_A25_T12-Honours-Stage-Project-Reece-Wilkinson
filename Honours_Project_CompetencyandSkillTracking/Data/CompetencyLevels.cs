@@ -13,7 +13,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public string ModCode { get; set; } = "";
         public CompetencyData Competency { get; set; } = null!;
         // Navigation
-        public ICollection<ModuleData> Modules { get; set; } = new List<ModuleData>();
+        public ICollection<ModuleData> Modules { get; set; } = new List<ModuleData>(); // comp levels can have multiple modules associated with them
         public ICollection<CompetencyAchievement> Achievements { get; set; } = new List<CompetencyAchievement>();
     }
 }
