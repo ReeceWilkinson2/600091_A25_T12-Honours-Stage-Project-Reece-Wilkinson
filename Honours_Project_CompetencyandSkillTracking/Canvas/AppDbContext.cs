@@ -26,17 +26,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    StudentId = "admin-001",
-                    UserName = "wewo",
-                    StEmail = "test@email",
-                    Password = "test",
-                    Role = "Admin"
-                }
-            );
-
             modelBuilder.Entity<CompetencyLevels>()
                 .HasOne(c => c.Competency)
                 .WithMany(c => c.Levels)

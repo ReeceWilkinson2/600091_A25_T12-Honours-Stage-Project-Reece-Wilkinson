@@ -1,5 +1,7 @@
-﻿using Honours_Project_CompetencyandSkillTracking.Components.Services;
+﻿using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
+using Honours_Project_CompetencyandSkillTracking.Components.Services;
 using Honours_Project_CompetencyandSkillTracking.Data;
+using Microsoft.EntityFrameworkCore;
 
 public class CSVReaderStartup
 {
@@ -17,28 +19,37 @@ public class CSVReaderStartup
         var modules = _CSVReader.ReadModules();
         var competencies = _CSVReader.ReadCompetencies();
         var competencyLevels = _CSVReader.ReadCompetencyLevels(competencies);
+        var users = _CSVReader.ReadUsers();
+        var courses = _CSVReader.ReadCourses(users);
 
         // Clear previous data
         _dbContext.ModulesCSV.RemoveRange(_dbContext.ModulesCSV);
         _dbContext.CompetencyData.RemoveRange(_dbContext.CompetencyData);
         _dbContext.CompetencyLevels.RemoveRange(_dbContext.CompetencyLevels);
+        _dbContext.Users.RemoveRange(_dbContext.Users);
+        _dbContext.Courses.RemoveRange(_dbContext.Courses);
         await _dbContext.SaveChangesAsync();
 
         await _dbContext.ModulesCSV.AddRangeAsync(modules);
         await _dbContext.CompetencyData.AddRangeAsync(competencies);
         await _dbContext.CompetencyLevels.AddRangeAsync(competencyLevels);
-        await _dbContext.SaveChangesAsync();
-
-        var users = _CSVReader.ReadUsers();
-        //_dbContext.Users.RemoveRange(_dbContext.Users);
-        await _dbContext.SaveChangesAsync();
         await _dbContext.Users.AddRangeAsync(users);
-        await _dbContext.SaveChangesAsync();
-
-        var courses = _CSVReader.ReadCourses(users);
-        _dbContext.Courses.RemoveRange(_dbContext.Courses);
-        await _dbContext.SaveChangesAsync();
         await _dbContext.Courses.AddRangeAsync(courses);
         await _dbContext.SaveChangesAsync();
+
+        var admin = new User
+        {
+            StudentId = "admin-001",
+            UserName = "wewo",
+            StEmail = "test@email",
+            Password = "test",
+            Role = "Admin"
+        };
+
+        if (!_dbContext.Users.Any(u => u.StudentId == admin.StudentId))
+        {
+            await _dbContext.Users.AddAsync(admin);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }
