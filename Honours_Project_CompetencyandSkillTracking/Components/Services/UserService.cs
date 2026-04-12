@@ -22,7 +22,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
         public async Task<User?> AuthenticateAsync(string email, string password)
         {
-            var user = await _db.Students
+            var user = await _db.Users
                 .FirstOrDefaultAsync(u => u.StEmail == email);
 
             if (user == null)
@@ -52,7 +52,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             try
             {
-                _db.Students.Add(user);
+                _db.Users.Add(user);
                 await _db.SaveChangesAsync();
                 return user;
             }
@@ -66,7 +66,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             try
             {
-                _db.Students.Update(user);
+                _db.Users.Update(user);
                 await _db.SaveChangesAsync();
                 return user;
             }
@@ -80,7 +80,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             try
             {
-                _db.Students.Remove(user);
+                _db.Users.Remove(user);
                 await _db.SaveChangesAsync();
             }
             catch (Exception)
@@ -91,12 +91,12 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
         public async Task<User?> GetUserByEmailAsync(string email)
         {
-            return await _db.Students.FirstOrDefaultAsync(u => u.StEmail == email);
+            return await _db.Users.FirstOrDefaultAsync(u => u.StEmail == email);
         }
 
         public async Task<User?> GetUserByIdAsync(string userId)
         {
-            return await _db.Students
+            return await _db.Users
                 .Include(s => s.Submissions)
                     .ThenInclude(sub => sub.Assignment)
                 .Include(s => s.Submissions)
@@ -115,14 +115,14 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
         public async Task<List<User>> GetStudentDataAsync(string role)
         {
-            return await _db.Students
+            return await _db.Users
                 .Where(m => m.Role == role)
                 .ToListAsync();
         }
 
         public async Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword)
         {
-            var user = await _db.Students.FirstOrDefaultAsync(u => u.StudentId == userId && u.Password == oldPassword);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.StudentId == userId && u.Password == oldPassword);
 
             if (user == null)
             {
@@ -142,7 +142,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             {
                 id = _random.Next(100000, 999999).ToString();
             }
-            while (await _db.Students.AnyAsync(u => u.StudentId == id));
+            while (await _db.Users.AnyAsync(u => u.StudentId == id));
 
             return id;
         }

@@ -27,7 +27,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
         {
             var profile = await _canvas.GetMyProfileAsync();
             string studentId = profile.Id.ToString();
-            var student = await _db.Students.Include(s => s.Courses).FirstOrDefaultAsync(s => s.StudentId == studentId);
+            var student = await _db.Users.Include(s => s.Courses).FirstOrDefaultAsync(s => s.StudentId == studentId);
 
             if (student == null)
             {
@@ -40,7 +40,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
                     Role = "Student"
                 };
 
-                _db.Students.Add(student);
+                _db.Users.Add(student);
                 await _db.SaveChangesAsync();
             }
             else

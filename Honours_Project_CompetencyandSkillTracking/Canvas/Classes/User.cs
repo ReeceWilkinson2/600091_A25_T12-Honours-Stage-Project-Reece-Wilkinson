@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Honours_Project_CompetencyandSkillTracking.Canvas.Classes
 {
-    [Index(nameof(StudentId), IsUnique = true)]
+    //[Index(nameof(StudentId), IsUnique = true)]
         public class User
     {
         [Key]

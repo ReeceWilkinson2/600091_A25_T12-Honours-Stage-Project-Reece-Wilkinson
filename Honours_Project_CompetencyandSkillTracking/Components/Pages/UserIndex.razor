@@ -138,7 +138,7 @@
 
     private async Task LoadStudents()
     {
-        Students = await DbContext.Students.OrderBy(s => s.UserName).ToListAsync();
+        Students = await DbContext.Users.OrderBy(s => s.UserName).ToListAsync();
     }
 
     private async Task AddStudent()
@@ -148,7 +148,7 @@
             NewStudent.StudentId = Guid.NewGuid().ToString();
         }
 
-        DbContext.Students.Add(NewStudent);
+        DbContext.Users.Add(NewStudent);
         await DbContext.SaveChangesAsync();
 
         NewStudent = new User();
@@ -169,7 +169,7 @@
 
     private async Task UpdateStudentData()
     {
-        var student = await DbContext.Students.FindAsync(UpdateStudent.StudentId);
+        var student = await DbContext.Users.FindAsync(UpdateStudent.StudentId);
         if (student != null)
         {
             student.UserName = UpdateStudent.UserName;
@@ -183,10 +183,10 @@
 
     private async Task DeleteStudent(User student)
     {
-        var s = await DbContext.Students.FindAsync(student.StudentId);
+        var s = await DbContext.Users.FindAsync(student.StudentId);
         if (s != null)
         {
-            DbContext.Students.Remove(s);
+            DbContext.Users.Remove(s);
             await DbContext.SaveChangesAsync();
             await LoadStudents();
         }

@@ -11,7 +11,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
             var random = new Random();
 
             // 1️⃣ Seed test student if not exists
-            var student = await context.Students
+            var student = await context.Users
                 .FirstOrDefaultAsync(u => u.StudentId == "12345");
 
             if (student == null)
@@ -24,7 +24,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                     Password = "test",
                     Role = "Student"
                 };
-                context.Students.Add(student);
+                context.Users.Add(student);
                 await context.SaveChangesAsync();
             }
 

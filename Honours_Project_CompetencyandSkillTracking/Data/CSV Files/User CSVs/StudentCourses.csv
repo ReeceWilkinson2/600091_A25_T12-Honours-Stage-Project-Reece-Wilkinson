@@ -1,0 +1,31 @@
+Id,Name,Code,Syllabus,Term,StudentId
+70001,Programming Portfolio (441101_A25_T12),441101_A25_T12: Programming Portfolio,null,2025/26_T12,100000
+70002,Algorithms and Data Structures (441105_A25_T1),441105_A25_T1: Algorithms and Data Structures,null,2025/26_T1,100000
+70003,Professional Development (441105_A25_T1),441105_A25_T1: Professional Development,null,2025/26_T1,100000
+70004,Computational Thinking (441105_A25_T2),441105_A25_T2: Computational Thinking,null,2025/26_T2,100000
+70005,"Architectures, Operating Systems, and the Cloud (441105_A25_T2)","441105_A25_T2: Architectures, Operating Systems, and the Cloud",null,2025/26_T2,100000
+70006,Programming Portfolio (441101_A24_T12),441101_A24_T12: Programming Portfolio,null,2024/25_T12,200000
+70007,Algorithms and Data Structures (441105_A24_T1),441105_A24_T1: Algorithms and Data Structures,null,2024/25_T1,200000
+70008,Professional Development (441105_A24_T1),441105_A24_T1: Professional Development,null,2024/25_T1,200000
+70009,Computational Thinking (441105_A24_T2),441105_A24_T2: Computational Thinking,null,2024/25_T2,200000
+70010,"Architectures, Operating Systems, and the Cloud (441105_A24_T2)","441105_A24_T2: Architectures, Operating Systems, and the Cloud",null,2024/25_T2,200000
+70011,Design Develop Deploy (551462_A25_T12),551462_A25_T12: Design Develop Deploy,null,2025/26_T12,200000
+70012,Artificial Intelligence (551458_A25_T1),551458_A25_T1: Artificial Intelligence,null,2025/26_T1,200000
+70013,Graphics Programming (551455_A25_T1),551455_A25_T1: Graphics Programming,null,2025/26_T1,200000
+70014,Advanced_Programming (500083_A25_T2),500083_A25_T2: Advanced Programming,null,2025/26_T2,200000
+70015,eXtended Reality Development (551461_A25_T2),551461_A25_T2: eXtended Reality Development,null,2025/26_T2,200000
+70016,Programming Portfolio (441101_A23_T12),441101_A23_T12: Programming Portfolio,null,2023/24_T12,300000
+70017,Algorithms and Data Structures (441105_A23_T1),441105_A23_T1: Algorithms and Data Structures,null,2023/24_T1,300000
+70018,Professional Development (441105_A23_T1),441105_A23_T1: Professional Development,null,2023/24_T1,300000
+70019,Computational Thinking (441105_A23_T2),441105_A23_T2: Computational Thinking,null,2023/24_T2,300000
+70020,"Architectures, Operating Systems, and the Cloud (441105_A23_T2)","441105_A23_T2: Architectures, Operating Systems, and the Cloud",null,2023/24_T2,300000
+70021,Design Develop Deploy (551462_A24_T12),551462_A24_T12: Design Develop Deploy,null,2024/25_T12,300000
+70022,Artificial Intelligence (551458_A24_T1),551458_A24_T1: Artificial Intelligence,null,2024/25_T1,300000
+70023,Databases and Networks (551457_A24_T1),551457_A24_T1: Databases and Networks,null,2024/25_T1,300000
+70024,User Interfaces and Experience (551460_A24_T2),551460_A24_T2: User Interfaces and Experience,null,2024/25_T2,300000
+70025,Advanced_Programming (500083_A24_T2),500083_A24_T2: Advanced Programming,null,2024/25_T2,300000
+70026,Honours Stage Project (600091_A25_T12),600091_A25_T12: Honours Stage Project,null,2025/26_T12,300000
+70027,Secure Digital Infrastructure (661982_A25_T1),661982_A25_T1: Secure Digital Infrastructure,null,2025/26_T1,300000
+70028,Embedded Systems Applications (662085_A25_T1),662085_A25_T1: Embedded Systems Applications,null,2025/26_T1,300000
+70029,Safety Critical Systems (661985_A25_T2),661985_A25_T2: Safety Critical Systems,null,2025/26_T2,300000
+70030,Distributed Systems Programming (600089_A25_T2),600089_A25_T2: Distributed Systems Programming,null,2025/26_T2,300000

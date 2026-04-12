@@ -1,4 +1,5 @@
-﻿using Honours_Project_CompetencyandSkillTracking.Data;
+﻿using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
+using Honours_Project_CompetencyandSkillTracking.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
@@ -217,7 +218,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
                     continue;
                 }
 
-                // Use dictionary instead of DB
                 if (!competencyLookup.TryGetValue(competencyId, out var competency))
                 {
                     Console.WriteLine($"Competency not found for ID {competencyId} at row {i}");
@@ -259,6 +259,101 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             return competencyLevels;
         }
 
+        public List<User> ReadUsers()
+        {
+            var users = new List<User>();
+
+            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Data", "CSV Files", "User CSVs", "Users.csv");
+
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException(filePath);
+
+            var lines = File.ReadAllLines(filePath);
+            if (lines.Length == 0) return users;
+
+            var map = BuildHeaderMap(ParseCsvLine(lines[0]));
+            var seen = new HashSet<string>();
+
+            for (int i = 1; i < lines.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(lines[i]))
+                    continue;
+
+                var values = ParseCsvLine(lines[i]);
+
+                var studentId = GetValue(values, map, "StudentId") ?? GetValue(values, map, "StudentID");
+
+                studentId = studentId.Trim();
+
+                if (string.IsNullOrWhiteSpace(studentId))
+                    continue;
+
+                if (!seen.Add(studentId))
+                    continue;
+
+                users.Add(new User
+                {
+                    StudentId = studentId,
+                    UserName = GetValue(values, map, "UserName"),
+                    StEmail = GetValue(values, map, "StEmail"),
+                    Password = GetValue(values, map, "Password"),
+                    Role = GetValue(values, map, "Role")
+                });
+            }
+
+            return users;
+        }
+
+        public List<Course> ReadCourses(List<User> users)
+        {
+            var courses = new List<Course>();
+
+            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Data", "CSV Files", "User CSVs", "StudentCourses.csv");
+
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException(filePath);
+
+            var lines = File.ReadAllLines(filePath);
+            if (lines.Length == 0) return courses;
+
+            var map = BuildHeaderMap(ParseCsvLine(lines[0]));
+
+            for (int i = 1; i < lines.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(lines[i]))
+                    continue;
+
+                var values = ParseCsvLine(lines[i]);
+
+                var studentId = GetValue(values, map, "StudentId")?.Trim();
+
+                if (string.IsNullOrWhiteSpace(studentId))
+                    continue;
+
+                var user = users.FirstOrDefault(u => u.StudentId == studentId);
+                if (user == null)
+                {
+                    Console.WriteLine($"User with StudentId {studentId} not found for course {GetValue(values, map, "Name")}");
+                    continue;
+                }
+
+                var course = new Course
+                {
+                    Name = GetValue(values, map, "Name"),
+                    Code = GetValue(values, map, "Code"),
+                    Syllabus = GetValue(values, map, "Syllabus"),
+                    Term = GetValue(values, map, "Term"),
+                    StudentId = studentId,
+                    Student = user
+                };
+
+                courses.Add(course);
+            }
+
+            return courses;
+        }
+
+
         private static List<string> ParseCsvLine(string line)
         {
             var values = new List<string>();
@@ -293,6 +388,20 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             }
             values.Add(currentValue.ToString().Trim());
             return values;
+        }
+
+        private Dictionary<string, int> BuildHeaderMap(List<string> headers)
+        {
+            return headers
+                .Select((h, i) => new { h = h.Trim(), i })
+                .GroupBy(x => x.h)
+                .ToDictionary(g => g.Key, g => g.First().i);
+        }
+
+        private string GetValue(List<string> values, Dictionary<string, int> map, string column)
+        {
+            return map.TryGetValue(column, out int index) && index < values.Count ? values[index].Trim()
+                : "";
         }
     }
 }
