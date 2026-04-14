@@ -1,0 +1,45 @@
+Id,CourseId,Name,Description,DueAt
+1,441101,Digital Portfolio Lab Book,Digital Portfolio Lab Book,21/03/2024 14:00:00
+2,441101,Open Book Practical Exam,Open Book Practical Exam,13/01/2024 17:00:00
+3,441101,Capstone Project,Capstone Project,22/05/2024 14:00:00
+4,441105,Code/Report,Code/Report,16/11/2023 14:00:00
+5,441105,Online Quiz,Online Quiz,09/01/2024 12:30:00
+6,441108,Personal Portfolio (Portfolio),Personal Portfolio (Portfolio),14/12/2023 14:00:00
+7,441108,Team Design Project (Portfolio of iterative design artefacts),Team Design Project (Portfolio of iterative design artefacts),14/12/2023 14:00:00
+8,441104,Computer based assessment of concepts and their application,Computer based assessment of concepts and their application,09/05/2024 14:00:00
+9,441102,"Weekly Lab Book on Architectures, Operating Systems and the Cloud","Weekly Lab Book on Architectures, Operating Systems and the Cloud",16/11/2023 14:00:00
+10,441102,Cloud Hosted Group Project,Cloud Hosted Group Project,09/01/2024 14:00:00
+,,,,
+11,551462,Individual Software project portfolio,Individual Software project portfolio,27/11/2024 20:37:38
+12,551462,Group Project Portfolio Individual reflection / log,Group Project Portfolio Individual reflection / log,08/05/2025 14:00:00
+13,551458,Coursework: Programming Assignment,Coursework: Programming Assignment,07/01/2025 14:00:00
+14,551457,Network Database Implementation Practical,Network Database Implementation Practical,20/11/2024 14:00:00
+15,551457,Online Examination Open Book,Online Examination Open Book,13/01/2025 17:00:00
+16,551455,Lab book,Lab book,27/11/2025 14:00:00
+17,551528,Electronic hardware development assignment.,Electronic hardware development assignment.,04/12/2025 14:00:00
+18,551528,Multi Sensors communication and hardware integration assignment.,Multi Sensors communication and hardware integration assignment.,11/12/2025 14:00:00
+19,551460,Individual UI/UX Portfolio,Individual UI/UX Portfolio,01/05/2025 14:00:00
+20,500083,Lab book,Lab book,21/05/2025 14:00:00
+21,551461,Virtual Reality App Development,Virtual Reality App Development,07/05/2025 14:00:00
+22,551461,Mixed Reality App Development ,Mixed Reality App Development ,24/04/2025 14:00:00
+23,551672,Analysis Plan Document ,Analysis Plan Document ,07/05/2025 14:00:00
+24,551672,Project report + code submission,Project report + code submission,24/04/2025 14:00:00
+25,551529,Multi-component IoTdevelopment assignment.,Multi-component IoTdevelopment assignment.,14/05/2025 14:00:00
+,,,,
+26,600091,Portfolio of evidence,Portfolio of evidence,23/04/2026 14:00:00
+27,662004,Portfolio of evidence,Portfolio of evidence,23/04/2026 14:00:00
+28,662004,Reflective Portfolio ,Reflective Portfolio ,23/04/2026 14:00:00
+29,661982,Practical Infrastructure installation and configuration exercise,Practical Infrastructure installation and configuration exercise,26/11/2026 14:00:00
+30,661982,Security and systems theory exercise,Security and systems theory exercise,08/01/2026 12:30:00
+31,661984,Group Portfolio (Portfolio),Group Portfolio (Portfolio),03/12/2026 14:00:00
+32,662086,Coursework: Programming Assignment,Coursework: Programming Assignment,11/12/2025 14:00:00
+33,662327,Coursework: Simulation and AI-based Game Programming,Coursework: Simulation and AI-based Game Programming,03/12/2025 14:00:00
+34,600098,Individual software implementation of a game and game engine,Individual software implementation of a game and game engine,18/12/2025 14:00:00
+36,662085,Group coursework with Individual Report: Real-time embedded control system development,Group coursework with Individual Report: Real-time embedded control system development,11/12/2025 14:00:00
+37,661985,"Portfolio of analysis, design and implementation of Safety Critical System.","Portfolio of analysis, design and implementation of Safety Critical System.",11/05/2026 14:00:00
+38,600089,Distributed Systems Assessed Coursework,Distributed Systems Assessed Coursework,29/04/2026 14:00:00
+39,600089,Open Book Digital Assessment,Open Book Digital Assessment,05/05/2026 11:30:00
+40,662253,Coursework: Programming Assignment Presentation to include ethical considerations.,Coursework: Programming Assignment Presentation to include ethical considerations.,05/05/2026 14:00:00
+41,600100,Coursework: Image Processing assignment,Coursework: Image Processing assignment,05/05/2026 14:00:00
+42,600100,Coursework:Computer Vision assignment,Coursework:Computer Vision assignment,05/05/2026 14:00:00
+43,600086,Lab book,Lab book,22/05/2026 14:00:00

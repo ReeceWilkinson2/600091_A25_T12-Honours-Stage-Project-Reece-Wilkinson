@@ -1,4 +1,4 @@
-StudentID,UserName,StEmail,Password,Role
+StudentId,UserName,StEmail,Password,Role
 100000,Year 1 Student,year1student@hull.ac.uk,test1,Student
 200000,Year 2 Student,year2student@hull.ac.uk,test2,Student
 300000,Year 3 Student,year3student@hull.ac.uk,test3,Student
