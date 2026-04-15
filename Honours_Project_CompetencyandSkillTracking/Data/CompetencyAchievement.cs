@@ -16,6 +16,6 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         
         // Links to specific module
         public int ModuleId { get; set; }
-        public ModuleData Module { get; set; }
+        public ModuleData Module { get; set; } = null!;
     }
 }
