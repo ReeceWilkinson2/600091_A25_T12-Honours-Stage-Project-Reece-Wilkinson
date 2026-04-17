@@ -21,6 +21,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public string ModCode { get; set; } = "";
         public string? VideoLink { get; set; } = "";
         // Navigation
-        public ICollection<CompetencyLevels> CompetencyLevels { get; set; } = new List<CompetencyLevels>();
+        public ICollection<CompetencyLevelModule> CompetencyLevelModules { get; set; } = new List<CompetencyLevelModule>();
+        public ICollection<CompetencyAchievement> CompetencyAchievements { get; set; } = new List<CompetencyAchievement>();
     }
 }

@@ -52,7 +52,7 @@
                         },
                         afterLabel: function (context) {
                             const modules = moduleTooltips[context.dataIndex];
-                            return modules && modules.length ? ["Modules:", ...modules] : "";
+                            return modules && modules.length ? ["Covered in:", ...modules] : "";
                         }
                     }
                 },

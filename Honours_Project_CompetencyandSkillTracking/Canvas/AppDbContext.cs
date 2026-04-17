@@ -17,6 +17,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
 
         public DbSet<CompetencyData> CompetencyData { get; set; }
         public DbSet<CompetencyLevels> CompetencyLevels { get; set; }
+        public DbSet<CompetencyLevelModule> CompetencyLevelModules { get; set; }
         public DbSet<CompetencyAchievement> CompetencyAchievements { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -44,10 +45,36 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
                 .HasForeignKey(a => a.CompetencyLevelId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<CompetencyLevels>()
-                .HasMany(cl => cl.Modules)
-                .WithMany(m => m.CompetencyLevels)
-                .UsingEntity(j => j.ToTable("CompetencyLevelModules"));
+            modelBuilder.Entity<CompetencyLevelModule>()
+                .HasKey(x => new { x.CompetencyLevelId, x.ModuleId });
+
+            modelBuilder.Entity<CompetencyLevelModule>()
+                .HasOne(x => x.CompetencyLevel)
+                .WithMany(cl => cl.Modules)
+                .HasForeignKey(x => x.CompetencyLevelId);
+
+            modelBuilder.Entity<CompetencyLevelModule>()
+                .HasOne(x => x.Module)
+                .WithMany(m => m.CompetencyLevelModules)
+                .HasForeignKey(x => x.ModuleId);
+
+            modelBuilder.Entity<Assignment>()
+                .Property(x => x.Id)
+                .ValueGeneratedNever();
+
+            modelBuilder.Entity<Submission>()
+                .Property(x => x.Id)
+                .ValueGeneratedNever();
+
+            modelBuilder.Entity<SubmissionComment>()
+                .Property(x => x.Id)
+                .ValueGeneratedNever();
+
+            modelBuilder.Entity<CompetencyAchievement>()
+                .HasOne(a => a.Submission)
+                .WithMany(s => s.CompetencyAchievements)
+                .HasForeignKey(a => a.SubmissionId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

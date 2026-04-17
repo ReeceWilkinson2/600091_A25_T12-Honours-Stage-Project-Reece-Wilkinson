@@ -1,16 +1,11 @@
-﻿using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
-using Honours_Project_CompetencyandSkillTracking.Data;
+﻿using Honours_Project_CompetencyandSkillTracking.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 {
     public class CompetencyDataServices
     {
-        private AppDbContext _db;
+        private readonly AppDbContext _db;
 
         public CompetencyDataServices(AppDbContext db)
         {
@@ -19,68 +14,52 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
         public async Task<List<CompetencyData>> GetCompetencyDataAsync()
         {
-            return await _db.CompetencyData.Include(c => c.Levels).ThenInclude(l => l.Modules).ToListAsync();
+            return await _db.CompetencyData
+                .Include(c => c.Levels).ThenInclude(l => l.Modules).ThenInclude(clm => clm.Module).ToListAsync();
         }
 
-        public async Task<CompetencyData> AddCompetencyDataAsync(CompetencyData CompetencyData)
+        public async Task<CompetencyData> AddCompetencyDataAsync(CompetencyData competencyData)
         {
-            try
-            {
-                _db.CompetencyData.Add(CompetencyData);
-                await _db.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-            return CompetencyData;
+            _db.CompetencyData.Add(competencyData);
+            await _db.SaveChangesAsync();
+            return competencyData;
         }
 
-        public async Task<CompetencyData?> GetCompetencyByIdAsync(string id)
+        public async Task<CompetencyData?> GetCompetencyByIdAsync(string code)
         {
-            return await _db.CompetencyData.Include(c => c.Levels).ThenInclude(l => l.Modules).FirstOrDefaultAsync(c => c.CompetencyID == id);
+            return await _db.CompetencyData.Include(c => c.Levels).ThenInclude(l => l.Modules).ThenInclude(clm => clm.Module).FirstOrDefaultAsync(c => c.CompetencyCode == code);
         }
 
         public async Task<List<CompetencyData>> GetCompetenciesByModuleAsync(string modCode)
         {
-            return await _db.CompetencyData.Include(c => c.Levels).ThenInclude(l => l.Modules).Where(c => c.Levels.Any(l => l.Modules.Any(m => m.ModCode == modCode))).ToListAsync();
+            return await _db.CompetencyData.Include(c => c.Levels).ThenInclude(l => l.Modules).ThenInclude(clm => clm.Module).Where(c => c.Levels.Any(l => l.Modules.Any(clm => clm.Module.ModCode == modCode))).ToListAsync();
         }
 
         public async Task<List<CompetencyData>> GetAllCompetenciesAsync()
         {
-            return await _db.CompetencyData.Include(c => c.Levels).ThenInclude(l => l.Modules).ToListAsync();
+            return await _db.CompetencyData.Include(c => c.Levels).ThenInclude(l => l.Modules).ThenInclude(clm => clm.Module).ToListAsync();
         }
 
-        public async Task<CompetencyData> UpdateCompetencyDataAsync(CompetencyData CompetencyData)
+        public async Task<CompetencyData> UpdateCompetencyDataAsync(CompetencyData competencyData)
         {
-            try
-            {
-                var competencyDataExist = _db.CompetencyData.Include(c => c.Levels).FirstOrDefault(p => p.CompetencyDbID == CompetencyData.CompetencyDbID);
-                if (competencyDataExist != null)
-                {
-                    _db.Update(CompetencyData);
-                    await _db.SaveChangesAsync();
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return CompetencyData;
+            var existing = await _db.CompetencyData.FirstOrDefaultAsync(c => c.CompetencyDbID == competencyData.CompetencyDbID);
+
+            if (existing == null)
+                return competencyData;
+
+            existing.CompetencyName = competencyData.CompetencyName;
+            existing.CompetencyCode = competencyData.CompetencyCode;
+            existing.AdditionalNotes = competencyData.AdditionalNotes;
+
+            await _db.SaveChangesAsync();
+
+            return existing;
         }
 
-        public async Task DeleteCompetencyDataAsync(CompetencyData CompetencyData)
+        public async Task DeleteCompetencyDataAsync(CompetencyData competencyData)
         {
-            try
-            {
-                _db.CompetencyData.Remove(CompetencyData);
-                await _db.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            _db.CompetencyData.Remove(competencyData);
+            await _db.SaveChangesAsync();
         }
     }
 }

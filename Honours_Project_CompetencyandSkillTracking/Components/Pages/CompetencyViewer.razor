@@ -1,5 +1,6 @@
 ﻿@page "/competencyviewer/{CompetencyID}"
 @rendermode InteractiveServer
+
 @inject NavigationManager NavigationManager
 @inject CompetencyDataServices service
 @inject AppDbContext dbContext
@@ -15,23 +16,27 @@
     <div>
         <h3>Competency Details: @Competency.CompetencyName</h3>
 
-        <h4>Competency ID: @Competency.CompetencyID</h4>
+        <h4>Competency ID: @Competency.CompetencyCode</h4>
 
-        @if (Competency.Levels != null && Competency.Levels.Any())
+        @if (Competency.Levels?.Any() == true)
         {
             @foreach (var level in Competency.Levels.OrderBy(l => l.LevelNumber))
             {
                 <div class="level-section">
                     <h5>Level @level.LevelNumber</h5>
 
-                    @if (level.Modules != null && level.Modules.Any())
+                    <p>@level.Description</p>
+
+                    @if (level.Modules?.Any() == true)
                     {
-                        <p>@level.Description</p>
                         <p><strong>Modules covered in:</strong></p>
+
                         <ul>
-                            @foreach (var module in level.Modules)
+                            @foreach (var clm in level.Modules)
                             {
-                                <li>@module.ModCode - @module.ModuleName</li>
+                                <li>
+                                    @clm.Module?.ModCode - @clm.Module?.ModuleName
+                                </li>
                             }
                         </ul>
                     }
@@ -57,13 +62,17 @@ else
 }
 
 @code {
-    [Parameter] public string CompetencyID { get; set; }
+    [Parameter] public string CompetencyID { get; set; } = "";
 
     private CompetencyData? Competency;
 
     protected override async Task OnInitializedAsync()
     {
-        Competency = await service.GetCompetencyByIdAsync(CompetencyID);
+        Competency = await dbContext.CompetencyData
+            .Include(c => c.Levels)
+                .ThenInclude(l => l.Modules)
+                    .ThenInclude(clm => clm.Module)
+            .FirstOrDefaultAsync(c => c.CompetencyCode == CompetencyID);
     }
 
     private void ReturnToSelection()

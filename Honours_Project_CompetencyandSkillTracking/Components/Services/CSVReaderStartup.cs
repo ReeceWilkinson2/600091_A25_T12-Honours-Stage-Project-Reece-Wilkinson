@@ -16,7 +16,6 @@ public class CSVReaderStartup
 
     public async Task SeedAllAsync()
     {
-        // Need to save all tables separately so the data can be referenced.
         var modules = _CSVReader.ReadModules();
         _dbContext.ModulesCSV.RemoveRange(_dbContext.ModulesCSV);
         await _dbContext.ModulesCSV.AddRangeAsync(modules);
@@ -25,21 +24,47 @@ public class CSVReaderStartup
         var competencies = _CSVReader.ReadCompetencies();
         _dbContext.CompetencyData.RemoveRange(_dbContext.CompetencyData);
         await _dbContext.CompetencyData.AddRangeAsync(competencies);
+        await _dbContext.SaveChangesAsync();
 
         var competencyLevels = _CSVReader.ReadCompetencyLevels(competencies);
         _dbContext.CompetencyLevels.RemoveRange(_dbContext.CompetencyLevels);
         await _dbContext.CompetencyLevels.AddRangeAsync(competencyLevels);
+        await _dbContext.SaveChangesAsync();
+
+        var competencyLevelModules = _CSVReader.ReadCompetencyLevelModules(competencyLevels, modules);
+        _dbContext.CompetencyLevelModules.RemoveRange(_dbContext.CompetencyLevelModules);
+        await _dbContext.CompetencyLevelModules.AddRangeAsync(competencyLevelModules);
+        await _dbContext.SaveChangesAsync();
 
         var users = _CSVReader.ReadUsers();
         _dbContext.Users.RemoveRange(_dbContext.Users);
         await _dbContext.Users.AddRangeAsync(users);
+        await _dbContext.SaveChangesAsync();
 
         var courses = _CSVReader.ReadCourses(users);
         _dbContext.Courses.RemoveRange(_dbContext.Courses);
         await _dbContext.Courses.AddRangeAsync(courses);
-
         await _dbContext.SaveChangesAsync();
 
+        var assignments = _CSVReader.ReadAssignments(courses);
+        _dbContext.Assignments.RemoveRange(_dbContext.Assignments);
+        await _dbContext.Assignments.AddRangeAsync(assignments);
+        await _dbContext.SaveChangesAsync();
+
+        var submissions = _CSVReader.ReadSubmissions(assignments, users);
+        _dbContext.Submissions.RemoveRange(_dbContext.Submissions);
+        await _dbContext.Submissions.AddRangeAsync(submissions);
+        await _dbContext.SaveChangesAsync();
+
+        var comments = _CSVReader.ReadSubmissionComments(submissions);
+        _dbContext.SubmissionComments.RemoveRange(_dbContext.SubmissionComments);
+        await _dbContext.SubmissionComments.AddRangeAsync(comments);
+        await _dbContext.SaveChangesAsync();
+
+        var achievements = _CSVReader.ReadCompetencyAchievements(users, competencyLevels, modules, submissions);
+        _dbContext.CompetencyAchievements.RemoveRange(_dbContext.CompetencyAchievements);
+        await _dbContext.CompetencyAchievements.AddRangeAsync(achievements);
+        await _dbContext.SaveChangesAsync();
 
         var admin = new User
         {

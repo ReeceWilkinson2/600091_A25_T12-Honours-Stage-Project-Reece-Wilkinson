@@ -51,88 +51,9 @@ namespace Honours_Project_CompetencyandSkillTracking.Canvas
             }
 
             // Sync competency achievements after syncing the student profile
-            await SyncCompetencyAchievementsAsync(student);
+            //await SyncCompetencyAchievementsAsync(student);
 
             return student;
-        }
-
-        private async Task SyncCompetencyAchievementsAsync(User student)
-        {
-            // Load all competencies with their levels and associated modules
-            var competencies = await _db.CompetencyData
-                .Include(c => c.Levels)
-                .ThenInclude(l => l.Modules)
-                .ToListAsync();
-
-            foreach (var competency in competencies)
-            {
-                foreach (var level in competency.Levels)
-                {
-                    // Check if student already has an achievement for this competency level
-                    var existingAchievements = await _db.CompetencyAchievements
-                        .Where(a => a.StudentId == student.StudentId && a.CompetencyLevelId == level.LevelDbID)
-                        .ToListAsync();
-
-                    foreach (var module in level.Modules)
-                    {
-                        // Check if the student already has an achievement for the current module
-                        var existingAchievement = existingAchievements.FirstOrDefault(a => a.ModuleId == module.DatabaseID);
-
-                        if (existingAchievement == null)
-                        {
-                            // Create new achievement
-                            var competencyAchievement = new CompetencyAchievement
-                            {
-                                StudentId = student.StudentId,
-                                User = student,
-                                CompetencyLevelId = level.LevelDbID,
-                                CompetencyLevel = level,
-                                ModuleId = module.DatabaseID,
-                                Module = module,
-                                MasteryPoints = 6, // Example value
-                                AchievedDate = DateTime.Now // Or compute based on logic
-                            };
-
-                            _db.CompetencyAchievements.Add(competencyAchievement);
-                        }
-                        else
-                        {
-                            // Optional: Update existing achievement only if needed
-                            bool updated = false;
-
-                            // Example: Update the mastery points if necessary (this is a placeholder logic)
-                            if (existingAchievement.MasteryPoints != 6)
-                            {
-                                existingAchievement.MasteryPoints = 6;
-                                updated = true;
-                            }
-
-                            // Update the achievement date if needed
-                            if (existingAchievement.AchievedDate != DateTime.Now)
-                            {
-                                existingAchievement.AchievedDate = DateTime.Now;
-                                updated = true;
-                            }
-
-                            // Update the module if necessary
-                            if (existingAchievement.ModuleId != module.DatabaseID)
-                            {
-                                existingAchievement.ModuleId = module.DatabaseID;
-                                existingAchievement.Module = module;
-                                updated = true;
-                            }
-
-                            if (updated)
-                            {
-                                _db.CompetencyAchievements.Update(existingAchievement);
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Save all changes
-            await _db.SaveChangesAsync();
         }
 
         private async Task SyncCoursesAsync(User student)

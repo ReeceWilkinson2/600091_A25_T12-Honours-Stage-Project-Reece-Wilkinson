@@ -37,10 +37,16 @@
     <None Update="Data\CSV Files\Competencies.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\CSV Files\CompetencyLevelModules.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\CSV Files\CompetencyLevels.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\CSV Files\User CSVs\StudentAssignments.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\CSV Files\User CSVs\StudentCompetencyAchievements.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\CSV Files\User CSVs\StudentCourses.csv">

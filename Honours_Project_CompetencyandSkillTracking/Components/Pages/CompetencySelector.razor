@@ -9,7 +9,7 @@
 <div>
 	@foreach (var competency in Competencies)
 	{
-		<button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick ="() => LoadCompetencyDetails(competency)">@competency.CompetencyID, @competency.CompetencyName</button>
+		<button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick ="() => LoadCompetencyDetails(competency)">@competency.CompetencyCode, @competency.CompetencyName</button>
 	}
 </div>
 
@@ -23,6 +23,6 @@
 
 	private void LoadCompetencyDetails(CompetencyData competency)
 	{
-		NavigationManager.NavigateTo($"/competencyviewer/{competency.CompetencyID}");
+		NavigationManager.NavigateTo($"/competencyviewer/{competency.CompetencyCode}");
 	}
 }

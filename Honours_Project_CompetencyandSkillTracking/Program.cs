@@ -21,8 +21,7 @@ builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection("Smtp"))
 
 // Configure SQLite database
 var dbPath = Path.Combine(builder.Environment.ContentRootPath, "UserDatabase.db");
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}"));
+builder.Services.AddDbContext<AppDbContext>(options =>options.UseSqlite($"Data Source={dbPath}"));
 
 // Add scoped services
 builder.Services.AddScoped<CanvasSyncService>();
@@ -47,12 +46,18 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
-        // Read CSVs
         var csvService = scope.ServiceProvider.GetRequiredService<CSVReaderStartup>();
-        await csvService.SeedAllAsync();
 
-        // Seed test data safely (idempotent)
-        await DbSeeder.SeedTestData(db);
+        if (!db.Users.Any())
+        {
+            Console.WriteLine("Seeding database from CSV...");
+            await csvService.SeedAllAsync();
+            Console.WriteLine("Seeding complete.");
+        }
+        else
+        {
+            Console.WriteLine("Database already seeded.");
+        }
     }
     catch (Exception ex)
     {

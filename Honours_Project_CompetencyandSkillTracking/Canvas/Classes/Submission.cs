@@ -1,4 +1,6 @@
-﻿namespace Honours_Project_CompetencyandSkillTracking.Canvas.Classes
+﻿using Honours_Project_CompetencyandSkillTracking.Data;
+
+namespace Honours_Project_CompetencyandSkillTracking.Canvas.Classes
 {
     public class Submission
     {
@@ -10,6 +12,7 @@
         public double? Score { get; set; }
         public DateTime? SubmittedAt { get; set; }
         public ICollection<SubmissionComment> Comments { get; set; } = new List<SubmissionComment>();
+        public ICollection<CompetencyAchievement> CompetencyAchievements { get; set; } = new List<CompetencyAchievement>();
         public ICollection<OutcomeResult> OutcomeResults { get; set; } = new List<OutcomeResult>();
     }
 }

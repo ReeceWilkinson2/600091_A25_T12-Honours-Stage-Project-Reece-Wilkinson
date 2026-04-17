@@ -191,10 +191,10 @@ else if (SelectedModule == null)
             <select class="form-control"
                     @onchange="OnCompetencyFilterChanged">
                 <option value="">-- None --</option>
-                @foreach (var comp in AllCompetencies.OrderBy(c => c.CompetencyID))
+                @foreach (var comp in AllCompetencies.OrderBy(c => c.CompetencyCode))
                 {
-                    <option value="@comp.CompetencyID">
-                        @comp.CompetencyID - @comp.CompetencyName
+                    <option value="@comp.CompetencyCode">
+                        @comp.CompetencyCode - @comp.CompetencyName
                     </option>
                 }
             </select>
@@ -221,7 +221,7 @@ else if (SelectedCompetency == null)
             @foreach (var competency in SelectedModuleCompetencies)
             {
                 <button class="module-button" @onclick="() => LoadCompetencyDetails(competency)">
-                    @competency.CompetencyID - @competency.CompetencyName
+                    @competency.CompetencyCode - @competency.CompetencyName
                 </button>
             }
         }
@@ -299,12 +299,14 @@ else
         </button>
     </div>
 
-    <h3>@SelectedCompetency.CompetencyID - @SelectedCompetency.CompetencyName</h3>
+    <h3>@SelectedCompetency.CompetencyCode - @SelectedCompetency.CompetencyName</h3>
 
     <div class="competency-details">
         @if (SelectedCompetency.Levels != null && ActiveModule != null)
         {
-            var relevantLevels = SelectedCompetency.Levels.Where(l => l.ModCode == ActiveModule.ModCode).OrderBy(l => l.LevelNumber);
+            var relevantLevels = SelectedCompetency.Levels
+            .Where(l => l.Modules.Any(m => m.Module.ModCode == ActiveModule.ModCode)) // CHANGED: ModCode is inside ModuleData
+            .OrderBy(l => l.LevelNumber);
 
             if (relevantLevels.Any())
             {
@@ -417,11 +419,11 @@ else
     {
         SelectedCompetencyFilterId = e.Value?.ToString();
 
-        var competency = AllCompetencies.FirstOrDefault(c => c.CompetencyID == SelectedCompetencyFilterId);
+        var competency = AllCompetencies.FirstOrDefault(c => c.CompetencyCode == SelectedCompetencyFilterId);
 
         if (competency?.Levels != null)
         {
-            FilterCompetencyModuleCodes = competency.Levels.SelectMany(l => l.Modules).Select(m => m.ModCode).Where(m => !string.IsNullOrWhiteSpace(m)).ToHashSet();
+            FilterCompetencyModuleCodes = competency.Levels.SelectMany(l => l.Modules).Select(m => m.Module.ModCode).Where(m => !string.IsNullOrWhiteSpace(m)).ToHashSet();
         }
         else
         {
@@ -520,7 +522,7 @@ else
         if (SelectedCompetency != null)
         {
             // Navigate to the studentprogressviewer page with CompetencyID as a query parameter
-            NavigationManager.NavigateTo($"/studentprogressviewer?competencyId={SelectedCompetency.CompetencyID}");
+            NavigationManager.NavigateTo($"/studentprogressviewer?competencyId={SelectedCompetency.CompetencyCode}");
         }
     }
 

@@ -7,6 +7,7 @@
         public string Name { get; set; } = "";
         public string? Description { get; set; }
         public DateTimeOffset? DueAt { get; set; }
+        public int? Weighting { get; set; }
 
         // Navigation
         public Course Course { get; set; } = null!;
