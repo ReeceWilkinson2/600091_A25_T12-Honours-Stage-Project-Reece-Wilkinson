@@ -209,6 +209,16 @@ h1:focus {
     border: 1px solid #f5c6cb;
 }
 
+.module-button-greyed {
+    background-color: #e2e2e2;
+    color: #666;
+    opacity: 0.7;
+}
+
+.module-button-restricted {
+    border: 2px solid red;
+}
+
 /* sign in styling*/
 .login-page {
     display: flex;

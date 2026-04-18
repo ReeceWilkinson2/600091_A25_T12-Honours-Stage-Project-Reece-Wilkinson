@@ -59,6 +59,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (!IsStudentEnrolledInModule(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -68,6 +73,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (!IsStudentEnrolledInModule(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -83,6 +93,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (!IsStudentEnrolledInModule(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -92,6 +107,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (!IsStudentEnrolledInModule(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -122,6 +142,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (!IsStudentEnrolledInModule(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -131,6 +156,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (!IsStudentEnrolledInModule(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -146,6 +176,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (!IsStudentEnrolledInModule(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -155,6 +190,11 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+                                        @if (!IsStudentEnrolledInModule(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -172,6 +212,11 @@ else if (SelectedModule == null)
                     {
                         <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                             @module.ModuleName
+                            @if (!IsStudentEnrolledInModule(module))
+                            {
+                                <br />
+                                <span class="restricted-text">Not Enrolled</span>
+                            }
                         </button>
                     }
                 </div>
@@ -190,6 +235,12 @@ else if (SelectedModule == null)
                                             <br />
                                             <span class="restricted-text">Not Available</span>
                                         }
+
+                                        @if (!IsStudentEnrolledInModule(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -199,10 +250,17 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
+
                                         @if (IsModuleRestricted(module))
                                         {
                                             <br />
                                             <span class="restricted-text">Not Available</span>
+                                        }
+
+                                        @if (!IsStudentEnrolledInModule(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>                                            
                                         }
                                     </button>
                                 }
@@ -497,8 +555,25 @@ else
     {
         var baseClass = "module-button";
 
-        if (FilterCompetencyModuleCodes.Contains(module.ModCode))
-            return baseClass + " module-button-highlight";
+        var isHighlighted = FilterCompetencyModuleCodes.Contains(module.ModCode);
+        var isRestricted = IsModuleRestricted(module);
+        var isEnrolled = IsStudentEnrolledInModule(module);
+
+        // Highlight takes priority over greyed-out
+        if (isHighlighted)
+        {
+            baseClass += " module-button-highlight";
+        }
+        else if (!isEnrolled)
+        {
+            baseClass += " module-button-greyed";
+        }
+
+        // Restricted should always stack (visual indicator like border/text)
+        if (isRestricted)
+        {
+            baseClass += " module-button-restricted";
+        }
 
         return baseClass;
     }
@@ -534,6 +609,18 @@ else
                 return string.Equals(submissionModCode,targetModCode,StringComparison.OrdinalIgnoreCase);
             })
             .ToList();
+    }
+
+    private bool IsStudentEnrolledInModule(ModuleData module)
+    {
+        if (student == null || string.IsNullOrWhiteSpace(module.ModCode))
+            return false;
+
+        return student.Courses.Any(course =>
+        {
+            var courseModCode = ExtractModCodeFromCourse(course.Code);
+            return string.Equals(courseModCode, module.ModCode, StringComparison.OrdinalIgnoreCase);
+        });
     }
 
     private bool IsModuleRestricted(ModuleData module)
