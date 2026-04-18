@@ -5,7 +5,6 @@
 @inject CompetencyDataServices competencyService
 @inject AuthStateService AuthState
 
-
 @if (SelectedCourse == null)
 {
     <h3>Select a Course</h3>
@@ -33,69 +32,50 @@
 else if (SelectedModule == null)
 {
     <div style="margin-bottom:20px">
-    <button class="module-button" @onclick="ClearSelection">← Back to Courses</button>
+        <button class="module-button" @onclick="ClearSelection">← Back to Courses</button>
     </div>
 
     <h3>@SelectedCourseName</h3>
 
-                <h4>Core Modules</h4>
-                <div class="module-group">
-                    @foreach (var module in Year1Modules.Where(m => m.SelectionStatus == "Core"))
-                    {
-                        <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                            @module.ModuleName
-                        </button>
-                    }
-
-                    @foreach (var module in Year2Modules.Where(m => m.SelectionStatus == "Core"))
-                    {
-                        <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                            @module.ModuleName
-                        </button>
-                    }
-                </div>
-
-                <h4>Elective Modules</h4>
-                <div class="module-group">
-                    @foreach (var module in Year3Modules.Where(m => m.SelectionStatus == "Elective"))
-                    {
-                        <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
-                            @module.ModuleName
-                        </button>
-                    }
-                </div>
     <div>
         <div class="trimester">
             <div class="module-group">
                 <div class="module-row-header">
-                    <div><h4>Compulsory</h4></div>
-                    <div><h4>Optional</h4></div>
+                    <div><h4>Trimester 1</h4></div>
+                    <div><h4>Trimester 2</h4></div>
                 </div>
                 <h5>Year 1</h5>
 
                 @{
-                    var compulsory1 = Year1Modules.Where(m => m.SelectionStatus == "Compulsory").ToList();
-                    var optional1 = Year1Modules.Where(m => m.SelectionStatus == "Optional").ToList();
+                    var T1Y1 = Year1Modules.Where(m => m.Trimester == "T1").ToList();
+                    var T2Y1 = Year1Modules.Where(m => m.Trimester == "T2").ToList();
                     // adds white space for aesthetics.
-                    var max1 = Math.Max(compulsory1.Count, optional1.Count);
+                    var max1 = Math.Max(T1Y1.Count, T2Y1.Count);
+                }
+
+                @foreach (var module in Year1Modules.Where(m => m.SelectionStatus == "Core"))
+                {
+                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
+                        @module.ModuleName
+                    </button>
                 }
 
                 @for (int i = 0; i < max1; i++)
                 {
                     <div class="module-row">
                         <div>
-                            @if (i < compulsory1.Count)
+                            @if (i < T1Y1.Count)
                             {
-                                var module = compulsory1[i];
+                                var module = T1Y1[i];
                                 <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                     @module.ModuleName
                                 </button>
                             }
                         </div>
                         <div>
-                            @if (i < optional1.Count)
+                            @if (i < T2Y1.Count)
                             {
-                                var module = optional1[i];
+                                var module = T2Y1[i];
                                 <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                     @module.ModuleName
                                 </button>
@@ -107,18 +87,25 @@ else if (SelectedModule == null)
                 <h5>Year 2</h5>
 
                 @{
-                    var compulsory2 = Year2Modules.Where(m => m.SelectionStatus == "Compulsory").ToList();
-                    var optional2 = Year2Modules.Where(m => m.SelectionStatus == "Optional").ToList();
-                    var max2 = Math.Max(compulsory2.Count, optional2.Count);
+                    var T1Y2 = Year2Modules.Where(m => m.Trimester == "T1").ToList();
+                    var T2Y2 = Year2Modules.Where(m => m.Trimester == "T2").ToList();
+                    var max2 = Math.Max(T1Y2.Count, T2Y2.Count);
+                }
+
+                @foreach (var module in Year2Modules.Where(m => m.SelectionStatus == "Core"))
+                {
+                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
+                        @module.ModuleName
+                    </button>
                 }
 
                 @for (int i = 0; i < max2; i++)
                 {
                     <div class="module-row">
                         <div>
-                            @if (i < compulsory2.Count)
+                            @if (i < T1Y2.Count)
                             {
-                                var module = compulsory2[i];
+                                var module = T1Y2[i];
                                 <button class="@GetModuleButtonClass(module)"
                                         @onclick="() => LoadModuleDetails(module)">
                                     @module.ModuleName
@@ -127,9 +114,9 @@ else if (SelectedModule == null)
                         </div>
 
                         <div>
-                            @if (i < optional2.Count)
+                            @if (i < T2Y2.Count)
                             {
-                                var module = optional2[i];
+                                var module = T2Y2[i];
                                 <button class="@GetModuleButtonClass(module)"
                                         @onclick="() => LoadModuleDetails(module)">
                                     @module.ModuleName
@@ -141,18 +128,25 @@ else if (SelectedModule == null)
                 <h5>Year 3</h5>
 
                 @{
-                    var compulsory3 = Year3Modules.Where(m => m.SelectionStatus == "Compulsory").ToList();
-                    var optional3 = Year3Modules.Where(m => m.SelectionStatus == "Optional").ToList();
-                    var max3 = Math.Max(compulsory3.Count, optional3.Count);
+                    var T1Y3 = Year3Modules.Where(m => m.Trimester == "T1").ToList();
+                    var T2Y3 = Year3Modules.Where(m => m.Trimester == "T2").ToList();
+                    var max3 = Math.Max(T1Y3.Count, T2Y3.Count);
+                }
+
+                @foreach (var module in Year3Modules.Where(m => m.SelectionStatus == "Elective"))
+                {
+                    <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
+                        @module.ModuleName
+                    </button>
                 }
 
                 @for (int i = 0; i < max3; i++)
                 {
                     <div class="module-row">
                         <div>
-                            @if (i < compulsory3.Count)
+                            @if (i < T1Y3.Count)
                             {
-                                var module = compulsory3[i];
+                                var module = T1Y3[i];
                                 <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                     @module.ModuleName
                                     @if (IsModuleRestricted(module))
@@ -165,9 +159,9 @@ else if (SelectedModule == null)
                         </div>
 
                         <div>
-                            @if (i < optional3.Count)
+                            @if (i < T2Y3.Count)
                             {
-                                var module = optional3[i];
+                                var module = T2Y3[i];
                                 <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                     @module.ModuleName
                                     @if (IsModuleRestricted(module))
