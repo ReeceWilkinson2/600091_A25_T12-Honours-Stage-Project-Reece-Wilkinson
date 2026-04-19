@@ -97,13 +97,14 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         public async Task<User?> GetUserByIdAsync(string userId)
         {
             return await _db.Users
-                .Include(s => s.Submissions)
-                    .ThenInclude(sub => sub.Assignment)
-                .Include(s => s.Submissions)
-                    .ThenInclude(sub => sub.Comments)
-                .Include(s => s.Courses)
-                    .ThenInclude(c => c.Assignments)
-                .FirstOrDefaultAsync(s => s.StudentId == userId);
+               .Include(s => s.Submissions)
+                   .ThenInclude(sub => sub.Assignment)
+                       .ThenInclude(a => a.Course)
+               .Include(s => s.Submissions)
+                   .ThenInclude(sub => sub.Comments)
+               .Include(s => s.Courses)
+                   .ThenInclude(c => c.Assignments)
+               .FirstOrDefaultAsync(s => s.StudentId == userId);
         }
 
         public async Task<List<ModuleData>> GetModuleDataAsync(string courseTitle, string level)

@@ -389,7 +389,7 @@ else
         @if (SelectedCompetency.Levels != null && ActiveModule != null)
         {
             var relevantLevels = SelectedCompetency.Levels
-            .Where(l => l.Modules.Any(m => m.Module.ModCode == ActiveModule.ModCode)) // CHANGED: ModCode is inside ModuleData
+            .Where(l => l.Modules.Any(m => m.Module.ModCode == ActiveModule.ModCode))
             .OrderBy(l => l.LevelNumber);
 
             if (relevantLevels.Any())
