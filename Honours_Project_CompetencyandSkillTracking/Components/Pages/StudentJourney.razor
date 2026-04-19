@@ -129,6 +129,16 @@ else if (SelectedModule == null)
                     {
                         <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                             @module.ModuleName
+                            @if (!IsEffectivelyEnrolled(module))
+                            {
+                                <br />
+                                <span class="restricted-text">Not Enrolled</span>
+                            }
+                            else if (TempSelectedModules.Contains(module.ModCode))
+                            {
+                                <br />
+                                <span class="highlight-text">Planned</span>
+                            }
                         </button>
                     }
                 </div>
@@ -142,10 +152,15 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
-                                        @if (!IsStudentEnrolledInModule(module))
+                                        @if (!IsEffectivelyEnrolled(module))
                                         {
                                             <br />
                                             <span class="restricted-text">Not Enrolled</span>
+                                        }
+                                        else if (TempSelectedModules.Contains(module.ModCode))
+                                        {
+                                            <br />
+                                            <span class="highlight-text">Planned</span>
                                         }
                                     </button>
                                 }
@@ -156,10 +171,20 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
-                                        @if (!IsStudentEnrolledInModule(module))
+                                        @if (IsModuleRestricted(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Available</span>
+                                        }
+                                        else if (!IsEffectivelyEnrolled(module))
                                         {
                                             <br />
                                             <span class="restricted-text">Not Enrolled</span>
+                                        }
+                                        else if (TempSelectedModules.Contains(module.ModCode))
+                                        {
+                                            <br />
+                                            <span class="highlight-text">Planned</span>
                                         }
                                     </button>
                                 }
@@ -176,10 +201,20 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
-                                        @if (!IsStudentEnrolledInModule(module))
+                                        @if (IsModuleRestricted(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Available</span>
+                                        }
+                                        else if (!IsEffectivelyEnrolled(module))
                                         {
                                             <br />
                                             <span class="restricted-text">Not Enrolled</span>
+                                        }
+                                        else if (TempSelectedModules.Contains(module.ModCode))
+                                        {
+                                            <br />
+                                            <span class="highlight-text">Planned</span>
                                         }
                                     </button>
                                 }
@@ -190,10 +225,20 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
-                                        @if (!IsStudentEnrolledInModule(module))
+                                        @if (IsModuleRestricted(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Available</span>
+                                        }
+                                        else if (!IsEffectivelyEnrolled(module))
                                         {
                                             <br />
                                             <span class="restricted-text">Not Enrolled</span>
+                                        }
+                                        else if (TempSelectedModules.Contains(module.ModCode))
+                                        {
+                                            <br />
+                                            <span class="highlight-text">Planned</span>
                                         }
                                     </button>
                                 }
@@ -212,10 +257,16 @@ else if (SelectedModule == null)
                     {
                         <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                             @module.ModuleName
-                            @if (!IsStudentEnrolledInModule(module))
+
+                            @if (!IsEffectivelyEnrolled(module))
                             {
                                 <br />
                                 <span class="restricted-text">Not Enrolled</span>
+                            }
+                            else if (TempSelectedModules.Contains(module.ModCode))
+                            {
+                                <br />
+                                <span class="highlight-text">Planned</span>
                             }
                         </button>
                     }
@@ -235,11 +286,15 @@ else if (SelectedModule == null)
                                             <br />
                                             <span class="restricted-text">Not Available</span>
                                         }
-
-                                        @if (!IsStudentEnrolledInModule(module))
+                                        else if (!IsEffectivelyEnrolled(module))
                                         {
                                             <br />
                                             <span class="restricted-text">Not Enrolled</span>
+                                        }
+                                        else if (TempSelectedModules.Contains(module.ModCode))
+                                        {
+                                            <br />
+                                            <span class="highlight-text">Planned</span>
                                         }
                                     </button>
                                 }
@@ -250,17 +305,20 @@ else if (SelectedModule == null)
                                 {
                                     <button class="@GetModuleButtonClass(module)" @onclick="() => LoadModuleDetails(module)">
                                         @module.ModuleName
-
                                         @if (IsModuleRestricted(module))
                                         {
                                             <br />
                                             <span class="restricted-text">Not Available</span>
                                         }
-
-                                        @if (!IsStudentEnrolledInModule(module))
+                                        else if (!IsEffectivelyEnrolled(module))
                                         {
                                             <br />
-                                            <span class="restricted-text">Not Enrolled</span>                                            
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
+                                        else if (TempSelectedModules.Contains(module.ModCode))
+                                        {
+                                            <br />
+                                            <span class="highlight-text">Planned</span>
                                         }
                                     </button>
                                 }
@@ -282,6 +340,16 @@ else if (SelectedModule == null)
                                             <br />
                                             <span class="restricted-text">Not Available</span>
                                         }
+                                        else if (!IsEffectivelyEnrolled(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
+                                        else if (TempSelectedModules.Contains(module.ModCode))
+                                        {
+                                            <br />
+                                            <span class="highlight-text">Planned</span>
+                                        }
                                     </button>
                                 }
                             </div>
@@ -295,6 +363,16 @@ else if (SelectedModule == null)
                                         {
                                             <br />
                                             <span class="restricted-text">Not Available</span>
+                                        }
+                                        else if (!IsEffectivelyEnrolled(module))
+                                        {
+                                            <br />
+                                            <span class="restricted-text">Not Enrolled</span>
+                                        }
+                                        else if (TempSelectedModules.Contains(module.ModCode))
+                                        {
+                                            <br />
+                                            <span class="highlight-text">Planned</span>
                                         }
                                     </button>
                                 }
@@ -333,6 +411,17 @@ else if (SelectedCompetency == null)
         </button>
     </div>
     <h3>@SelectedModuleName</h3>
+    @if (ActiveModule != null && CanShowToggle(ActiveModule))
+    {
+        <div style="margin-bottom:15px">
+            <button class="module-button"
+                    @onclick="() => ToggleTempEnrollment(ActiveModule)">
+                @(TempSelectedModules.Contains(ActiveModule.ModCode)
+                        ? "Remove from Planned Modules"
+                        : "Add to Planned Modules")
+    </button>
+</div>
+}
     <h4>Competencies</h4>
 
     @if (student != null && ActiveModule != null)
@@ -467,6 +556,7 @@ else
     private string? SelectedCompetencyFilterId;
     private CompetencyData? FilterCompetency;
     private HashSet<string> FilterCompetencyModuleCodes = new();
+    private HashSet<string> TempSelectedModules = new();
 
 
     private List<ModuleData> Year1Modules = new List<ModuleData>();
@@ -557,9 +647,8 @@ else
 
         var isHighlighted = FilterCompetencyModuleCodes.Contains(module.ModCode);
         var isRestricted = IsModuleRestricted(module);
-        var isEnrolled = IsStudentEnrolledInModule(module);
+        var isEnrolled = IsEffectivelyEnrolled(module); // ✅ FIX
 
-        // Highlight takes priority over greyed-out
         if (isHighlighted)
         {
             baseClass += " module-button-highlight";
@@ -569,7 +658,6 @@ else
             baseClass += " module-button-greyed";
         }
 
-        // Restricted should always stack (visual indicator like border/text)
         if (isRestricted)
         {
             baseClass += " module-button-restricted";
@@ -623,6 +711,12 @@ else
         });
     }
 
+    private bool IsEffectivelyEnrolled(ModuleData module)
+    {
+        return IsStudentEnrolledInModule(module)
+            || TempSelectedModules.Contains(module.ModCode);
+    }
+
     private bool IsModuleRestricted(ModuleData module)
     {
         if (student == null)
@@ -640,11 +734,13 @@ else
 
             if (string.Equals(module.ModCode, restrictedModCode, StringComparison.OrdinalIgnoreCase))
             {
-                var isEnrolledInRequiredModule = student.Courses.Any(course =>
+                var isEnrolledInRequiredModule =
+                    student.Courses.Any(course =>
                     {
                         var courseModCode = ExtractModCodeFromCourse(course.Code);
                         return string.Equals(courseModCode, requiredModCode, StringComparison.OrdinalIgnoreCase);
-                    });
+                    })
+                    || TempSelectedModules.Contains(requiredModCode);
                 return !isEnrolledInRequiredModule;
             }
         }
@@ -664,6 +760,111 @@ else
             return digits;
 
         return string.Empty;
+    }
+
+    private int GetMaxOptionalSelections(string year, string trimester)
+    {
+        return (year, trimester) switch
+        {
+            ("5", "T1") => 1,
+            ("5", "T2") => 2,
+            ("6", "T1") => 2,
+            ("6", "T2") => 2,
+            _ => 0
+        };
+    }
+
+    private string GetYearFromLevel(ModuleData module)
+    {
+        return module.Level switch
+        {
+            "4" => "1",
+            "5" => "2",
+            "6" => "3",
+            _ => ""
+        };
+    }
+
+    private int CountSelectionsForTrimester(string level, string trimester)
+    {
+        return TempSelectedModules.Count(code =>
+        {
+            var module = Year1Modules
+                .Concat(Year2Modules)
+                .Concat(Year3Modules)
+                .FirstOrDefault(m => m.ModCode == code);
+
+            return module != null
+                && module.Level == level
+                && module.Trimester == trimester;
+        });
+    }
+
+    private bool IsYearLongModule(ModuleData module)
+    {
+        return module.SelectionStatus == "Core" || module.SelectionStatus == "Elective";
+    }
+
+    private bool HasSelectedYearLongModule(string level)
+    {
+        return TempSelectedModules.Any(code =>
+        {
+            var module = Year1Modules
+                .Concat(Year2Modules)
+                .Concat(Year3Modules)
+                .FirstOrDefault(m => m.ModCode == code);
+
+            return module != null
+                && module.Level == level
+                && IsYearLongModule(module);
+        });
+    }
+
+    private void ToggleTempEnrollment(ModuleData module)
+    {
+        var level = module.Level;
+        var trimester = module.Trimester;
+
+        if (TempSelectedModules.Contains(module.ModCode))
+        {
+            TempSelectedModules.Remove(module.ModCode);
+            return;
+        }
+
+        // Year-long rule (Core OR Elective)
+        if (IsYearLongModule(module) && HasSelectedYearLongModule(level))
+            return;
+
+        // Trimester rule (max 2)
+        var current = CountSelectionsForTrimester(level, trimester);
+        if (current >= 2)
+            return;
+
+        TempSelectedModules.Add(module.ModCode);
+    }
+
+    private bool CanShowToggle(ModuleData module)
+    {
+        if (IsStudentEnrolledInModule(module))
+            return false;
+
+        if (IsModuleRestricted(module))
+            return false;
+
+        var level = module.Level;
+        var trimester = module.Trimester;
+
+        // Always allow removing
+        if (TempSelectedModules.Contains(module.ModCode))
+            return true;
+
+        // Year-long rule
+        if (IsYearLongModule(module) && HasSelectedYearLongModule(level))
+            return false;
+
+        // Trimester rule
+        var current = CountSelectionsForTrimester(level, trimester);
+        return current < 2;
     }
 
     private void NavigateToCompetencyProgress()

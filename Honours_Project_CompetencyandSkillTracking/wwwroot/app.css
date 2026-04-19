@@ -219,6 +219,15 @@ h1:focus {
     border: 2px solid red;
 }
 
+.highlight-text {
+    color: white;
+    background-color: #28a745;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    margin-left: 4px;
+}
+
 /* sign in styling*/
 .login-page {
     display: flex;
