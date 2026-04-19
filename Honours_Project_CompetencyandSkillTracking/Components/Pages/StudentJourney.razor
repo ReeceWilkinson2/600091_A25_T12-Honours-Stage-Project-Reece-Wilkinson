@@ -785,9 +785,23 @@ else
         };
     }
 
-    private int CountSelectionsForTrimester(string level, string trimester)
+    private int CountTotalSelectionsForTrimester(string level, string trimester)
     {
-        return TempSelectedModules.Count(code =>
+        int enrolled = student?.Courses.Count(course =>
+        {
+            var modCode = ExtractModCodeFromCourse(course.Code);
+
+            var module = Year1Modules
+                .Concat(Year2Modules)
+                .Concat(Year3Modules)
+                .FirstOrDefault(m => m.ModCode == modCode);
+
+            return module != null
+                && module.Level == level
+                && module.Trimester == trimester;
+        }) ?? 0;
+
+        int planned = TempSelectedModules.Count(code =>
         {
             var module = Year1Modules
                 .Concat(Year2Modules)
@@ -798,6 +812,8 @@ else
                 && module.Level == level
                 && module.Trimester == trimester;
         });
+
+        return enrolled + planned;
     }
 
     private bool IsYearLongModule(ModuleData module)
@@ -836,7 +852,7 @@ else
             return;
 
         // Trimester rule (max 2)
-        var current = CountSelectionsForTrimester(level, trimester);
+        var current = CountTotalSelectionsForTrimester(level, trimester);
         if (current >= 2)
             return;
 
@@ -863,7 +879,7 @@ else
             return false;
 
         // Trimester rule
-        var current = CountSelectionsForTrimester(level, trimester);
+        var current = CountTotalSelectionsForTrimester(level, trimester);
         return current < 2;
     }
 
