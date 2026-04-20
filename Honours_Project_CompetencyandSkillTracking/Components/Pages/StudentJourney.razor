@@ -708,9 +708,12 @@ else
         ActiveModule = module;
         SelectedModule = module.ModuleName;
         SelectedModuleName = module.ModuleName;
+        SelectedModuleCompetencies = await competencyService.GetCompetenciesByModuleAsync(module.ModCode);
 
         ActiveAssignments = await GetAssignmentsForModule(module);
         ProjectedGrade = await CalculateOverallGrade(module);
+
+        StateHasChanged();
     }
 
 private List<Submission> GetRelevantSubmissionsForModule()
@@ -913,6 +916,22 @@ private List<Submission> GetRelevantSubmissionsForModule()
         return current < 2;
     }
 
+    private ModuleData? GetModuleFromCourse(Course course)
+    {
+        if (course == null || string.IsNullOrWhiteSpace(course.Code))
+            return null;
+
+        var modCode = ExtractModCodeFromCourse(course.Code);
+
+        return Year1Modules
+            .Concat(Year2Modules)
+            .Concat(Year3Modules)
+            .FirstOrDefault(m => m.ModCode == modCode);
+    }
+
+    //---------------------------------------
+    // Grade calcs
+    //---------------------------------------
     private double CalculateModuleGrade(ModuleData module)
     {
         if (module == null || student == null)
@@ -994,7 +1013,6 @@ private List<Submission> GetRelevantSubmissionsForModule()
 
         PlannedModules[modCode].AssignmentScores[assignmentId] = score;
 
-        // 🔥 recompute grade live
         if (ActiveModule != null)
         {
             ProjectedGrade = await CalculateOverallGrade(ActiveModule);
@@ -1035,20 +1053,6 @@ private List<Submission> GetRelevantSubmissionsForModule()
         }
 
         return totalWeight > 0 ? total / totalWeight : 0;
-    }
-
-
-    private ModuleData? GetModuleFromCourse(Course course)
-    {
-        if (course == null || string.IsNullOrWhiteSpace(course.Code))
-            return null;
-
-        var modCode = ExtractModCodeFromCourse(course.Code);
-
-        return Year1Modules
-            .Concat(Year2Modules)
-            .Concat(Year3Modules)
-            .FirstOrDefault(m => m.ModCode == modCode);
     }
 
     private double GetAssignmentProjectedScore(long assignmentId)
@@ -1123,6 +1127,9 @@ private List<Submission> GetRelevantSubmissionsForModule()
         // Planned module → fetch from backend
         return await service.GetAssignmentsByModuleCodeAsync(module.ModCode);
     }
+    //---------------------------------------
+    //
+    //---------------------------------------
 
     private void NavigateToCompetencyProgress()
     {
