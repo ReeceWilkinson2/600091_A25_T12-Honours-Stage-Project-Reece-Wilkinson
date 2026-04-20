@@ -490,15 +490,11 @@ else if (SelectedCompetency == null)
 
     @if (ActiveModule != null && student != null)
     {
-        var allAssignments = GetAllAssignmentsForModule();
-        var submissions = GetRelevantSubmissionsForModule();
-
-        if (allAssignments.Any())
+        if (ActiveAssignments.Any())
         {
-            @foreach (var assignment in allAssignments)
+            @foreach (var assignment in ActiveAssignments)
             {
-                var submission = submissions
-                    .FirstOrDefault(s => s.AssignmentId == assignment.Id);
+                var realScore = GetRealSubmissionScore(assignment.Id);
 
                 <div style="margin-bottom:10px; padding:10px; border:1px solid #ddd;">
                     <strong>@assignment.Name</strong>
@@ -506,10 +502,10 @@ else if (SelectedCompetency == null)
 
                     <br />
 
-                    @if (submission?.Score != null)
+                    @if (realScore != null)
                     {
                         <span style="color:green;">
-                            ✔ Submitted Score: @submission.Score
+                            ✔ Submitted Score: @realScore
                         </span>
                     }
                     else
@@ -520,35 +516,21 @@ else if (SelectedCompetency == null)
                                min="0"
                                max="100"
                                step="0.1"
-                               value="@GetPlannedScore(assignment.Id)"
-                               @onchange="(e) => SetPlannedScore(assignment.Id, e.Value)" />
+                               value="@(GetPlannedScore(ActiveModule.ModCode, assignment.Id) ?? 0)"
+                               @onchange="async (e) => await SetPlannedScore(ActiveModule.ModCode, assignment.Id, e.Value)" />
                     }
                 </div>
             }
 
             <div style="margin-top:15px; font-weight:bold;">
                 Projected Overall Grade:
-                @CalculateOverallGrade().ToString("F1")%
+                @ProjectedGrade.ToString("F1")%
             </div>
         }
         else
         {
             <p>No assignments found for this module.</p>
         }
-    }
-
-    @if (!string.IsNullOrWhiteSpace(ActiveModule?.VideoLink))
-    {
-        <div style="margin-bottom:20px">
-            <h4>Module Introduction:</h4>
-
-            <iframe src="@ActiveModule.VideoLink"
-                    width="560"
-                    height="315"
-                    style="border:0"
-                    allowfullscreen>
-            </iframe>
-        </div>
     }
 }
 else
@@ -609,7 +591,11 @@ else
     private HashSet<string> TempSelectedModules = new();
 
     private Dictionary<long, double> PlannedAssignmentScores = new();
+    Dictionary<string, PlannedModuleGrade> PlannedModules = new();
     private Dictionary<long, double> PlannedGrades = new();
+    private List<Assignment> ActiveAssignments = new();
+    private double ProjectedGrade = 0;
+
     private List<ModuleData> Year1Modules = new List<ModuleData>();
     private List<ModuleData> Year2Modules = new List<ModuleData>();
     private List<ModuleData> Year3Modules = new List<ModuleData>();
@@ -722,7 +708,9 @@ else
         ActiveModule = module;
         SelectedModule = module.ModuleName;
         SelectedModuleName = module.ModuleName;
-        SelectedModuleCompetencies = await competencyService.GetCompetenciesByModuleAsync(module.ModCode);
+
+        ActiveAssignments = await GetAssignmentsForModule(module);
+        ProjectedGrade = await CalculateOverallGrade(module);
     }
 
 private List<Submission> GetRelevantSubmissionsForModule()
@@ -970,40 +958,85 @@ private List<Submission> GetRelevantSubmissionsForModule()
         return totalWeight == 0 ? 0 : total / totalWeight;
     }
 
-    private double CalculateOverallGrade()
+    private double? GetRealSubmissionScore(long assignmentId)
     {
-        if (student == null || ActiveModule == null)
-            return 0;
+        return student?.Courses
+            .SelectMany(c => c.Assignments)
+            .SelectMany(a => a.Submissions)
+            .FirstOrDefault(s =>
+                s.AssignmentId == assignmentId &&
+                s.StudentId == student.StudentId)
+            ?.Score;
+    }
 
-        var assignments = GetAllAssignmentsForModule();
-        var submissions = GetRelevantSubmissionsForModule();
+    private double? GetPlannedScore(string modCode, long assignmentId)
+    {
+        if (PlannedModules.TryGetValue(modCode, out var module))
+        {
+            if (module.AssignmentScores.TryGetValue(assignmentId, out var score))
+                return score;
+        }
+        return null;
+    }
+
+    private async Task SetPlannedScore(string modCode, long assignmentId, object? value)
+    {
+        if (!double.TryParse(value?.ToString(), out var score))
+            return;
+
+        if (!PlannedModules.ContainsKey(modCode))
+        {
+            PlannedModules[modCode] = new PlannedModuleGrade
+            {
+                ModCode = modCode
+            };
+        }
+
+        PlannedModules[modCode].AssignmentScores[assignmentId] = score;
+
+        // 🔥 recompute grade live
+        if (ActiveModule != null)
+        {
+            ProjectedGrade = await CalculateOverallGrade(ActiveModule);
+            StateHasChanged();
+        }
+    }
+
+    private async Task<double> CalculateOverallGrade(ModuleData module)
+    {
+        var assignments = await GetAssignmentsForModule(module);
 
         double total = 0;
         double totalWeight = 0;
 
         foreach (var assignment in assignments)
         {
+            double? score = null;
+
+            // 1. real submission
+            var real = GetRealSubmissionScore(assignment.Id);
+            if (real != null)
+            {
+                score = real;
+            }
+            // 2. planned fallback
+            else
+            {
+                score = GetPlannedScore(module.ModCode, assignment.Id);
+            }
+
+            if (score == null)
+                continue;
+
             var weight = assignment.Weighting ?? 0;
 
-            var submission = submissions
-                .FirstOrDefault(s => s.AssignmentId == assignment.Id);
-
-            double? score = submission?.Score;
-
-            if (score == null && PlannedGrades.ContainsKey(assignment.Id))
-            {
-                score = PlannedGrades[assignment.Id];
-            }
-
-            if (score != null)
-            {
-                total += score.Value * weight;
-                totalWeight += weight;
-            }
+            total += score.Value * weight;
+            totalWeight += weight;
         }
 
         return totalWeight > 0 ? total / totalWeight : 0;
     }
+
 
     private ModuleData? GetModuleFromCourse(Course course)
     {
@@ -1075,6 +1108,20 @@ private List<Submission> GetRelevantSubmissionsForModule()
         {
             PlannedGrades[assignmentId] = grade;
         }
+    }
+
+    private async Task<List<Assignment>> GetAssignmentsForModule(ModuleData module)
+    {
+        if (student != null && IsStudentEnrolledInModule(module))
+        {
+            return student.Courses
+                .Where(c => ExtractModCodeFromCourse(c.Code) == module.ModCode)
+                .SelectMany(c => c.Assignments)
+                .ToList();
+        }
+
+        // Planned module → fetch from backend
+        return await service.GetAssignmentsByModuleCodeAsync(module.ModCode);
     }
 
     private void NavigateToCompetencyProgress()

@@ -147,5 +147,13 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
             return id;
         }
+
+        public async Task<List<Assignment>> GetAssignmentsByModuleCodeAsync(string modCode)
+        {
+            return await _db.Assignments
+                .Where(a => a.Course != null &&
+                            a.Course.Code.StartsWith(modCode))
+                .ToListAsync();
+        }
     }
 }
