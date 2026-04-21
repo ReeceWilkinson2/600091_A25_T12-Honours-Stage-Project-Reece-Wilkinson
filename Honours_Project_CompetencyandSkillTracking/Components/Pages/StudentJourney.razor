@@ -607,23 +607,6 @@ else
         { "662253", "662086" }  // Natural Language Processing needs Machine Learning
     };
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender) return;
-
-        if (string.IsNullOrEmpty(AuthState.UserId))
-            return;
-
-        student = await service.GetUserByIdAsync(AuthState.UserId);
-
-        StateHasChanged();
-    }
-
-    private void GoToFullView()
-    {
-        NavigationManager.NavigateTo("/studentjourneyfull");
-    }
-
     private async Task SelectCourse(string courseName)
     {
         SelectedCourse = courseName;
@@ -634,32 +617,6 @@ else
         Year3Modules = await service.GetModuleDataAsync(courseName, "6");
 
         AllCompetencies = await competencyService.GetAllCompetenciesAsync();
-    }
-
-    private void ClearSelection()
-    {
-        SelectedCourse = null;
-        SelectedCourseName = null;
-        SelectedModule = null;
-        SelectedCompetency = null;
-
-        SelectedCompetencyFilterId = null;
-        FilterCompetency = null;
-        FilterCompetencyModuleCodes.Clear();
-
-        Year1Modules.Clear();
-        Year2Modules.Clear();
-        Year3Modules.Clear();
-    }
-
-    private void ClearSelection2()
-    {
-        SelectedCompetency = null;
-        SelectedModule = null;
-
-        SelectedCompetencyFilterId = null;
-        FilterCompetency = null;
-        FilterCompetencyModuleCodes.Clear();
     }
 
     private void OnCompetencyFilterChanged(ChangeEventArgs e)
@@ -678,31 +635,6 @@ else
         }
     }
 
-    private string GetModuleButtonClass(ModuleData module)
-    {
-        var baseClass = "module-button";
-
-        var isHighlighted = FilterCompetencyModuleCodes.Contains(module.ModCode);
-        var isRestricted = IsModuleRestricted(module);
-        var isEnrolled = IsEffectivelyEnrolled(module);
-
-        if (isHighlighted)
-        {
-            baseClass += " module-button-highlight";
-        }
-        else if (!isEnrolled)
-        {
-            baseClass += " module-button-greyed";
-        }
-
-        if (isRestricted)
-        {
-            baseClass += " module-button-restricted";
-        }
-
-        return baseClass;
-    }
-
     private async Task LoadModuleDetails(ModuleData module)
     {
         ActiveModule = module;
@@ -715,22 +647,6 @@ else
 
         StateHasChanged();
     }
-
-private List<Submission> GetRelevantSubmissionsForModule()
-{
-    if (student == null || ActiveModule == null)
-        return new List<Submission>();
-
-    var modCode = ActiveModule.ModCode;
-
-    return student.Submissions
-        .Where(sub =>
-            sub.Assignment != null &&
-            sub.Assignment.Course != null &&
-            !string.IsNullOrWhiteSpace(sub.Assignment.Course.Code) &&
-            ExtractModCodeFromCourse(sub.Assignment.Course.Code) == modCode)
-        .ToList();
-}
 
     private bool IsStudentEnrolledInModule(ModuleData module)
     {
@@ -793,29 +709,6 @@ private List<Submission> GetRelevantSubmissionsForModule()
             return digits;
 
         return string.Empty;
-    }
-
-    private int GetMaxOptionalSelections(string year, string trimester)
-    {
-        return (year, trimester) switch
-        {
-            ("5", "T1") => 1,
-            ("5", "T2") => 2,
-            ("6", "T1") => 2,
-            ("6", "T2") => 2,
-            _ => 0
-        };
-    }
-
-    private string GetYearFromLevel(ModuleData module)
-    {
-        return module.Level switch
-        {
-            "4" => "1",
-            "5" => "2",
-            "6" => "3",
-            _ => ""
-        };
     }
 
     private int CountTotalSelectionsForTrimester(string level, string trimester)
@@ -928,6 +821,73 @@ private List<Submission> GetRelevantSubmissionsForModule()
             .Concat(Year3Modules)
             .FirstOrDefault(m => m.ModCode == modCode);
     }
+    //---------------------------------------
+    // Getters
+    //---------------------------------------
+    private string GetModuleButtonClass(ModuleData module)
+    {
+        var baseClass = "module-button";
+
+        var isHighlighted = FilterCompetencyModuleCodes.Contains(module.ModCode);
+        var isRestricted = IsModuleRestricted(module);
+        var isEnrolled = IsEffectivelyEnrolled(module);
+
+        if (isHighlighted)
+        {
+            baseClass += " module-button-highlight";
+        }
+        else if (!isEnrolled)
+        {
+            baseClass += " module-button-greyed";
+        }
+
+        if (isRestricted)
+        {
+            baseClass += " module-button-restricted";
+        }
+
+        return baseClass;
+    }
+
+    private List<Submission> GetRelevantSubmissionsForModule()
+    {
+        if (student == null || ActiveModule == null)
+            return new List<Submission>();
+
+        var modCode = ActiveModule.ModCode;
+
+        return student.Submissions
+            .Where(sub =>
+                sub.Assignment != null &&
+                sub.Assignment.Course != null &&
+                !string.IsNullOrWhiteSpace(sub.Assignment.Course.Code) &&
+                ExtractModCodeFromCourse(sub.Assignment.Course.Code) == modCode)
+            .ToList();
+    }
+
+    private int GetMaxOptionalSelections(string year, string trimester)
+    {
+        return (year, trimester) switch
+        {
+            ("5", "T1") => 1,
+            ("5", "T2") => 2,
+            ("6", "T1") => 2,
+            ("6", "T2") => 2,
+            _ => 0
+        };
+    }
+
+    private string GetYearFromLevel(ModuleData module)
+    {
+        return module.Level switch
+        {
+            "4" => "1",
+            "5" => "2",
+            "6" => "3",
+            _ => ""
+        };
+    }
+
 
     //---------------------------------------
     // Grade calcs
@@ -1128,7 +1088,7 @@ private List<Submission> GetRelevantSubmissionsForModule()
         return await service.GetAssignmentsByModuleCodeAsync(module.ModCode);
     }
     //---------------------------------------
-    //
+    // Navigation and rendering
     //---------------------------------------
 
     private void NavigateToCompetencyProgress()
@@ -1140,13 +1100,56 @@ private List<Submission> GetRelevantSubmissionsForModule()
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    private void GoToFullView()
     {
-        await AuthState.InitializeAsync();
+        NavigationManager.NavigateTo("/studentjourneyfull");
+    }
+
+    private void ClearSelection()
+    {
+        SelectedCourse = null;
+        SelectedCourseName = null;
+        SelectedModule = null;
+        SelectedCompetency = null;
+
+        SelectedCompetencyFilterId = null;
+        FilterCompetency = null;
+        FilterCompetencyModuleCodes.Clear();
+
+        Year1Modules.Clear();
+        Year2Modules.Clear();
+        Year3Modules.Clear();
+    }
+
+    private void ClearSelection2()
+    {
+        SelectedCompetency = null;
+        SelectedModule = null;
+
+        SelectedCompetencyFilterId = null;
+        FilterCompetency = null;
+        FilterCompetencyModuleCodes.Clear();
     }
 
     private void LoadCompetencyDetails(CompetencyData competency)
     {
         SelectedCompetency = competency;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthState.InitializeAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (string.IsNullOrEmpty(AuthState.UserId))
+            return;
+
+        student = await service.GetUserByIdAsync(AuthState.UserId);
+
+        StateHasChanged();
     }
 }
