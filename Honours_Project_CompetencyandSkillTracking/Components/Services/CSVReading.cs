@@ -94,7 +94,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
                     Trimester = GetValue("Trimester"),
                     SelectionStatus = GetValue("Selection_Status"),
                     Level = GetValue("Level"),
-                    Credits = GetValue("Credits"),
+                    Credits = int.TryParse(GetValue("Credits"), out int credits) ? credits : 0,
                     ModCode = GetValue("Mod Code"),
                     VideoLink = GetValue("Video_URLs")
                 };

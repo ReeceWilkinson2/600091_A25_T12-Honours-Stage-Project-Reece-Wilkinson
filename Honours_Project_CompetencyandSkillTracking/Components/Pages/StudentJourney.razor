@@ -37,6 +37,9 @@ else if (SelectedModule == null)
     </div>
 
     <h3>@SelectedCourseName</h3>
+    <div>
+        Overall Degree Grade: @(ProjectedOverallGrade.ToString("F1")) %
+    </div>
     <Tabs>
         <Tab Title="Year 1" Active="true">
             <ChildContent>
@@ -595,6 +598,7 @@ else
     private Dictionary<long, double> PlannedGrades = new();
     private List<Assignment> ActiveAssignments = new();
     private double ProjectedGrade = 0;
+    private double ProjectedOverallGrade = 0;
 
     private List<ModuleData> Year1Modules = new List<ModuleData>();
     private List<ModuleData> Year2Modules = new List<ModuleData>();
@@ -894,47 +898,60 @@ else
     //---------------------------------------
     private double CalculateModuleGrade(ModuleData module)
     {
-        if (module == null || student == null)
+        if (module == null)
             return 0;
 
-        var course = student.Courses
-            .FirstOrDefault(c =>
-                GetModuleFromCourse(c)?.ModCode == module.ModCode);
+        var assignments = new List<Assignment>();
 
-        if (course == null)
-            return 0;
+        // Real course assignments
+        if (student != null)
+        {
+            var course = student.Courses.FirstOrDefault(c => GetModuleFromCourse(c)?.ModCode == module.ModCode);
+            if (course != null)
+                assignments.AddRange(course.Assignments);
+        }
+
+        // Planned assignments (fallback)
+        if (PlannedModules.TryGetValue(module.ModCode, out var plannedModule))
+        {
+            assignments.AddRange(plannedModule.AssignmentScores.Keys
+                .Select(id => new Assignment
+                {
+                    Id = id,
+                    Weighting = 100 // default 100% for planned if missing
+                }));
+        }
 
         double total = 0;
         double totalWeight = 0;
 
-        foreach (var assignment in course.Assignments)
+        foreach (var assignment in assignments)
         {
             double? score = null;
 
-            // 1. real submission
-            var submission = assignment.Submissions
-                .FirstOrDefault(s => s.StudentId == student.StudentId);
+            // Real submission
+            var submission = student?.Courses
+                .SelectMany(c => c.Assignments)
+                .SelectMany(a => a.Submissions)
+                .FirstOrDefault(s => s.AssignmentId == assignment.Id && s.StudentId == student.StudentId);
 
             if (submission?.Score != null)
-            {
                 score = submission.Score.Value;
-            }
-            // 2. planned fallback
-            else if (PlannedAssignmentScores.TryGetValue(assignment.Id, out var planned))
-            {
+            else if (PlannedModules.TryGetValue(module.ModCode, out var mod) &&
+                     mod.AssignmentScores.TryGetValue(assignment.Id, out var planned))
                 score = planned;
-            }
 
             if (score == null)
                 continue;
 
-            var weight = assignment.Weighting ?? 0;
+            // convert weighting from % to fraction
+            var weightFraction = (assignment.Weighting ?? 100) / 100.0;
 
-            total += score.Value * weight;
-            totalWeight += weight;
+            total += score.Value * weightFraction;
+            totalWeight += weightFraction;
         }
 
-        return totalWeight == 0 ? 0 : total / totalWeight;
+        return totalWeight > 0 ? total / totalWeight : 0;
     }
 
     private double? GetRealSubmissionScore(long assignmentId)
@@ -964,20 +981,23 @@ else
             return;
 
         if (!PlannedModules.ContainsKey(modCode))
-        {
-            PlannedModules[modCode] = new PlannedModuleGrade
-            {
-                ModCode = modCode
-            };
-        }
+            PlannedModules[modCode] = new PlannedModuleGrade { ModCode = modCode };
 
         PlannedModules[modCode].AssignmentScores[assignmentId] = score;
 
+        // Update module-level projected grade
         if (ActiveModule != null)
-        {
             ProjectedGrade = await CalculateOverallGrade(ActiveModule);
-            StateHasChanged();
-        }
+
+        // Update overall projected grade
+        ProjectedOverallGrade = await CalculateOverallDegreeGrade();
+
+        StateHasChanged();
+    }
+    private async Task UpdateProjectedOverallGrade()
+    {
+        ProjectedOverallGrade = await CalculateOverallDegreeGrade();
+        StateHasChanged();
     }
 
     private async Task<double> CalculateOverallGrade(ModuleData module)
@@ -991,16 +1011,17 @@ else
         {
             double? score = null;
 
-            // 1. real submission
+            // 1. use actual submission if it exists
             var real = GetRealSubmissionScore(assignment.Id);
             if (real != null)
             {
                 score = real;
             }
-            // 2. planned fallback
-            else
+            // 2. fallback to planned score
+            else if (PlannedModules.TryGetValue(module.ModCode, out var plannedModule) &&
+                     plannedModule.AssignmentScores.TryGetValue(assignment.Id, out var plannedScore))
             {
-                score = GetPlannedScore(module.ModCode, assignment.Id);
+                score = plannedScore;
             }
 
             if (score == null)
@@ -1087,6 +1108,54 @@ else
         // Planned module → fetch from backend
         return await service.GetAssignmentsByModuleCodeAsync(module.ModCode);
     }
+
+    private double CalculateYearAverage(List<ModuleData> modules)
+    {
+        double totalScore = 0;
+        double totalCredits = 0;
+
+        foreach (var module in modules)
+        {
+            double moduleGrade = CalculateModuleGrade(module); // now includes planned scores
+            int credits = module.Credits;
+
+            totalScore += moduleGrade * credits;
+            totalCredits += credits;
+        }
+
+        return totalCredits > 0 ? totalScore / totalCredits : 0;
+    }
+
+    private async Task<double> CalculateOverallDegreeGrade()
+    {
+        double totalWeightedGrade = 0;
+        double totalCredits = 0;
+
+        // Year 2 weighting: 30%
+        double year2Weight = 0.3;
+        double year3Weight = 0.7;
+
+        // Year 2 modules
+        foreach (var module in Year2Modules)
+        {
+            var grade = await CalculateOverallGrade(module);
+            var credits = module.Credits; // assuming module.Credits is numeric
+            totalWeightedGrade += grade * credits * year2Weight;
+            totalCredits += credits * year2Weight;
+        }
+
+        // Year 3 modules
+        foreach (var module in Year3Modules)
+        {
+            var grade = await CalculateOverallGrade(module);
+            var credits = module.Credits;
+            totalWeightedGrade += grade * credits * year3Weight;
+            totalCredits += credits * year3Weight;
+        }
+
+        return totalCredits > 0 ? totalWeightedGrade / totalCredits : 0;
+    }
+
     //---------------------------------------
     // Navigation and rendering
     //---------------------------------------

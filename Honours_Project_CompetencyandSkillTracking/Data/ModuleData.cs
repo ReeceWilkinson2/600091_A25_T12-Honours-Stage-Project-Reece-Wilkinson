@@ -17,7 +17,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Data
         public string Trimester { get; set; } = "";
         public string SelectionStatus { get; set; } = "";
         public string Level { get; set; } = "";
-        public string Credits { get; set; } = "";
+        public int Credits { get; set; }
         public string ModCode { get; set; } = "";
         public string? VideoLink { get; set; } = "";
         // Navigation
