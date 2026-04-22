@@ -165,17 +165,30 @@
         </h4>
     }
 
-    @if (student?.Submissions != null && student.Submissions.Any())
+@if (student?.Submissions != null && student.Submissions.Any())
+{
+    <div style="border-top:10px">
+    <h4>Current Submissions:</h4>
+        </div>
+    var filtered = student.Submissions
+        .Where(s => s.Assignment?.Course != null &&
+               (s.Assignment.Course.Code.Length > 0 && 
+                (s.Assignment.Course.Code[0] == '5' || // Year 2 (Level 5)
+                 s.Assignment.Course.Code[0] == '6'))) // Year 3 (Level 6)
+        .ToList();
+
+    if (filtered.Any())
     {
         <div class="scrollable-box">
-            @foreach (var submission in student.Submissions)
+            @foreach (var submission in filtered)
             {
                 <ul>
                     <li>
+                        <strong>@submission.Assignment.Course.Name</strong>
+                        <br />
                         <strong>@submission.Assignment.Name</strong>
                         - Score: @submission.Score
                         - Weighting: @submission.Assignment.Weighting%
-                        <br />
                     </li>
                 </ul>
             }
@@ -183,8 +196,13 @@
     }
     else
     {
-        <p>No submissions found.</p>
+        <p>No applicable submissions found.</p>
     }
+}
+else
+{
+    <p>No submissions found.</p>
+}
 }
 
 @code {
