@@ -260,3 +260,11 @@ h1:focus {
         border-radius: 12px;
     }
 }
+
+.scrollable-box {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+}

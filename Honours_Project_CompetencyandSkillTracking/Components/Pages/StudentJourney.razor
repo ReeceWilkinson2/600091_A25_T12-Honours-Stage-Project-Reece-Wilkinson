@@ -37,9 +37,6 @@ else if (SelectedModule == null)
     </div>
 
     <h3>@SelectedCourseName</h3>
-    <div>
-        Overall Degree Grade: @(ProjectedOverallGrade.ToString("F1")) %
-    </div>
     <Tabs>
         <Tab Title="Year 1" Active="true">
             <ChildContent>
@@ -489,51 +486,19 @@ else if (SelectedCompetency == null)
         }
 
     }
-    <h4 style="margin-top:30px">Planned Grades (What-if Calculator)</h4>
 
-    @if (ActiveModule != null && student != null)
+    @if (!string.IsNullOrWhiteSpace(ActiveModule?.VideoLink))
     {
-        if (ActiveAssignments.Any())
-        {
-            @foreach (var assignment in ActiveAssignments)
-            {
-                var realScore = GetRealSubmissionScore(assignment.Id);
+        <div style="margin-bottom:20px">
+            <h4>Module Introduction:</h4>
 
-                <div style="margin-bottom:10px; padding:10px; border:1px solid #ddd;">
-                    <strong>@assignment.Name</strong>
-                    <span> (Weight: @assignment.Weighting%)</span>
-
-                    <br />
-
-                    @if (realScore != null)
-                    {
-                        <span style="color:green;">
-                            ✔ Submitted Score: @realScore
-                        </span>
-                    }
-                    else
-                    {
-                        <label>Predicted Score:</label>
-
-                        <input type="number"
-                               min="0"
-                               max="100"
-                               step="0.1"
-                               value="@(GetPlannedScore(ActiveModule.ModCode, assignment.Id) ?? 0)"
-                               @onchange="async (e) => await SetPlannedScore(ActiveModule.ModCode, assignment.Id, e.Value)" />
-                    }
-                </div>
-            }
-
-            <div style="margin-top:15px; font-weight:bold;">
-                Projected Overall Grade:
-                @ProjectedGrade.ToString("F1")%
-            </div>
-        }
-        else
-        {
-            <p>No assignments found for this module.</p>
-        }
+            <iframe src="@ActiveModule.VideoLink"
+                    width="560"
+                    height="315"
+                    style="border:0"
+                    allowfullscreen>
+            </iframe>
+        </div>
     }
 }
 else
@@ -593,12 +558,6 @@ else
     private HashSet<string> FilterCompetencyModuleCodes = new();
     private HashSet<string> TempSelectedModules = new();
 
-    private Dictionary<long, double> PlannedAssignmentScores = new();
-    Dictionary<string, PlannedModuleGrade> PlannedModules = new();
-    private Dictionary<long, double> PlannedGrades = new();
-    private List<Assignment> ActiveAssignments = new();
-    private double ProjectedGrade = 0;
-    private double ProjectedOverallGrade = 0;
 
     private List<ModuleData> Year1Modules = new List<ModuleData>();
     private List<ModuleData> Year2Modules = new List<ModuleData>();
@@ -611,6 +570,23 @@ else
         { "662253", "662086" }  // Natural Language Processing needs Machine Learning
     };
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (string.IsNullOrEmpty(AuthState.UserId))
+            return;
+
+        student = await service.GetUserByIdAsync(AuthState.UserId);
+
+        StateHasChanged();
+    }
+
+    private void GoToFullView()
+    {
+        NavigationManager.NavigateTo("/studentjourneyfull");
+    }
+
     private async Task SelectCourse(string courseName)
     {
         SelectedCourse = courseName;
@@ -621,6 +597,32 @@ else
         Year3Modules = await service.GetModuleDataAsync(courseName, "6");
 
         AllCompetencies = await competencyService.GetAllCompetenciesAsync();
+    }
+
+    private void ClearSelection()
+    {
+        SelectedCourse = null;
+        SelectedCourseName = null;
+        SelectedModule = null;
+        SelectedCompetency = null;
+
+        SelectedCompetencyFilterId = null;
+        FilterCompetency = null;
+        FilterCompetencyModuleCodes.Clear();
+
+        Year1Modules.Clear();
+        Year2Modules.Clear();
+        Year3Modules.Clear();
+    }
+
+    private void ClearSelection2()
+    {
+        SelectedCompetency = null;
+        SelectedModule = null;
+
+        SelectedCompetencyFilterId = null;
+        FilterCompetency = null;
+        FilterCompetencyModuleCodes.Clear();
     }
 
     private void OnCompetencyFilterChanged(ChangeEventArgs e)
@@ -639,17 +641,62 @@ else
         }
     }
 
+    private string GetModuleButtonClass(ModuleData module)
+    {
+        var baseClass = "module-button";
+
+        var isHighlighted = FilterCompetencyModuleCodes.Contains(module.ModCode);
+        var isRestricted = IsModuleRestricted(module);
+        var isEnrolled = IsEffectivelyEnrolled(module);
+
+        if (isHighlighted)
+        {
+            baseClass += " module-button-highlight";
+        }
+        else if (!isEnrolled)
+        {
+            baseClass += " module-button-greyed";
+        }
+
+        if (isRestricted)
+        {
+            baseClass += " module-button-restricted";
+        }
+
+        return baseClass;
+    }
+
     private async Task LoadModuleDetails(ModuleData module)
     {
         ActiveModule = module;
         SelectedModule = module.ModuleName;
         SelectedModuleName = module.ModuleName;
         SelectedModuleCompetencies = await competencyService.GetCompetenciesByModuleAsync(module.ModCode);
+    }
 
-        ActiveAssignments = await GetAssignmentsForModule(module);
-        ProjectedGrade = await CalculateOverallGrade(module);
+    private List<Submission> GetRelevantSubmissionsForModule()
+    {
+        if (student == null || ActiveModule == null)
+            return new List<Submission>();
 
-        StateHasChanged();
+        var targetModCode = ActiveModule.ModCode?.Trim();
+        if (string.IsNullOrWhiteSpace(targetModCode))
+            return new List<Submission>();
+
+        return student.Submissions
+            .Where(sub =>
+            {
+                var courseCode = sub.Assignment?.Course?.Code;
+                if (string.IsNullOrWhiteSpace(courseCode))
+                    return false;
+
+                // Extract the "module" part from the Canvas course code
+                var submissionModCode = courseCode.Split('_')[0].Trim();
+
+                // Compare submission’s module code to the selected module’s ModCode
+                return string.Equals(submissionModCode,targetModCode,StringComparison.OrdinalIgnoreCase);
+            })
+            .ToList();
     }
 
     private bool IsStudentEnrolledInModule(ModuleData module)
@@ -715,6 +762,29 @@ else
         return string.Empty;
     }
 
+    private int GetMaxOptionalSelections(string year, string trimester)
+    {
+        return (year, trimester) switch
+        {
+            ("5", "T1") => 1,
+            ("5", "T2") => 2,
+            ("6", "T1") => 2,
+            ("6", "T2") => 2,
+            _ => 0
+        };
+    }
+
+    private string GetYearFromLevel(ModuleData module)
+    {
+        return module.Level switch
+        {
+            "4" => "1",
+            "5" => "2",
+            "6" => "3",
+            _ => ""
+        };
+    }
+
     private int CountTotalSelectionsForTrimester(string level, string trimester)
     {
         int enrolled = student?.Courses.Count(course =>
@@ -777,11 +847,9 @@ else
             return;
         }
 
-        // Year-long rule (Core OR Elective)
         if (IsYearLongModule(module) && HasSelectedYearLongModule(level))
             return;
 
-        // Trimester rule (max 2)
         var current = CountTotalSelectionsForTrimester(level, trimester);
         if (current >= 2)
             return;
@@ -800,409 +868,22 @@ else
         var level = module.Level;
         var trimester = module.Trimester;
 
-        // Always allow removing
         if (TempSelectedModules.Contains(module.ModCode))
             return true;
 
-        // Year-long rule
         if (IsYearLongModule(module) && HasSelectedYearLongModule(level))
             return false;
 
-        // Trimester rule
         var current = CountTotalSelectionsForTrimester(level, trimester);
         return current < 2;
     }
-
-    private ModuleData? GetModuleFromCourse(Course course)
-    {
-        if (course == null || string.IsNullOrWhiteSpace(course.Code))
-            return null;
-
-        var modCode = ExtractModCodeFromCourse(course.Code);
-
-        return Year1Modules
-            .Concat(Year2Modules)
-            .Concat(Year3Modules)
-            .FirstOrDefault(m => m.ModCode == modCode);
-    }
-    //---------------------------------------
-    // Getters
-    //---------------------------------------
-    private string GetModuleButtonClass(ModuleData module)
-    {
-        var baseClass = "module-button";
-
-        var isHighlighted = FilterCompetencyModuleCodes.Contains(module.ModCode);
-        var isRestricted = IsModuleRestricted(module);
-        var isEnrolled = IsEffectivelyEnrolled(module);
-
-        if (isHighlighted)
-        {
-            baseClass += " module-button-highlight";
-        }
-        else if (!isEnrolled)
-        {
-            baseClass += " module-button-greyed";
-        }
-
-        if (isRestricted)
-        {
-            baseClass += " module-button-restricted";
-        }
-
-        return baseClass;
-    }
-
-    private List<Submission> GetRelevantSubmissionsForModule()
-    {
-        if (student == null || ActiveModule == null)
-            return new List<Submission>();
-
-        var modCode = ActiveModule.ModCode;
-
-        return student.Submissions
-            .Where(sub =>
-                sub.Assignment != null &&
-                sub.Assignment.Course != null &&
-                !string.IsNullOrWhiteSpace(sub.Assignment.Course.Code) &&
-                ExtractModCodeFromCourse(sub.Assignment.Course.Code) == modCode)
-            .ToList();
-    }
-
-    private int GetMaxOptionalSelections(string year, string trimester)
-    {
-        return (year, trimester) switch
-        {
-            ("5", "T1") => 1,
-            ("5", "T2") => 2,
-            ("6", "T1") => 2,
-            ("6", "T2") => 2,
-            _ => 0
-        };
-    }
-
-    private string GetYearFromLevel(ModuleData module)
-    {
-        return module.Level switch
-        {
-            "4" => "1",
-            "5" => "2",
-            "6" => "3",
-            _ => ""
-        };
-    }
-
-
-    //---------------------------------------
-    // Grade calcs
-    //---------------------------------------
-    private double CalculateModuleGrade(ModuleData module)
-    {
-        if (module == null)
-            return 0;
-
-        var assignments = new List<Assignment>();
-
-        // Real course assignments
-        if (student != null)
-        {
-            var course = student.Courses.FirstOrDefault(c => GetModuleFromCourse(c)?.ModCode == module.ModCode);
-            if (course != null)
-                assignments.AddRange(course.Assignments);
-        }
-
-        // Planned assignments (fallback)
-        if (PlannedModules.TryGetValue(module.ModCode, out var plannedModule))
-        {
-            assignments.AddRange(plannedModule.AssignmentScores.Keys
-                .Select(id => new Assignment
-                {
-                    Id = id,
-                    Weighting = 100 // default 100% for planned if missing
-                }));
-        }
-
-        double total = 0;
-        double totalWeight = 0;
-
-        foreach (var assignment in assignments)
-        {
-            double? score = null;
-
-            // Real submission
-            var submission = student?.Courses
-                .SelectMany(c => c.Assignments)
-                .SelectMany(a => a.Submissions)
-                .FirstOrDefault(s => s.AssignmentId == assignment.Id && s.StudentId == student.StudentId);
-
-            if (submission?.Score != null)
-                score = submission.Score.Value;
-            else if (PlannedModules.TryGetValue(module.ModCode, out var mod) &&
-                     mod.AssignmentScores.TryGetValue(assignment.Id, out var planned))
-                score = planned;
-
-            if (score == null)
-                continue;
-
-            // convert weighting from % to fraction
-            var weightFraction = (assignment.Weighting ?? 100) / 100.0;
-
-            total += score.Value * weightFraction;
-            totalWeight += weightFraction;
-        }
-
-        return totalWeight > 0 ? total / totalWeight : 0;
-    }
-
-    private double? GetRealSubmissionScore(long assignmentId)
-    {
-        return student?.Courses
-            .SelectMany(c => c.Assignments)
-            .SelectMany(a => a.Submissions)
-            .FirstOrDefault(s =>
-                s.AssignmentId == assignmentId &&
-                s.StudentId == student.StudentId)
-            ?.Score;
-    }
-
-    private double? GetPlannedScore(string modCode, long assignmentId)
-    {
-        if (PlannedModules.TryGetValue(modCode, out var module))
-        {
-            if (module.AssignmentScores.TryGetValue(assignmentId, out var score))
-                return score;
-        }
-        return null;
-    }
-
-    private async Task SetPlannedScore(string modCode, long assignmentId, object? value)
-    {
-        if (!double.TryParse(value?.ToString(), out var score))
-            return;
-
-        if (!PlannedModules.ContainsKey(modCode))
-            PlannedModules[modCode] = new PlannedModuleGrade { ModCode = modCode };
-
-        PlannedModules[modCode].AssignmentScores[assignmentId] = score;
-
-        // Update module-level projected grade
-        if (ActiveModule != null)
-            ProjectedGrade = await CalculateOverallGrade(ActiveModule);
-
-        // Update overall projected grade
-        ProjectedOverallGrade = await CalculateOverallDegreeGrade();
-
-        StateHasChanged();
-    }
-    private async Task UpdateProjectedOverallGrade()
-    {
-        ProjectedOverallGrade = await CalculateOverallDegreeGrade();
-        StateHasChanged();
-    }
-
-    private async Task<double> CalculateOverallGrade(ModuleData module)
-    {
-        var assignments = await GetAssignmentsForModule(module);
-
-        double total = 0;
-        double totalWeight = 0;
-
-        foreach (var assignment in assignments)
-        {
-            double? score = null;
-
-            // 1. use actual submission if it exists
-            var real = GetRealSubmissionScore(assignment.Id);
-            if (real != null)
-            {
-                score = real;
-            }
-            // 2. fallback to planned score
-            else if (PlannedModules.TryGetValue(module.ModCode, out var plannedModule) &&
-                     plannedModule.AssignmentScores.TryGetValue(assignment.Id, out var plannedScore))
-            {
-                score = plannedScore;
-            }
-
-            if (score == null)
-                continue;
-
-            var weight = assignment.Weighting ?? 0;
-
-            total += score.Value * weight;
-            totalWeight += weight;
-        }
-
-        return totalWeight > 0 ? total / totalWeight : 0;
-    }
-
-    private double GetAssignmentProjectedScore(long assignmentId)
-    {
-        var submission = student?.Courses
-            .SelectMany(c => c.Assignments)
-            .SelectMany(a => a.Submissions)
-            .FirstOrDefault(s => s.StudentId == student.StudentId && s.AssignmentId == assignmentId);
-
-        if (submission?.Score != null)
-            return submission.Score.Value;
-
-        return PlannedAssignmentScores.TryGetValue(assignmentId, out var planned)
-            ? planned
-            : 0;
-    }
-
-    private double GetPlannedScore(long assignmentId)
-    {
-        return PlannedAssignmentScores.TryGetValue(assignmentId, out var value)
-            ? value
-            : 0;
-    }
-
-    private void SetPlannedScore(long assignmentId, object? value)
-    {
-        if (value == null)
-            return;
-
-        if (double.TryParse(value.ToString(), out var score))
-        {
-            PlannedAssignmentScores[assignmentId] = score;
-        }
-    }
-
-    private List<Assignment> GetAllAssignmentsForModule()
-    {
-        if (student == null || ActiveModule == null)
-            return new List<Assignment>();
-
-        var modCode = ActiveModule.ModCode;
-
-        // Find matching courses for this module
-        var matchingCourses = student.Courses
-            .Where(c => ExtractModCodeFromCourse(c.Code) == modCode)
-            .ToList();
-
-        // Get ALL assignments from those courses
-        return matchingCourses
-            .SelectMany(c => c.Assignments)
-            .ToList();
-    }
-
-    private void OnPlannedGradeChanged(long assignmentId, object? value)
-    {
-        if (double.TryParse(value?.ToString(), out var grade))
-        {
-            PlannedGrades[assignmentId] = grade;
-        }
-    }
-
-    private async Task<List<Assignment>> GetAssignmentsForModule(ModuleData module)
-    {
-        if (student != null && IsStudentEnrolledInModule(module))
-        {
-            return student.Courses
-                .Where(c => ExtractModCodeFromCourse(c.Code) == module.ModCode)
-                .SelectMany(c => c.Assignments)
-                .ToList();
-        }
-
-        // Planned module → fetch from backend
-        return await service.GetAssignmentsByModuleCodeAsync(module.ModCode);
-    }
-
-    private double CalculateYearAverage(List<ModuleData> modules)
-    {
-        double totalScore = 0;
-        double totalCredits = 0;
-
-        foreach (var module in modules)
-        {
-            double moduleGrade = CalculateModuleGrade(module); // now includes planned scores
-            int credits = module.Credits;
-
-            totalScore += moduleGrade * credits;
-            totalCredits += credits;
-        }
-
-        return totalCredits > 0 ? totalScore / totalCredits : 0;
-    }
-
-    private async Task<double> CalculateOverallDegreeGrade()
-    {
-        double totalWeightedGrade = 0;
-        double totalCredits = 0;
-
-        // Year 2 weighting: 30%
-        double year2Weight = 0.3;
-        double year3Weight = 0.7;
-
-        // Year 2 modules
-        foreach (var module in Year2Modules)
-        {
-            var grade = await CalculateOverallGrade(module);
-            var credits = module.Credits; // assuming module.Credits is numeric
-            totalWeightedGrade += grade * credits * year2Weight;
-            totalCredits += credits * year2Weight;
-        }
-
-        // Year 3 modules
-        foreach (var module in Year3Modules)
-        {
-            var grade = await CalculateOverallGrade(module);
-            var credits = module.Credits;
-            totalWeightedGrade += grade * credits * year3Weight;
-            totalCredits += credits * year3Weight;
-        }
-
-        return totalCredits > 0 ? totalWeightedGrade / totalCredits : 0;
-    }
-
-    //---------------------------------------
-    // Navigation and rendering
-    //---------------------------------------
 
     private void NavigateToCompetencyProgress()
     {
         if (SelectedCompetency != null)
         {
-            // Navigate to the studentprogressviewer page with CompetencyID as a query parameter
             NavigationManager.NavigateTo($"/studentprogressviewer?competencyId={SelectedCompetency.CompetencyCode}");
         }
-    }
-
-    private void GoToFullView()
-    {
-        NavigationManager.NavigateTo("/studentjourneyfull");
-    }
-
-    private void ClearSelection()
-    {
-        SelectedCourse = null;
-        SelectedCourseName = null;
-        SelectedModule = null;
-        SelectedCompetency = null;
-
-        SelectedCompetencyFilterId = null;
-        FilterCompetency = null;
-        FilterCompetencyModuleCodes.Clear();
-
-        Year1Modules.Clear();
-        Year2Modules.Clear();
-        Year3Modules.Clear();
-    }
-
-    private void ClearSelection2()
-    {
-        SelectedCompetency = null;
-        SelectedModule = null;
-
-        SelectedCompetencyFilterId = null;
-        FilterCompetency = null;
-        FilterCompetencyModuleCodes.Clear();
-    }
-
-    private void LoadCompetencyDetails(CompetencyData competency)
-    {
-        SelectedCompetency = competency;
     }
 
     protected override async Task OnInitializedAsync()
@@ -1210,15 +891,8 @@ else
         await AuthState.InitializeAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private void LoadCompetencyDetails(CompetencyData competency)
     {
-        if (!firstRender) return;
-
-        if (string.IsNullOrEmpty(AuthState.UserId))
-            return;
-
-        student = await service.GetUserByIdAsync(AuthState.UserId);
-
-        StateHasChanged();
+        SelectedCompetency = competency;
     }
 }

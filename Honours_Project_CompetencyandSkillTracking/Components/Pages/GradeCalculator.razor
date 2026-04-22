@@ -1,6 +1,7 @@
 ﻿@page "/gradecalculator"
 @rendermode InteractiveServer
 @inject UserService service
+@inject AuthStateService AuthState
 
 <h3>Grade Calculator</h3>
 
@@ -21,7 +22,9 @@
     <h4>Year 2 Modules (30%)</h4>
 
     <label>Core Module:</label>
-    <select class="form-select mb-2" @bind="SelectedYear2CoreModule">
+    <select class="form-select mb-2"
+            value="@Year2Core.ModuleName"
+            @onchange="e => Year2Core.ModuleName = e.Value?.ToString()">
         <option value="">-- Select Core --</option>
         @foreach (var m in Year2Modules.Where(x => x.SelectionStatus == "Core"))
         {
@@ -29,42 +32,54 @@
         }
     </select>
 
-    @if (!string.IsNullOrEmpty(SelectedYear2CoreModule))
+    @if (!string.IsNullOrEmpty(Year2Core.ModuleName))
     {
-        @RenderAssignments(SelectedYear2CoreModule)
+        @RenderAssignments(Year2Core)
     }
 
-    <h5>Year 2 - T1</h5>
-    @for (int i = 0; i < 2; i++)
+    <h5>T1</h5>
+    @for (int i = 0; i < Year2T1.Count; i++)
     {
-        <select class="form-select mb-2" @bind="SelectedYear2T1[i]">
+        var module = Year2T1[i];
+
+        <select class="form-select mb-2"
+                value="@module.ModuleName"
+                @onchange="e => module.ModuleName = e.Value?.ToString()">
             <option value="">-- Module --</option>
-            @foreach (var m in Year2Modules.Where(x => (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional") && x.Trimester == "T1"))
+            @foreach (var m in Year2Modules.Where(x =>
+                (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional")
+                && x.Trimester == "T1"))
             {
                 <option value="@m.ModuleName">@m.ModuleName</option>
             }
         </select>
 
-        @if (!string.IsNullOrEmpty(SelectedYear2T1[i]))
+        @if (!string.IsNullOrEmpty(module.ModuleName))
         {
-            @RenderAssignments(SelectedYear2T1[i])
+            @RenderAssignments(module)
         }
     }
 
-    <h5>Year 2 - T2</h5>
-    @for (int i = 0; i < 2; i++)
+    <h5>T2</h5>
+    @for (int i = 0; i < Year2T2.Count; i++)
     {
-        <select class="form-select mb-2" @bind="SelectedYear2T2[i]">
+        var module = Year2T2[i];
+
+        <select class="form-select mb-2"
+                value="@module.ModuleName"
+                @onchange="e => module.ModuleName = e.Value?.ToString()">
             <option value="">-- Module --</option>
-            @foreach (var m in Year2Modules.Where(x => (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional") && x.Trimester == "T2"))
+            @foreach (var m in Year2Modules.Where(x =>
+                (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional")
+                && x.Trimester == "T2"))
             {
                 <option value="@m.ModuleName">@m.ModuleName</option>
             }
         </select>
 
-        @if (!string.IsNullOrEmpty(SelectedYear2T2[i]))
+        @if (!string.IsNullOrEmpty(module.ModuleName))
         {
-            @RenderAssignments(SelectedYear2T2[i])
+            @RenderAssignments(module)
         }
     }
 
@@ -73,7 +88,9 @@
     <h4>Year 3 Modules (70%)</h4>
 
     <label>Elective Module:</label>
-    <select class="form-select mb-2" @bind="SelectedYear3Elective">
+    <select class="form-select mb-2"
+            value="@Year3Elective.ModuleName"
+            @onchange="e => Year3Elective.ModuleName = e.Value?.ToString()">
         <option value="">-- Select Elective --</option>
         @foreach (var m in Year3Modules.Where(x => x.SelectionStatus == "Elective"))
         {
@@ -81,42 +98,54 @@
         }
     </select>
 
-    @if (!string.IsNullOrEmpty(SelectedYear3Elective))
+    @if (!string.IsNullOrEmpty(Year3Elective.ModuleName))
     {
-        @RenderAssignments(SelectedYear3Elective)
+        @RenderAssignments(Year3Elective)
     }
 
-    <h5>Year 3 - T1</h5>
-    @for (int i = 0; i < 2; i++)
+    <h5>T1</h5>
+    @for (int i = 0; i < Year3T1.Count; i++)
     {
-        <select class="form-select mb-2" @bind="SelectedYear3T1[i]">
+        var module = Year3T1[i];
+
+        <select class="form-select mb-2"
+                value="@module.ModuleName"
+                @onchange="e => module.ModuleName = e.Value?.ToString()">
             <option value="">-- Module --</option>
-            @foreach (var m in Year3Modules.Where(x => (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional") && x.Trimester == "T1"))
+            @foreach (var m in Year3Modules.Where(x =>
+                (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional")
+                && x.Trimester == "T1"))
             {
                 <option value="@m.ModuleName">@m.ModuleName</option>
             }
         </select>
 
-        @if (!string.IsNullOrEmpty(SelectedYear3T1[i]))
+        @if (!string.IsNullOrEmpty(module.ModuleName))
         {
-            @RenderAssignments(SelectedYear3T1[i])
+            @RenderAssignments(module)
         }
     }
 
-    <h5>Year 3 - T2</h5>
-    @for (int i = 0; i < 2; i++)
+    <h5>T2</h5>
+    @for (int i = 0; i < Year3T2.Count; i++)
     {
-        <select class="form-select mb-2" @bind="SelectedYear3T2[i]">
+        var module = Year3T2[i];
+
+        <select class="form-select mb-2"
+                value="@module.ModuleName"
+                @onchange="e => module.ModuleName = e.Value?.ToString()">
             <option value="">-- Module --</option>
-            @foreach (var m in Year3Modules.Where(x => (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional") && x.Trimester == "T2"))
+            @foreach (var m in Year3Modules.Where(x =>
+                (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional")
+                && x.Trimester == "T2"))
             {
                 <option value="@m.ModuleName">@m.ModuleName</option>
             }
         </select>
 
-        @if (!string.IsNullOrEmpty(SelectedYear3T2[i]))
+        @if (!string.IsNullOrEmpty(module.ModuleName))
         {
-            @RenderAssignments(SelectedYear3T2[i])
+            @RenderAssignments(module)
         }
     }
 
@@ -133,31 +162,63 @@
     {
         <h4 class="mt-2">Final Grade: @FinalGrade.Value.ToString("0.00")%</h4>
     }
+
+    @if (student?.Submissions != null && student.Submissions.Any())
+    {
+        <div class="scrollable-box">
+            @foreach (var submission in student.Submissions)
+            {
+                <ul>
+                    <li>
+                        <strong>@submission.Assignment.Name</strong>
+                        - Score: @submission.Score
+                        - Weighting: @submission.Assignment.Weighting%
+                        <br />
+                    </li>
+                </ul>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No submissions found.</p>
+    }
 }
 
 @code {
-
+    private User? student;
     private List<string> Courses = new();
     private List<ModuleData> Year2Modules = new();
     private List<ModuleData> Year3Modules = new();
     private string? SelectedCourse;
 
-    private string? SelectedYear2CoreModule;
+    private List<ModuleSelection> Year2T1 = new() { new(), new() };
+    private List<ModuleSelection> Year2T2 = new() { new(), new() };
+    private ModuleSelection Year2Core = new();
 
-    private List<string?> SelectedYear2T1 = new() { null, null };
-    private List<string?> SelectedYear2T2 = new() { null, null };
-
-    private string? SelectedYear3Elective;
-    private List<string?> SelectedYear3T1 = new() { null, null };
-    private List<string?> SelectedYear3T2 = new() { null, null };
-
-    private Dictionary<string, List<AssignmentInput>> ModuleAssignments = new();
+    private List<ModuleSelection> Year3T1 = new() { new(), new() };
+    private List<ModuleSelection> Year3T2 = new() { new(), new() };
+    private ModuleSelection Year3Elective = new();
 
     private decimal? FinalGrade;
     private string? CalculationError;
 
     protected override async Task OnInitializedAsync()
     {
+        await AuthState.InitializeAsync();
+
+        if (!AuthState.IsInitialized || string.IsNullOrEmpty(AuthState.UserId))
+        {
+            return;
+        }
+
+        student = await service.GetUserByIdAsync(AuthState.UserId);
+
+        if (student != null)
+        {
+            student.Submissions = student.Submissions ?? new List<Submission>();
+        }
+
         Courses = await service.GetAllCourseTitlesAsync();
     }
 
@@ -169,32 +230,30 @@
         {
             Year2Modules = await service.GetModuleDataAsync(SelectedCourse, "5");
             Year3Modules = await service.GetModuleDataAsync(SelectedCourse, "6");
-            ModuleAssignments.Clear();
+
+            Year2T1 = new() { new(), new() };
+            Year2T2 = new() { new(), new() };
+            Year3T1 = new() { new(), new() };
+            Year3T2 = new() { new(), new() };
+            Year2Core = new();
+            Year3Elective = new();
         }
     }
 
-    private void EnsureModule(string module)
+    public class ModuleSelection
     {
-        if (!ModuleAssignments.ContainsKey(module))
-            ModuleAssignments[module] = new List<AssignmentInput> { new() };
+        public string? ModuleName { get; set; }
+        public List<AssignmentInput> Assignments { get; set; } = new();
     }
 
-    private void AddAssignment(string module)
+    public class AssignmentInput
     {
-        EnsureModule(module);
-        ModuleAssignments[module].Add(new AssignmentInput());
+        public string Name { get; set; } = "";
+        public decimal Score { get; set; }
+        public decimal Weighting { get; set; }
     }
 
-    private void RemoveAssignment(string module, int index)
-    {
-        if (ModuleAssignments.ContainsKey(module))
-        {
-            if (index >= 0 && index < ModuleAssignments[module].Count)
-                ModuleAssignments[module].RemoveAt(index);
-        }
-    }
-
-    private decimal? CalculateModuleGrade(List<AssignmentInput>? assignments)
+    private decimal? CalculateModuleGrade(List<AssignmentInput> assignments)
     {
         if (assignments == null || assignments.Count == 0)
             return null;
@@ -205,26 +264,18 @@
         return assignments.Sum(a => a.Score * (a.Weighting / 100m));
     }
 
-    private decimal? GetModuleGrade(string module)
-    {
-        if (!ModuleAssignments.ContainsKey(module))
-            return null;
-
-        return CalculateModuleGrade(ModuleAssignments[module]);
-    }
-
-    private decimal? CalculateYear(List<ModuleData> modules, List<string?> selected)
+    private decimal? CalculateYear(List<ModuleData> modules, List<ModuleSelection> selected)
     {
         decimal totalCredits = 0;
         decimal weighted = 0;
 
-        foreach (var name in selected)
+        foreach (var sel in selected)
         {
-            if (string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(sel.ModuleName))
                 return null;
 
-            var mod = modules.FirstOrDefault(m => m.ModuleName == name);
-            var grade = GetModuleGrade(name);
+            var mod = modules.FirstOrDefault(m => m.ModuleName == sel.ModuleName);
+            var grade = CalculateModuleGrade(sel.Assignments);
 
             if (mod == null || grade == null)
                 return null;
@@ -240,17 +291,8 @@
     {
         CalculationError = null;
 
-        var y2 = SelectedYear2T1
-            .Concat(SelectedYear2T2)
-            .Append(SelectedYear2CoreModule)
-            .Where(x => !string.IsNullOrEmpty(x))
-            .ToList();
-
-        var y3 = SelectedYear3T1
-            .Concat(SelectedYear3T2)
-            .Append(SelectedYear3Elective)
-            .Where(x => !string.IsNullOrEmpty(x))
-            .ToList();
+        var y2 = Year2T1.Concat(Year2T2).Append(Year2Core).ToList();
+        var y3 = Year3T1.Concat(Year3T2).Append(Year3Elective).ToList();
 
         var y2Avg = CalculateYear(Year2Modules, y2);
         var y3Avg = CalculateYear(Year3Modules, y3);
@@ -265,41 +307,43 @@
         FinalGrade = (y2Avg * 0.30m) + (y3Avg * 0.70m);
     }
 
-    public class AssignmentInput
+    private RenderFragment RenderAssignments(ModuleSelection module) => builder =>
     {
-        public string Name { get; set; } = "";
-        public decimal Score { get; set; }
-        public decimal Weighting { get; set; }
-    }
-
-    private RenderFragment RenderAssignments(string moduleName) => builder =>
-    {
-        EnsureModule(moduleName);
-        var list = ModuleAssignments[moduleName];
-
         int seq = 0;
+
+        if (!module.Assignments.Any())
+            module.Assignments.Add(new AssignmentInput());
 
         builder.OpenElement(seq++, "div");
 
-        for (int i = 0; i < list.Count; i++)
+        for (int i = 0; i < module.Assignments.Count; i++)
         {
-            var item = list[i];
+            var item = module.Assignments[i];
 
             builder.OpenElement(seq++, "div");
             builder.AddAttribute(seq++, "class", "d-flex gap-2 mb-2");
 
+            builder.OpenElement(seq++, "label");
+            builder.AddAttribute(seq++, "class", "form-label");
+            builder.AddContent(seq++, "Assignment Name:");
+            builder.CloseElement();
+
             builder.OpenElement(seq++, "input");
             builder.AddAttribute(seq++, "class", "form-control");
-            builder.AddAttribute(seq++, "placeholder", "Name");
             builder.AddAttribute(seq++, "value", item.Name);
             builder.AddAttribute(seq++, "oninput",
-                EventCallback.Factory.Create<ChangeEventArgs>(this, e => item.Name = e.Value?.ToString() ?? ""));
+                EventCallback.Factory.Create<ChangeEventArgs>(this,
+                    e => item.Name = e.Value?.ToString() ?? ""));
+            builder.CloseElement();
+
+            builder.OpenElement(seq++, "label");
+            builder.AddAttribute(seq++, "class", "form-label");
+            builder.AddContent(seq++, "Score:");
             builder.CloseElement();
 
             builder.OpenElement(seq++, "input");
             builder.AddAttribute(seq++, "type", "number");
             builder.AddAttribute(seq++, "class", "form-control");
-            builder.AddAttribute(seq++, "placeholder", "Score");
             builder.AddAttribute(seq++, "value", item.Score);
             builder.AddAttribute(seq++, "oninput",
                 EventCallback.Factory.Create<ChangeEventArgs>(this, e =>
@@ -309,10 +353,14 @@
                 }));
             builder.CloseElement();
 
+            builder.OpenElement(seq++, "label");
+            builder.AddAttribute(seq++, "class", "form-label");
+            builder.AddContent(seq++, "Weighting:");
+            builder.CloseElement();
+
             builder.OpenElement(seq++, "input");
             builder.AddAttribute(seq++, "type", "number");
             builder.AddAttribute(seq++, "class", "form-control");
-            builder.AddAttribute(seq++, "placeholder", "%");
             builder.AddAttribute(seq++, "value", item.Weighting);
             builder.AddAttribute(seq++, "oninput",
                 EventCallback.Factory.Create<ChangeEventArgs>(this, e =>
@@ -325,7 +373,7 @@
             builder.OpenElement(seq++, "button");
             builder.AddAttribute(seq++, "class", "btn btn-danger");
             builder.AddAttribute(seq++, "onclick",
-                EventCallback.Factory.Create(this, () => RemoveAssignment(moduleName, i)));
+                EventCallback.Factory.Create(this, () => module.Assignments.Remove(item)));
             builder.AddContent(seq++, "X");
             builder.CloseElement();
 
@@ -335,11 +383,11 @@
         builder.OpenElement(seq++, "button");
         builder.AddAttribute(seq++, "class", "btn btn-success");
         builder.AddAttribute(seq++, "onclick",
-            EventCallback.Factory.Create(this, () => AddAssignment(moduleName)));
+            EventCallback.Factory.Create(this, () => module.Assignments.Add(new AssignmentInput())));
         builder.AddContent(seq++, "Add Assignment");
         builder.CloseElement();
 
-        var total = list.Sum(x => x.Weighting);
+        var total = module.Assignments.Sum(x => x.Weighting);
 
         builder.OpenElement(seq++, "div");
         builder.AddContent(seq++, $"Total Weighting: {total}%");
