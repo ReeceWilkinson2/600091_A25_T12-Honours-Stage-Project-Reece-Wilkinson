@@ -155,5 +155,13 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
                             a.Course.Code.StartsWith(modCode))
                 .ToListAsync();
         }
+
+        public async Task<List<string>> GetAllCourseTitlesAsync()
+        {
+            return await _db.ModulesCSV
+                .Select(m => m.Title)
+                .Distinct()
+                .ToListAsync();
+        }
     }
 }

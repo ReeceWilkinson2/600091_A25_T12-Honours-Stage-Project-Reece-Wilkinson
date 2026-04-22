@@ -1,0 +1,358 @@
+﻿@page "/gradecalculator"
+@rendermode InteractiveServer
+@inject UserService service
+
+<h3>Grade Calculator</h3>
+
+@if (Courses.Any())
+{
+    <label>Select Course:</label>
+    <select @onchange="OnCourseChanged" class="form-select mb-3">
+        <option value="">-- Select Course --</option>
+        @foreach (var course in Courses)
+        {
+            <option value="@course">@course</option>
+        }
+    </select>
+}
+
+@if (!string.IsNullOrEmpty(SelectedCourse))
+{
+    <h4>Year 2 Modules (30%)</h4>
+
+    <label>Core Module:</label>
+    <select class="form-select mb-2" @bind="SelectedYear2CoreModule">
+        <option value="">-- Select Core --</option>
+        @foreach (var m in Year2Modules.Where(x => x.SelectionStatus == "Core"))
+        {
+            <option value="@m.ModuleName">@m.ModuleName</option>
+        }
+    </select>
+
+    @if (!string.IsNullOrEmpty(SelectedYear2CoreModule))
+    {
+        @RenderAssignments(SelectedYear2CoreModule)
+    }
+
+    <h5>Year 2 - T1</h5>
+    @for (int i = 0; i < 2; i++)
+    {
+        <select class="form-select mb-2" @bind="SelectedYear2T1[i]">
+            <option value="">-- Module --</option>
+            @foreach (var m in Year2Modules.Where(x => (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional") && x.Trimester == "T1"))
+            {
+                <option value="@m.ModuleName">@m.ModuleName</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrEmpty(SelectedYear2T1[i]))
+        {
+            @RenderAssignments(SelectedYear2T1[i])
+        }
+    }
+
+    <h5>Year 2 - T2</h5>
+    @for (int i = 0; i < 2; i++)
+    {
+        <select class="form-select mb-2" @bind="SelectedYear2T2[i]">
+            <option value="">-- Module --</option>
+            @foreach (var m in Year2Modules.Where(x => (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional") && x.Trimester == "T2"))
+            {
+                <option value="@m.ModuleName">@m.ModuleName</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrEmpty(SelectedYear2T2[i]))
+        {
+            @RenderAssignments(SelectedYear2T2[i])
+        }
+    }
+
+    <hr />
+
+    <h4>Year 3 Modules (70%)</h4>
+
+    <label>Elective Module:</label>
+    <select class="form-select mb-2" @bind="SelectedYear3Elective">
+        <option value="">-- Select Elective --</option>
+        @foreach (var m in Year3Modules.Where(x => x.SelectionStatus == "Elective"))
+        {
+            <option value="@m.ModuleName">@m.ModuleName</option>
+        }
+    </select>
+
+    @if (!string.IsNullOrEmpty(SelectedYear3Elective))
+    {
+        @RenderAssignments(SelectedYear3Elective)
+    }
+
+    <h5>Year 3 - T1</h5>
+    @for (int i = 0; i < 2; i++)
+    {
+        <select class="form-select mb-2" @bind="SelectedYear3T1[i]">
+            <option value="">-- Module --</option>
+            @foreach (var m in Year3Modules.Where(x => (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional") && x.Trimester == "T1"))
+            {
+                <option value="@m.ModuleName">@m.ModuleName</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrEmpty(SelectedYear3T1[i]))
+        {
+            @RenderAssignments(SelectedYear3T1[i])
+        }
+    }
+
+    <h5>Year 3 - T2</h5>
+    @for (int i = 0; i < 2; i++)
+    {
+        <select class="form-select mb-2" @bind="SelectedYear3T2[i]">
+            <option value="">-- Module --</option>
+            @foreach (var m in Year3Modules.Where(x => (x.SelectionStatus == "Compulsory" || x.SelectionStatus == "Optional") && x.Trimester == "T2"))
+            {
+                <option value="@m.ModuleName">@m.ModuleName</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrEmpty(SelectedYear3T2[i]))
+        {
+            @RenderAssignments(SelectedYear3T2[i])
+        }
+    }
+
+    <button class="btn btn-primary mt-3" @onclick="CalculateFinalGrade">
+        Calculate Final Grade
+    </button>
+
+    @if (!string.IsNullOrEmpty(CalculationError))
+    {
+        <div class="text-danger mt-2">@CalculationError</div>
+    }
+
+    @if (FinalGrade != null)
+    {
+        <h4 class="mt-2">Final Grade: @FinalGrade.Value.ToString("0.00")%</h4>
+    }
+}
+
+@code {
+
+    private List<string> Courses = new();
+    private List<ModuleData> Year2Modules = new();
+    private List<ModuleData> Year3Modules = new();
+    private string? SelectedCourse;
+
+    private string? SelectedYear2CoreModule;
+
+    private List<string?> SelectedYear2T1 = new() { null, null };
+    private List<string?> SelectedYear2T2 = new() { null, null };
+
+    private string? SelectedYear3Elective;
+    private List<string?> SelectedYear3T1 = new() { null, null };
+    private List<string?> SelectedYear3T2 = new() { null, null };
+
+    private Dictionary<string, List<AssignmentInput>> ModuleAssignments = new();
+
+    private decimal? FinalGrade;
+    private string? CalculationError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Courses = await service.GetAllCourseTitlesAsync();
+    }
+
+    private async Task OnCourseChanged(ChangeEventArgs e)
+    {
+        SelectedCourse = e.Value?.ToString();
+
+        if (!string.IsNullOrEmpty(SelectedCourse))
+        {
+            Year2Modules = await service.GetModuleDataAsync(SelectedCourse, "5");
+            Year3Modules = await service.GetModuleDataAsync(SelectedCourse, "6");
+            ModuleAssignments.Clear();
+        }
+    }
+
+    private void EnsureModule(string module)
+    {
+        if (!ModuleAssignments.ContainsKey(module))
+            ModuleAssignments[module] = new List<AssignmentInput> { new() };
+    }
+
+    private void AddAssignment(string module)
+    {
+        EnsureModule(module);
+        ModuleAssignments[module].Add(new AssignmentInput());
+    }
+
+    private void RemoveAssignment(string module, int index)
+    {
+        if (ModuleAssignments.ContainsKey(module))
+        {
+            if (index >= 0 && index < ModuleAssignments[module].Count)
+                ModuleAssignments[module].RemoveAt(index);
+        }
+    }
+
+    private decimal? CalculateModuleGrade(List<AssignmentInput>? assignments)
+    {
+        if (assignments == null || assignments.Count == 0)
+            return null;
+
+        if (assignments.Sum(a => a.Weighting) != 100)
+            return null;
+
+        return assignments.Sum(a => a.Score * (a.Weighting / 100m));
+    }
+
+    private decimal? GetModuleGrade(string module)
+    {
+        if (!ModuleAssignments.ContainsKey(module))
+            return null;
+
+        return CalculateModuleGrade(ModuleAssignments[module]);
+    }
+
+    private decimal? CalculateYear(List<ModuleData> modules, List<string?> selected)
+    {
+        decimal totalCredits = 0;
+        decimal weighted = 0;
+
+        foreach (var name in selected)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+
+            var mod = modules.FirstOrDefault(m => m.ModuleName == name);
+            var grade = GetModuleGrade(name);
+
+            if (mod == null || grade == null)
+                return null;
+
+            weighted += grade.Value * mod.Credits;
+            totalCredits += mod.Credits;
+        }
+
+        return totalCredits == 0 ? null : weighted / totalCredits;
+    }
+
+    private void CalculateFinalGrade()
+    {
+        CalculationError = null;
+
+        var y2 = SelectedYear2T1
+            .Concat(SelectedYear2T2)
+            .Append(SelectedYear2CoreModule)
+            .Where(x => !string.IsNullOrEmpty(x))
+            .ToList();
+
+        var y3 = SelectedYear3T1
+            .Concat(SelectedYear3T2)
+            .Append(SelectedYear3Elective)
+            .Where(x => !string.IsNullOrEmpty(x))
+            .ToList();
+
+        var y2Avg = CalculateYear(Year2Modules, y2);
+        var y3Avg = CalculateYear(Year3Modules, y3);
+
+        if (y2Avg == null || y3Avg == null)
+        {
+            CalculationError = "Please complete all modules and ensure each weighting = 100%.";
+            FinalGrade = null;
+            return;
+        }
+
+        FinalGrade = (y2Avg * 0.30m) + (y3Avg * 0.70m);
+    }
+
+    public class AssignmentInput
+    {
+        public string Name { get; set; } = "";
+        public decimal Score { get; set; }
+        public decimal Weighting { get; set; }
+    }
+
+    private RenderFragment RenderAssignments(string moduleName) => builder =>
+    {
+        EnsureModule(moduleName);
+        var list = ModuleAssignments[moduleName];
+
+        int seq = 0;
+
+        builder.OpenElement(seq++, "div");
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            var item = list[i];
+
+            builder.OpenElement(seq++, "div");
+            builder.AddAttribute(seq++, "class", "d-flex gap-2 mb-2");
+
+            builder.OpenElement(seq++, "input");
+            builder.AddAttribute(seq++, "class", "form-control");
+            builder.AddAttribute(seq++, "placeholder", "Name");
+            builder.AddAttribute(seq++, "value", item.Name);
+            builder.AddAttribute(seq++, "oninput",
+                EventCallback.Factory.Create<ChangeEventArgs>(this, e => item.Name = e.Value?.ToString() ?? ""));
+            builder.CloseElement();
+
+            builder.OpenElement(seq++, "input");
+            builder.AddAttribute(seq++, "type", "number");
+            builder.AddAttribute(seq++, "class", "form-control");
+            builder.AddAttribute(seq++, "placeholder", "Score");
+            builder.AddAttribute(seq++, "value", item.Score);
+            builder.AddAttribute(seq++, "oninput",
+                EventCallback.Factory.Create<ChangeEventArgs>(this, e =>
+                {
+                    decimal.TryParse(e.Value?.ToString(), out var v);
+                    item.Score = v;
+                }));
+            builder.CloseElement();
+
+            builder.OpenElement(seq++, "input");
+            builder.AddAttribute(seq++, "type", "number");
+            builder.AddAttribute(seq++, "class", "form-control");
+            builder.AddAttribute(seq++, "placeholder", "%");
+            builder.AddAttribute(seq++, "value", item.Weighting);
+            builder.AddAttribute(seq++, "oninput",
+                EventCallback.Factory.Create<ChangeEventArgs>(this, e =>
+                {
+                    decimal.TryParse(e.Value?.ToString(), out var v);
+                    item.Weighting = v;
+                }));
+            builder.CloseElement();
+
+            builder.OpenElement(seq++, "button");
+            builder.AddAttribute(seq++, "class", "btn btn-danger");
+            builder.AddAttribute(seq++, "onclick",
+                EventCallback.Factory.Create(this, () => RemoveAssignment(moduleName, i)));
+            builder.AddContent(seq++, "X");
+            builder.CloseElement();
+
+            builder.CloseElement();
+        }
+
+        builder.OpenElement(seq++, "button");
+        builder.AddAttribute(seq++, "class", "btn btn-success");
+        builder.AddAttribute(seq++, "onclick",
+            EventCallback.Factory.Create(this, () => AddAssignment(moduleName)));
+        builder.AddContent(seq++, "Add Assignment");
+        builder.CloseElement();
+
+        var total = list.Sum(x => x.Weighting);
+
+        builder.OpenElement(seq++, "div");
+        builder.AddContent(seq++, $"Total Weighting: {total}%");
+        builder.CloseElement();
+
+        if (total != 100)
+        {
+            builder.OpenElement(seq++, "div");
+            builder.AddAttribute(seq++, "style", "color:red");
+            builder.AddContent(seq++, "⚠ Must equal 100%");
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+    };
+}
