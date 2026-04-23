@@ -5,36 +5,44 @@
 
 @if (_authorized)
 {
-    <h1>Hello, world!</h1>
-    <p>Hello @_username</p>
+    <h1>Hello @_username,</h1>
+
     <p>Your role: @AuthState.Role</p>
 
-    <h3>Change Password</h3>
-    <EditForm Model="_passwordModel" OnValidSubmit="HandlePasswordChange">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
 
-        <div class="form-group">
-            <label for="oldPassword">Old Password</label>
-            <InputText id="oldPassword" class="form-control" @bind-Value="_passwordModel.OldPassword" />
-        </div>
+    <button class="btn btn-secondary" @onclick="TogglePasswordForm">
+        @(_showPasswordForm ? "Cancel" : "Change Password")
+    </button>
 
-        <div class="form-group">
-            <label for="newPassword">New Password</label>
-            <InputText id="newPassword" class="form-control" @bind-Value="_passwordModel.NewPassword" />
-        </div>
-
-        <div class="form-group">
-            <label for="confirmPassword">Confirm New Password</label>
-            <InputText id="confirmPassword" class="form-control" @bind-Value="_passwordModel.ConfirmPassword" />
-        </div>
-
-        <button type="submit" class="btn btn-primary">Change Password</button>
-    </EditForm>
-
-    @if (_passwordChangeSuccess != null)
+    @if (_showPasswordForm)
     {
-        <p>@_passwordChangeSuccess</p>
+        <h3>Change Password</h3>
+        <EditForm Model="_passwordModel" OnValidSubmit="HandlePasswordChange">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label for="oldPassword">Old Password</label>
+                <InputText id="oldPassword" type="password" class="form-control" @bind-Value="_passwordModel.OldPassword" />
+            </div>
+
+            <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <InputText id="newPassword" type="password" class="form-control" @bind-Value="_passwordModel.NewPassword" />
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm New Password</label>
+                <InputText id="confirmPassword" type="password" class="form-control" @bind-Value="_passwordModel.ConfirmPassword" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </EditForm>
+
+        @if (_passwordChangeSuccess != null)
+        {
+            <p>@_passwordChangeSuccess</p>
+        }
     }
 }
 
@@ -43,6 +51,14 @@
     private string _username = "";
     private PasswordModel _passwordModel = new PasswordModel();
     private string? _passwordChangeSuccess = null;
+
+    private bool _showPasswordForm = false;
+
+    private void TogglePasswordForm()
+    {
+        _showPasswordForm = !_showPasswordForm;
+        _passwordChangeSuccess = null; // optional: clear message when toggling
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -75,15 +91,14 @@
             return;
         }
 
-        bool success = await UserService.ChangePasswordAsync(AuthState.UserId, _passwordModel.OldPassword, _passwordModel.NewPassword);
+        bool success = await UserService.ChangePasswordAsync(
+            AuthState.UserId,
+            _passwordModel.OldPassword,
+            _passwordModel.NewPassword
+        );
 
-        if (success)
-        {
-            _passwordChangeSuccess = "Password changed successfully!";
-        }
-        else
-        {
-            _passwordChangeSuccess = "Invalid old password.";
-        }
+        _passwordChangeSuccess = success
+            ? "Password changed successfully!"
+            : "Invalid old password.";
     }
 }

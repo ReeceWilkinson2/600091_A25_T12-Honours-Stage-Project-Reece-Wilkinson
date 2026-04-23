@@ -16,11 +16,26 @@
         <h3>Student Details: @student.UserName</h3>
         <p>Student ID: @student.StudentId</p>
         <p>Email: @student.StEmail</p>
-        <p>Enrolled Modules: @string.Join(", ", student.Courses.Select(c => c.Name))</p>
-        <p>Assignments: @string.Join(", ", student.Submissions.Select(s => $"{s.Assignment.Name} (Score: {s.Score})"))</p>
-
-        <h4>Achieved Competencies</h4>
-
+        <h4>Enrolled Modules:</h4>
+        <div class=" scrollable-box">
+            <ul>
+                @foreach (var c in student.Courses)
+                {
+                    <li>@c.Name (@c.Code)</li>
+                }
+            </ul>
+        </div>
+        <h4>Assignments:</h4>
+        <div class=" scrollable-box">
+            <ul>
+                @foreach (var s in student.Submissions)
+                {
+                    <li>@s.Assignment.Name (Score: @s.Score) - (@s.Assignment.Course.Code)</li>
+                }
+            </ul>
+        </div>
+        <h4>Achieved Competencies:</h4>
+        <div class=" scrollable-box" style="margin-bottom:10px">
         @if (groupedCompetencies.Any())
         {
             <ul>
@@ -28,18 +43,13 @@
                 {
                     <li style="margin-bottom:15px;">
                         <strong>
-                            @item.BestAttempt.CompetencyLevel.Competency.CompetencyName
+                            @item.BestAttempt.CompetencyLevel.Competency.CompetencyName Level: @item.BestAttempt.CompetencyLevel.LevelNumber:
                         </strong>
-                        <p>Level: @item.BestAttempt.CompetencyLevel.LevelNumber</p>
                         <p>
-                            Best Score: @item.BestAttempt.MasteryPoints
+                            @item.BestAttempt.CompetencyLevel.Description
                             <br />
-                            Achieved on: @item.BestAttempt.AchievedDate.ToString("yyyy-MM-dd")
-                        </p>
-
-                        <p>
-                            Achieved in modules:
-                            @string.Join(", ", item.Modules.Select(m => $"{m.ModuleName} ({m.ModCode})"))
+                            Best Score: @item.BestAttempt.MasteryPoints - 
+                            Achieved on: @item.BestAttempt.AchievedDate.ToString("yyyy-MM-dd") in @($"{item.Module.ModuleName} ({item.Module.ModCode})")
                         </p>
                     </li>
                 }
@@ -49,6 +59,7 @@
         {
             <p>No competencies achieved yet.</p>
         }
+        </div>
     </div>
 }
 else
@@ -78,15 +89,20 @@ else
                 .ToListAsync();
 
             groupedCompetencies = achievedCompetencies
-                .GroupBy(a => a.CompetencyLevelId)
-                .Select(g => new GroupedCompetencyView
+                .GroupBy(a => a.CompetencyLevel.CompetencyDbID)
+                .Select(g =>
                 {
-                    BestAttempt = g.OrderByDescending(a => a.MasteryPoints).First(),
+                    var best = g
+                        .OrderByDescending(a => a.CompetencyLevel.LevelNumber)
+                        .ThenByDescending(a => a.MasteryPoints)
+                        .ThenByDescending(a => a.AchievedDate)
+                        .First();
 
-                    Modules = g.Select(a => a.Module)
-                               .GroupBy(m => m.DatabaseID)
-                               .Select(m => m.First())
-                               .ToList()
+                    return new GroupedCompetencyView
+                    {
+                        BestAttempt = best,
+                        Module = best.Module
+                    };
                 })
                 .ToList();
         }
@@ -100,6 +116,6 @@ else
     private class GroupedCompetencyView
     {
         public CompetencyAchievement BestAttempt { get; set; } = null!;
-        public List<ModuleData> Modules { get; set; } = new();
+        public ModuleData Module { get; set; } = null!;
     }
 }

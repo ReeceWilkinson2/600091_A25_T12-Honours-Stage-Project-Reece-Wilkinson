@@ -259,7 +259,7 @@ else if (SelectedModule == null)
 
     @if (AllCompetencies.Any())
     {
-        <div class="form-group" style="margin-bottom:15px">
+        <div class="form-group" style="margin-bottom:15px; margin-top:10px">
             <label>Search Competencies:</label>
             <select class="form-control"
                     @onchange="OnCompetencyFilterChanged">
@@ -646,6 +646,7 @@ else
             ("5", "T2") => 2,
             ("6", "T1") => 2,
             ("6", "T2") => 2,
+            ("6", "T12") => 1,
             _ => 0
         };
     }
@@ -694,12 +695,13 @@ else
 
     private bool IsYearLongModule(ModuleData module)
     {
-        return module.SelectionStatus == "Core" || module.SelectionStatus == "Elective";
+        return module.Trimester == "T12";
     }
+
 
     private bool HasSelectedYearLongModule(string level)
     {
-        return TempSelectedModules.Any(code =>
+        var hasPlanned = TempSelectedModules.Any(code =>
         {
             var module = Year1Modules
                 .Concat(Year2Modules)
@@ -710,6 +712,25 @@ else
                 && module.Level == level
                 && IsYearLongModule(module);
         });
+
+        if (hasPlanned)
+            return true;
+
+        var hasEnrolled = student?.Courses.Any(course =>
+        {
+            var modCode = ExtractModCodeFromCourse(course.Code);
+
+            var module = Year1Modules
+                .Concat(Year2Modules)
+                .Concat(Year3Modules)
+                .FirstOrDefault(m => m.ModCode == modCode);
+
+            return module != null
+                && module.Level == level
+                && IsYearLongModule(module);
+        }) ?? false;
+
+        return hasEnrolled;
     }
 
     private void ToggleTempEnrollment(ModuleData module)
@@ -729,7 +750,8 @@ else
 
         // Trimester rule (max 2)
         var current = CountTotalSelectionsForTrimester(level, trimester);
-        if (current >= 2)
+        var max = GetMaxOptionalSelections(level, trimester);
+        if (current >= max)
             return;
 
         TempSelectedModules.Add(module.ModCode);

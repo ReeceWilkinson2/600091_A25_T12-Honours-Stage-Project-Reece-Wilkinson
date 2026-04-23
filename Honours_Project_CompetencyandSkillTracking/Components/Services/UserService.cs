@@ -123,18 +123,36 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 
         public async Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.StudentId == userId && u.Password == oldPassword);
+            var user = await _db.Users
+                .FirstOrDefaultAsync(u => u.StudentId == userId);
 
             if (user == null)
-            {
                 return false;
+
+            bool isValid = false;
+
+            if (user.Password.StartsWith("$2"))
+            {
+                isValid = BCrypt.Net.BCrypt.Verify(oldPassword, user.Password);
+            }
+            else
+            {
+                if (user.Password == oldPassword)
+                {
+                    isValid = true;
+
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(oldPassword);
+                }
             }
 
-            user.Password = newPassword;
+            if (!isValid)
+                return false;
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
             await _db.SaveChangesAsync();
             return true;
         }
-
         public async Task<string> GenerateUniqueStudentIdAsync()
         {
             string id;

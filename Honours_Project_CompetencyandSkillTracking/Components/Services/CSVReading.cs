@@ -572,8 +572,15 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
             var userLookup = users.ToDictionary(u => u.StudentId.Trim().ToLower());
             var levelLookup = levels.ToDictionary(l => l.LevelDbID);
 
+            var duplicates = modules.GroupBy(m => m.ModCode).Where(g => g.Count() > 1).ToList();
+
+            foreach (var d in duplicates)
+            {
+                Console.WriteLine($"Duplicate ModCode: {d.Key} → {d.Count()} entries");
+            }
+
             var moduleLookup = modules
-                .GroupBy(m => ExtractCourseCode(m.ModCode))
+                .GroupBy(m => m.ModCode.Trim())
                 .ToDictionary(
                     g => g.Key,
                     g => g.First()
@@ -605,10 +612,10 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
                     continue;
                 }
 
-                var rawModule = GetValue(values, map, "ModuleId").Trim();
-                var moduleCode = ExtractCourseCode(rawModule);
+                var rawModule = GetValue(values, map, "ModuleId")?.Trim();
 
-                if (!moduleLookup.TryGetValue(moduleCode, out var module))
+                if (string.IsNullOrWhiteSpace(rawModule) ||
+                    !moduleLookup.TryGetValue(rawModule, out var module))
                 {
                     Console.WriteLine($"❌ Module not found: '{rawModule}'");
                     continue;
