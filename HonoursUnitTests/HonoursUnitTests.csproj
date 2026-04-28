@@ -7,6 +7,9 @@
 		<IsPackable>false</IsPackable>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<PreserveCompilationContext>false</PreserveCompilationContext>
+		<CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+		<CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
 	</PropertyGroup>
 
 	<ItemGroup>

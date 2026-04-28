@@ -5,6 +5,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 	<StaticWebAssetsCompressionEnabled>false</StaticWebAssetsCompressionEnabled>
+	  
+	  
+	<BlazorWebAssemblyLoadAllGlobalizationData>false</BlazorWebAssemblyLoadAllGlobalizationData>
+	<GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
   </PropertyGroup>
 
   <ItemGroup>
