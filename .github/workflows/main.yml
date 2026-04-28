@@ -14,15 +14,14 @@ jobs:
       - name: Clean
         shell: powershell
         run: |
-          Get-ChildItem -Path . -Recurse -Directory |
-            Where-Object { $_.Name -in 'bin','obj' } |
+          Get-ChildItem -Recurse -Include bin,obj |
             Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
       - name: Restore
         run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
 
-      - name: Build (SHOW REAL ERROR)
-        run: dotnet build HonoursUnitTests/HonoursUnitTests.csproj -c Debug --verbosity normal
+      - name: Build
+        run: dotnet build HonoursUnitTests/HonoursUnitTests.csproj -c Debug
 
       - name: Test
-        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build --logger "console;verbosity=detailed"
+        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build
