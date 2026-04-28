@@ -11,10 +11,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Restore
-        run: dotnet restore Honours_Project_CompetencyandSkillTracking.sln
-
+        run: dotnet restore 600091_A25_T12-Honours-Stage-Project-Reece-Wilkinson/Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
+      
       - name: Build
-        run: dotnet build Honours_Project_CompetencyandSkillTracking.sln -c Debug --no-restore
-
+        run: dotnet build 600091_A25_T12-Honours-Stage-Project-Reece-Wilkinson/Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln -c Debug --no-restore
+      
       - name: Test
-        run: dotnet test Honours_Project_CompetencyandSkillTracking.sln -c Debug --no-build
+        run: dotnet test 600091_A25_T12-Honours-Stage-Project-Reece-Wilkinson/Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln -c Debug --no-build
