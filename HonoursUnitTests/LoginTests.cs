@@ -40,7 +40,7 @@ public class SignInTests : BunitContext
     }
 
     [Fact]
-    public void LoginFails_ShowsErrorMessage()
+    public void LoginFails_ShowsErrorMessage() 
     {
         // Arrange: authentication fails
         _mockUserService
