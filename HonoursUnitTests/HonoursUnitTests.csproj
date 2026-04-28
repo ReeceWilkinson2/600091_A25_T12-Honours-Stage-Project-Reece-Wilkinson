@@ -22,9 +22,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Honours_Project_CompetencyandSkillTracking\Honours_Project_CompetencyandSkillTracking.csproj">
-			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-		</ProjectReference>
 	</ItemGroup>
 
 </Project>
