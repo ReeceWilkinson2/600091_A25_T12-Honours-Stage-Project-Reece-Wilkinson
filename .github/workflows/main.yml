@@ -24,4 +24,4 @@ jobs:
         run: dotnet build HonoursUnitTests/HonoursUnitTests.csproj -c Debug
 
       - name: Test
-        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build
+        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug
