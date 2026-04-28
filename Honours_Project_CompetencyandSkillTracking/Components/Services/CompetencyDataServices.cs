@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 {
-    public class CompetencyDataServices
+    public class CompetencyDataServices : ICompetencyDataServices
     {
         private readonly AppDbContext _db;
 

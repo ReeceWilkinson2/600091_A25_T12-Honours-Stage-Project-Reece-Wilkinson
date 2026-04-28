@@ -33,6 +33,7 @@ builder.Services.AddScoped<IAuthStateService, AuthStateService>();
 builder.Services.AddScoped<CSVReading>();
 builder.Services.AddScoped<CSVReaderStartup>();
 builder.Services.AddScoped<CompetencyDataServices>();
+builder.Services.AddScoped<ICompetencyDataServices, CompetencyDataServices>();
 
 var app = builder.Build();
 
