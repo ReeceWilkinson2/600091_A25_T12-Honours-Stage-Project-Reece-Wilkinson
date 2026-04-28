@@ -18,7 +18,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Honours_Project_CompetencyandSkillTracking\Honours_Project_CompetencyandSkillTracking.csproj">
-			<Private>false</Private>
 			<ExcludeAssets>runtime</ExcludeAssets>
 		</ProjectReference>
 	</ItemGroup>
