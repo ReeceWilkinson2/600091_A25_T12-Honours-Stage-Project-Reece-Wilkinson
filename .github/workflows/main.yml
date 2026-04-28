@@ -19,9 +19,12 @@ jobs:
         
       - name: Restore
         run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
-
-      - name: Build Solution
-        run: dotnet build Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln -c Debug
-
+      
+      - name: Build main project
+        run: dotnet build Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.csproj -c Debug
+      
+      - name: Build tests
+        run: dotnet build Honours_Project_CompetencyandSkillTracking/HonoursUnitTests/HonoursUnitTests.csproj -c Debug
+      
       - name: Test
-        run: dotnet test Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln -c Debug
+        run: dotnet test Honours_Project_CompetencyandSkillTracking/HonoursUnitTests/HonoursUnitTests.csproj -c Debug
