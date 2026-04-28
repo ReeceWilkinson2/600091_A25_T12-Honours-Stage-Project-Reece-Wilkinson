@@ -9,16 +9,17 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repo
+        uses: actions/checkout@v4
 
-      - name: Test (diagnostic)
-        run: dotnet test Honours_Project_CompetencyandSkillTracking.sln -c Debug --verbosity normal
-      
       - name: Restore
         run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
-      
-      - name: Build + Test (solution driven)
-        run: dotnet build Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln -c Debug --no-restore
-      
-      - name: Test
-        run: dotnet test Honours_Project_CompetencyandSkillTracking/HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build
+
+      - name: Build Web Project
+        run: dotnet build Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.csproj -c Debug --no-restore
+
+      - name: Build Tests
+        run: dotnet build HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-restore
+
+      - name: Run Tests
+        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build
