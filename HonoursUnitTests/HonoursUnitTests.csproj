@@ -5,11 +5,11 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<IncludeBuildOutput>false</IncludeBuildOutput>
-		<PreserveCompilationContext>false</PreserveCompilationContext>
-		<CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+
 		<CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
+		<CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+		<GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
+		<PreserveCompilationContext>false</PreserveCompilationContext>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -25,4 +25,4 @@
 		<ProjectReference Include="..\Honours_Project_CompetencyandSkillTracking\Honours_Project_CompetencyandSkillTracking.csproj" />
 	</ItemGroup>
 
-</Project> 
+</Project>
