@@ -3,68 +3,72 @@
 @inject NavigationManager NavigationManager
 @inject UserService service
 @inject AppDbContext DbContext
+@inject AuthStateService AuthState
 
-<div style="margin-bottom:10px">
-    <button class="module-button" @onclick="ReturnToSelection">
-        ← Back to Selection
-    </button>
-</div>
-
-@if (student != null)
+@if (_authorized)
 {
-    <div>
-        <h3>Student Details: @student.UserName</h3>
-        <p>Student ID: @student.StudentId</p>
-        <p>Email: @student.StEmail</p>
-        <h4>Enrolled Modules:</h4>
-        <div class=" scrollable-box">
-            <ul>
-                @foreach (var c in student.Courses)
-                {
-                    <li>@c.Name (@c.Code)</li>
-                }
-            </ul>
-        </div>
-        <h4>Assignments:</h4>
-        <div class=" scrollable-box">
-            <ul>
-                @foreach (var s in student.Submissions)
-                {
-                    <li>@s.Assignment.Name (Score: @s.Score) - (@s.Assignment.Course.Code)</li>
-                }
-            </ul>
-        </div>
-        <h4>Achieved Competencies:</h4>
-        <div class=" scrollable-box" style="margin-bottom:10px">
-        @if (groupedCompetencies.Any())
-        {
-            <ul>
-                @foreach (var item in groupedCompetencies)
-                {
-                    <li style="margin-bottom:15px;">
-                        <strong>
-                            @item.BestAttempt.CompetencyLevel.Competency.CompetencyName Level: @item.BestAttempt.CompetencyLevel.LevelNumber:
-                        </strong>
-                        <p>
-                            @item.BestAttempt.CompetencyLevel.Description
-                            <br />
-                            Best Score: @item.BestAttempt.MasteryPoints - 
-                            Achieved on: @item.BestAttempt.AchievedDate.ToString("yyyy-MM-dd") in @($"{item.Module.ModuleName} ({item.Module.ModCode})")
-                        </p>
-                    </li>
-                }
-            </ul>
-        }
-        else
-        {
-            <p>No competencies achieved yet.</p>
-        }
-        </div>
+    <div style="margin-bottom:10px">
+        <button class="module-button" @onclick="ReturnToSelection">
+            ← Back to Selection
+        </button>
     </div>
-}
-else
-{
-    <p>Loading didn't work</p>
+
+    @if (student != null)
+    {
+        <div>
+            <h3>Student Details: @student.UserName</h3>
+            <p>Student ID: @student.StudentId</p>
+            <p>Email: @student.StEmail</p>
+            <h4>Enrolled Modules:</h4>
+            <div class=" scrollable-box">
+                <ul>
+                    @foreach (var c in student.Courses)
+                    {
+                        <li>@c.Name (@c.Code)</li>
+                    }
+                </ul>
+            </div>
+            <h4>Assignments:</h4>
+            <div class=" scrollable-box">
+                <ul>
+                    @foreach (var s in student.Submissions)
+                    {
+                        <li>@s.Assignment.Name (Score: @s.Score) - (@s.Assignment.Course.Code)</li>
+                    }
+                </ul>
+            </div>
+            <h4>Achieved Competencies:</h4>
+            <div class=" scrollable-box" style="margin-bottom:10px">
+                @if (groupedCompetencies.Any())
+                {
+                    <ul>
+                        @foreach (var item in groupedCompetencies)
+                        {
+                            <li style="margin-bottom:15px;">
+                                <strong>
+                                    @item.BestAttempt.CompetencyLevel.Competency.CompetencyName Level: @item.BestAttempt.CompetencyLevel.LevelNumber:
+                                </strong>
+                                <p>
+                                    @item.BestAttempt.CompetencyLevel.Description
+                                    <br />
+                                    Best Score: @item.BestAttempt.MasteryPoints -
+                                    Achieved on: @item.BestAttempt.AchievedDate.ToString("yyyy-MM-dd") in @($"{item.Module.ModuleName} ({item.Module.ModCode})")
+                                </p>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No competencies achieved yet.</p>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <p>Loading didn't work</p>
+    }
 }
 
 @code {
@@ -73,6 +77,8 @@ else
     private User? student;
     private List<CompetencyAchievement> achievedCompetencies = new();
     private List<GroupedCompetencyView> groupedCompetencies = new();
+    private bool _authorized = false;
+    private string _username = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -107,6 +113,30 @@ else
                 .ToList();
         }
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (string.IsNullOrEmpty(AuthState.UserId))
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        var user = await service.GetUserByIdAsync(AuthState.UserId);
+
+        if (user.Role == "User")
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        _username = user.UserName;
+        _authorized = true;
+        StateHasChanged();
+    }
+
     private void ReturnToSelection()
     {
         NavigationManager.NavigateTo("/studentselection");

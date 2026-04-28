@@ -1,15 +1,19 @@
 ﻿@page "/moduleindexcsv"
 @rendermode InteractiveServer
 @inject AppDbContext DbContext
-@inject CSVReading CsvReader
+@inject NavigationManager NavigationManager
+@inject UserService service
+@inject AuthStateService AuthState
 
-<div class="container">
+@if (_authorized)
+{
+    <div class="container">
 
-    <div class="row bg-light mb-4">
-        <div class="p-3 bg-primary text-white text-center">
-            Modules
+        <div class="row bg-light mb-4">
+            <div class="p-3 bg-primary text-white text-center">
+                Modules
+            </div>
         </div>
-    </div>
 
         <table class="table table-bordered">
             <thead class="thead-dark">
@@ -68,14 +72,40 @@
             </tbody>
         </table>
     </div>
+}
 
 @code {
     private List<ModuleData> Modules = new();
     private string? StatusMessage;
+    private bool _authorized = false;
+    private string _username = "";
 
     protected override async Task OnInitializedAsync()
     {
         await LoadModules();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (string.IsNullOrEmpty(AuthState.UserId))
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        var user = await service.GetUserByIdAsync(AuthState.UserId);
+
+        if (user.Role != "Admin")
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        _username = user.UserName;
+        _authorized = true;
+        StateHasChanged();
     }
 
     private async Task LoadModules()

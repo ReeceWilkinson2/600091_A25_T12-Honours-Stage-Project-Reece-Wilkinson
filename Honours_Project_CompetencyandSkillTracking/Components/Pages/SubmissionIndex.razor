@@ -1,157 +1,109 @@
 ﻿@page "/submissionindex"
 @inject AppDbContext DbContext
 @rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject UserService service
+@inject AuthStateService AuthState
 
-<div class="container">
-    <div class="row bg-light mb-4">
-        <table class="table table-bordered">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Submission ID</th>
-                    <th>Assignment ID</th>
-                    <th>Assignment Name</th>
-                    <th>Student</th>
-                    <th>Score</th>
-                    <th>Submitted At</th>
-                    <th>Submission Comments</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
+@if (_authorized)
+{
+    <div class="container">
+        <div class="row bg-light mb-4">
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Submission ID</th>
+                        <th>Assignment ID</th>
+                        <th>Assignment Name</th>
+                        <th>Student</th>
+                        <th>Score</th>
+                        <th>Submitted At</th>
+                        <th>Submission Comments</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                @if (Submissions.Any())
-                {
-                    @foreach (var submission in Submissions)
+                <tbody>
+                    @if (Submissions.Any())
                     {
-                        <tr @onclick="(() => SetSubmissionForUpdate(submission))">
-                            <td>@submission.Id</td>
-                            <td>@submission.AssignmentId</td>
-                            <td>@submission.Assignment?.Name</td>
-                            <td>@submission.Student?.UserName</td>
-                            <td>@submission.Score</td>
-                            <td>@submission.SubmittedAt?.ToString("g")</td>
+                        @foreach (var submission in Submissions)
+                        {
+                            <tr @onclick="(() => SetSubmissionForUpdate(submission))">
+                                <td>@submission.Id</td>
+                                <td>@submission.AssignmentId</td>
+                                <td>@submission.Assignment?.Name</td>
+                                <td>@submission.Student?.UserName</td>
+                                <td>@submission.Score</td>
+                                <td>@submission.SubmittedAt?.ToString("g")</td>
 
-                            <td>
-                                @if (submission.Comments?.Any() == true)
-                                {
-                                    <ul>
-                                        @foreach (var comment in submission.Comments)
-                                        {
-                                            <li>@comment.Comment</li>
-                                        }
-                                    </ul>
-                                }
-                            </td>
+                                <td>
+                                    @if (submission.Comments?.Any() == true)
+                                    {
+                                        <ul>
+                                            @foreach (var comment in submission.Comments)
+                                            {
+                                                <li>@comment.Comment</li>
+                                            }
+                                        </ul>
+                                    }
+                                </td>
 
-                            <td>
-                                <button class="btn btn-danger" @onclick="() => DeleteSubmission(submission)" @onclick:stopPropagation="true">
-                                    Delete
-                                </button>
+                                <td>
+                                    <button class="btn btn-danger" @onclick="() => DeleteSubmission(submission)" @onclick:stopPropagation="true">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                <strong>No submissions found</strong>
                             </td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="8" class="text-center">
-                            <strong>No submissions found</strong>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    @* <div class="row m-5">
-        <div class="col-5 bg-light m-2">
-            <div class="p-3 mb-3 bg-primary text-white text-center">
-                Add New Submission
-            </div>
-
-            <EditForm Model="@NewSubmission">
-                <div class="form-group">
-                    <label>Assignment ID</label>
-                    <input type="number" class="form-control" @bind-value="NewSubmission.AssignmentId" />
-                </div>
-
-                <div class="form-group">
-                    <label>Student ID</label>
-                    <input type="text" class="form-control" @bind-value="NewSubmission.StudentId" />
-                </div>
-
-                <div class="form-group">
-                    <label>Score</label>
-                    <input type="number" step="0.1" class="form-control" @bind-value="NewSubmission.Score" />
-                </div>
-
-                <div class="form-group">
-                    <label>Submitted At</label>
-                    <input type="datetime-local" class="form-control" @bind-value="NewSubmission.SubmittedAt" />
-                </div>
-
-                <div class="text-center p-3">
-                    <button class="btn btn-info" @onclick="AddSubmission">
-                        Add Submission
-                    </button>
-                </div>
-            </EditForm>
+                </tbody>
+            </table>
         </div>
-
-        <div class="col-5 bg-light m-2">
-            <div class="p-3 mb-3 bg-primary text-white text-center">
-                Update Submission
-            </div>
-
-            <EditForm Model="@UpdateSubmission">
-
-                <div class="form-group">
-                    <label>Submission ID</label>
-                    <input type="number" class="form-control" @bind-value="UpdateSubmission.Id" disabled />
-                </div>
-
-                <div class="form-group">
-                    <label>Assignment ID</label>
-                    <input type="number" class="form-control" @bind-value="UpdateSubmission.AssignmentId" />
-                </div>
-
-                <div class="form-group">
-                    <label>Student ID</label>
-                    <input type="text" class="form-control" @bind-value="UpdateSubmission.StudentId" />
-                </div>
-
-                <div class="form-group">
-                    <label>Score</label>
-                    <input type="number" step="0.1" class="form-control"
-                           @bind-value="UpdateSubmission.Score" />
-                </div>
-
-                <div class="form-group">
-                    <label>Submitted At</label>
-                    <input type="datetime-local"class="form-control"@bind-value="UpdateSubmission.SubmittedAt" />
-                </div>
-
-                <div class="text-center p-3">
-                    <button class="btn btn-info"@onclick="UpdateSubmissionData">
-                        Update Submission
-                    </button>
-                </div>
-            </EditForm>
-        </div> 
-
-    </div> *@
-</div>
-
+    </div>
+}
 
 @code {
 
     private List<Submission> Submissions = new();
     private Submission NewSubmission = new Submission();
     private Submission UpdateSubmission = new Submission();
+    private bool _authorized = false;
+    private string _username = "";
 
     protected override async Task OnInitializedAsync()
     {
         await LoadSubmissions();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (string.IsNullOrEmpty(AuthState.UserId))
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        var user = await service.GetUserByIdAsync(AuthState.UserId);
+
+        if (user.Role != "Admin")
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        _username = user.UserName;
+        _authorized = true;
+        StateHasChanged();
     }
 
     private async Task LoadSubmissions()

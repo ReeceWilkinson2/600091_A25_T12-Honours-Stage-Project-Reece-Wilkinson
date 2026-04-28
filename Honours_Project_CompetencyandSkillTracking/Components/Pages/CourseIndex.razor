@@ -1,159 +1,186 @@
 ﻿@page "/courseindex"
-@using Honours_Project_CompetencyandSkillTracking.Canvas.Classes
 @inject AppDbContext DbContext
+@inject NavigationManager NavigationManager
+@inject UserService service
+@inject AuthStateService AuthState
 @rendermode InteractiveServer
 
-<div class="container">
+@if (_authorized)
+{
+    <div class="container">
 
-    <!-- COURSES TABLE -->
-    <div class="row bg-light mb-4">
-        <h4 class="p-2">Courses</h4>
-        <table class="table table-bordered">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Code</th>
-                    <th>Term</th>
-                    @* <th>Student</th> *@
-                    <th>Outcomes</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var course in Courses)
-                {
-                    <tr @onclick="() => SelectCourse(course)">
-                        <td>@course.Id</td>
-                        <td>@course.Name</td>
-                        <td>@course.Code</td>
-                        <td>@course.Term</td>
-                        @* <td>@course.Students</td> *@
+        <!-- COURSES TABLE -->
+        <div class="row bg-light mb-4">
+            <h4 class="p-2">Courses</h4>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Term</th>
+                        @* <th>Student</th> *@
+                        <th>Outcomes</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var course in Courses)
+                    {
+                <tr @onclick="() => SelectCourse(course)">
+                    <td>@course.Id</td>
+                    <td>@course.Name</td>
+                    <td>@course.Code</td>
+                    <td>@course.Term</td>
+                    @* <td>@course.Students</td> *@
                     <td>
                         @string.Join(", ", OutcomesByCourse.ContainsKey(course.Id)
                                                 ? OutcomesByCourse[course.Id].Select(o => o.Title)
                                                 : Array.Empty<string>())
                     </td>
-                        <td>
-                            <button class="btn btn-danger"
-                                    @onclick="() => DeleteCourse(course)"
-                                    @onclick:stopPropagation="true">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <div class="row">
-        <div class="col-5 bg-light m-2">
-            <div class="p-3 bg-primary text-white text-center">Add / Update Course</div>
-
-            <EditForm Model="@EditCourse">
-                <div class="form-group">
-                    <label>Name</label>
-                    <input class="form-control" @bind="EditCourse.Name" />
-                </div>
-
-                <div class="form-group">
-                    <label>Code</label>
-                    <input class="form-control" @bind="EditCourse.Code" />
-                </div>
-
-                <div class="form-group">
-                    <label>Term</label>
-                    <input class="form-control" @bind="EditCourse.Term" />
-                </div>
-
-                <div class="text-center p-3">
-                    <button class="btn btn-info" @onclick="SaveCourse">Save Course</button>
-                </div>
-            </EditForm>
+                    <td>
+                        <button class="btn btn-danger"
+                                @onclick="() => DeleteCourse(course)"
+                                @onclick:stopPropagation="true">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                                }
+                </tbody>
+            </table>
         </div>
 
-        <!-- ASSIGNMENTS -->
-        <div class="col-6 bg-light m-2">
-            <div class="p-3 bg-primary text-white text-center">
-                Assignments (@SelectedCourse?.Name)
-            </div>
+        <div class="row">
+            <div class="col-5 bg-light m-2">
+                <div class="p-3 bg-primary text-white text-center">Add / Update Course</div>
 
-            @if (SelectedCourse != null)
-            {
-                <table class="table table-bordered mt-2">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Due</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var a in Assignments)
-                        {
-                            <tr @onclick="() => SelectAssignment(a)">
-                                <td>@a.Name</td>
-                                <td>@a.DueAt</td>
-                                <td>
-                                    <button class="btn btn-danger"
-                                            @onclick="() => DeleteAssignment(a)"
-                                            @onclick:stopPropagation="true">
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-
-                <EditForm Model="@EditAssignment">
+                <EditForm Model="@EditCourse">
                     <div class="form-group">
                         <label>Name</label>
-                        <input class="form-control" @bind="EditAssignment.Name" />
+                        <input class="form-control" @bind="EditCourse.Name" />
                     </div>
 
                     <div class="form-group">
-                        <label>Description</label>
-                        <textarea class="form-control" @bind="EditAssignment.Description"></textarea>
+                        <label>Code</label>
+                        <input class="form-control" @bind="EditCourse.Code" />
                     </div>
 
                     <div class="form-group">
-                        <label>Due Date</label>
-                        <input type="datetime-local" class="form-control"
-                               @bind="EditAssignment.DueAt" />
+                        <label>Term</label>
+                        <input class="form-control" @bind="EditCourse.Term" />
                     </div>
 
                     <div class="text-center p-3">
-                        <button class="btn btn-info" @onclick="SaveAssignment">
-                            Save Assignment
-                        </button>
+                        <button class="btn btn-info" @onclick="SaveCourse">Save Course</button>
                     </div>
                 </EditForm>
-            }
-            else
-            {
-                <p class="p-3 text-center"><strong>Select a course</strong></p>
-            }
+            </div>
+
+            <!-- ASSIGNMENTS -->
+            <div class="col-6 bg-light m-2">
+                <div class="p-3 bg-primary text-white text-center">
+                    Assignments (@SelectedCourse?.Name)
+                </div>
+
+                @if (SelectedCourse != null)
+                {
+                    <table class="table table-bordered mt-2">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Due</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var a in Assignments)
+                            {
+                                <tr @onclick="() => SelectAssignment(a)">
+                                    <td>@a.Name</td>
+                                    <td>@a.DueAt</td>
+                                    <td>
+                                        <button class="btn btn-danger"
+                                                @onclick="() => DeleteAssignment(a)"
+                                                @onclick:stopPropagation="true">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <EditForm Model="@EditAssignment">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input class="form-control" @bind="EditAssignment.Name" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" @bind="EditAssignment.Description"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Due Date</label>
+                            <input type="datetime-local" class="form-control"
+                                   @bind="EditAssignment.DueAt" />
+                        </div>
+
+                        <div class="text-center p-3">
+                            <button class="btn btn-info" @onclick="SaveAssignment">
+                                Save Assignment
+                            </button>
+                        </div>
+                    </EditForm>
+                }
+                else
+                {
+                    <p class="p-3 text-center"><strong>Select a course</strong></p>
+                }
+            </div>
         </div>
     </div>
-</div>
+}
 
 @code {
 
     private List<Course> Courses = new();
     private List<Assignment> Assignments = new();
-
     private Course EditCourse = new();
     private Course? SelectedCourse;
-
     private Assignment EditAssignment = new();
-
     private Dictionary<long, List<Outcome>> OutcomesByCourse = new();
+    private bool _authorized = false;
+    private string _username = "";
 
     protected override async Task OnInitializedAsync()
     {
         await LoadCourses();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (string.IsNullOrEmpty(AuthState.UserId))
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        var user = await service.GetUserByIdAsync(AuthState.UserId);
+
+        if (user.Role != "Admin")
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        _username = user.UserName;
+        _authorized = true;
+        StateHasChanged();
     }
 
     private async Task LoadCourses()

@@ -3,41 +3,72 @@
 @inject CanvasSyncService CanvasSyncService
 @inject AppDbContext DbContext
 @inject CSVReading CSVReader
+@inject NavigationManager NavigationManager
+@inject UserService service
+@inject AuthStateService AuthState
 
-<h3>Data Sync</h3>
-
-@if (_isSyncing)
+@if (_authorized)
 {
-    <p>Syncing Canvas data… please wait.</p>
-}
-else if (_isCsvReading)
-{
-    <p>Reading CSV file… please wait.</p>
-}
-else if (_error != null)
-{
-    <p style="color:red">Error: @_error</p>
-}
-else if (_completed)
-{
-    <p style="color:green">Data sync completed successfully.</p>
-}
+    <h3>Data Sync</h3>
 
-<button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick="StartSync" disabled="@_isSyncing">
-    Start Canvas Sync
-</button>
+    @if (_isSyncing)
+    {
+        <p>Syncing Canvas data… please wait.</p>
+    }
+    else if (_isCsvReading)
+    {
+        <p>Reading CSV file… please wait.</p>
+    }
+    else if (_error != null)
+    {
+        <p style="color:red">Error: @_error</p>
+    }
+    else if (_completed)
+    {
+        <p style="color:green">Data sync completed successfully.</p>
+    }
 
-<button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick="ReadCsv">
-    Import Modules from CSV
-</button>
+    <button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick="StartSync" disabled="@_isSyncing">
+        Start Canvas Sync
+    </button>
 
-<p>The import modules button is for testing only and will break multiple things if used improperly</p>
+    <button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick="ReadCsv">
+        Import Modules from CSV
+    </button>
+
+    <p>The import modules button is for testing only and will break multiple things if used improperly</p>
+}
 
 @code {
     private bool _isSyncing;
     private bool _isCsvReading;
     private bool _completed;
     private string? _error;
+    private bool _authorized = false;
+    private string _username = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (string.IsNullOrEmpty(AuthState.UserId))
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        var user = await service.GetUserByIdAsync(AuthState.UserId);
+
+        if (user.Role != "Admin")
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        _username = user.UserName;
+        _authorized = true;
+        StateHasChanged();
+    }
 
     private async Task StartSync()
     {

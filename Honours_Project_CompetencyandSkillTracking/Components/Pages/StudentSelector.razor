@@ -2,23 +2,52 @@
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 @inject UserService service
+@inject AuthStateService AuthState
 
-<h3>Student Selection</h3>
-<p>Please select a student to view:</p>
+@if (_authorized)
+{
+    <h3>Student Selection</h3>
+    <p>Please select a student to view:</p>
 
-<div>
-    @foreach (var student in Students)
-    {
-        <button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick="() => LoadStudentDetails(student)">@student.StudentId, @student.UserName</button>
-    }
-</div>
+    <div>
+        @foreach (var student in Students)
+        {
+            <button class="module-button" style="width: 100%; text-align: left; margin-bottom: 10px" @onclick="() => LoadStudentDetails(student)">@student.StudentId, @student.UserName</button>
+        }
+    </div>
+}
 
 @code {
     private List<User> Students = new List<User>();
+    private bool _authorized = false;
+    private string _username = "";
 
     protected override async Task OnInitializedAsync()
     {
         Students = await service.GetStudentDataAsync("Student");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (string.IsNullOrEmpty(AuthState.UserId))
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        var user = await service.GetUserByIdAsync(AuthState.UserId);
+
+        if (user.Role == "User")
+        {
+            NavigationManager.NavigateTo("/home");
+            return;
+        }
+
+        _username = user.UserName;
+        _authorized = true;
+        StateHasChanged();
     }
 
     private void LoadStudentDetails(User student)
