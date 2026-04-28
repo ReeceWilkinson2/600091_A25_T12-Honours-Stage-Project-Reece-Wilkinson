@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Clean
+        run: dotnet clean Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
+        
       - name: Restore
         run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
 
@@ -18,4 +21,4 @@ jobs:
         run: dotnet build Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln -c Debug
 
       - name: Test
-        run: dotnet test Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln -c Debug --no-build
+        run: dotnet test Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln -c Debug
