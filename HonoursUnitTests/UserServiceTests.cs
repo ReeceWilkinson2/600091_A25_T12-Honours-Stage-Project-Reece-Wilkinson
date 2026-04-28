@@ -50,20 +50,23 @@ public class UserServiceTests
     [Fact]
     public async Task AuthenticateAsync_ReturnsNull_WhenWrongPassword()
     {
-        var db = GetDb();
+        var context = GetDb();
 
-        db.Users.Add(new User
+        context.Users.Add(new User
         {
-            StEmail = "test@email.com",
-            Password = "1234"
+            StudentId = "123",
+            StEmail = "test@hull.ac.uk",
+            Password = BCrypt.Net.BCrypt.HashPassword("correct")
         });
 
-        await db.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
-        var service = GetService(db);
+        var service = new UserService(context);
 
-        var result = await service.AuthenticateAsync("test@email.com", "wrong");
+        // Act
+        var result = await service.AuthenticateAsync("test@hull.ac.uk", "wrongpassword");
 
+        // Assert
         Assert.Null(result);
     }
 
