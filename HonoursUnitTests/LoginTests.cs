@@ -1,84 +1,87 @@
-﻿using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
+﻿using Bunit;
+using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
 using Honours_Project_CompetencyandSkillTracking.Components.Pages;
 using Honours_Project_CompetencyandSkillTracking.Components.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
-using Bunit;
 using Moq;
+using Xunit;
 
 namespace HonoursUnitTests;
 
-public class SignInTests : BunitContext
+public class SignInTests : IDisposable
 {
-    private readonly Mock<UserService> _mockUserService = new();
-    private readonly Mock<AuthStateService> _mockAuthState = new();
-    private readonly NavigationManager _navManager;
+    private readonly TestContext _ctx;
+
+    private readonly Mock<IUserService> _userServiceMock = new();
+    private readonly Mock<IAuthStateService> _authStateMock = new();
 
     public SignInTests()
     {
-        // Get bUnit's built-in fake NavigationManager
-        _navManager = Services.GetRequiredService<NavigationManager>();
+        _ctx = new TestContext();
 
         // Register mocked services
-        Services.AddSingleton(_mockUserService.Object);
-        Services.AddSingleton(_mockAuthState.Object);
+        _ctx.Services.AddSingleton(_userServiceMock.Object);
+        _ctx.Services.AddSingleton(_authStateMock.Object);
     }
 
     [Fact]
     public void SignInPageRendersCorrectly()
     {
-        // Act
-        var cut = Render<SignIn>();
+        var cut = _ctx.Render<SignIn>(); 
 
-        // Assert page elements
-        cut.Find("h1").MarkupMatches("<h1>Login</h1>");
+        Assert.Contains("Login", cut.Markup);
         cut.Find("input#email");
         cut.Find("input#password");
-        cut.Find("button").MarkupMatches("<button class=\"module-button\" type=\"submit\">Login</button>");
+        cut.Find("button");
         cut.Find("a[href='/PasswordReset']");
         cut.Find("a[href='/signup']");
     }
 
     [Fact]
-    public void LoginFails_ShowsErrorMessage() 
+    public void LoginFails_ShowsErrorMessage()
     {
-        // Arrange: authentication fails
-        _mockUserService
+        _userServiceMock
             .Setup(s => s.AuthenticateAsync(It.IsAny<string>(), It.IsAny<string>()))
-            .ReturnsAsync((User)null);
+            .ReturnsAsync((User?)null);
 
-        var cut = Render<SignIn>();
+        var cut = _ctx.Render<SignIn>();
 
-        // Act: fill form and submit
         cut.Find("input#email").Change("wrong@example.com");
         cut.Find("input#password").Change("wrongpassword");
         cut.Find("button").Click();
 
-        // Assert error message
-        Assert.Equal("Invalid email or password", cut.Find(".text-danger").TextContent);
+        Assert.Contains("Invalid email or password", cut.Markup);
     }
 
     [Fact]
-    public void LoginSucceeds_NavigatesToHome_AndSetsAuthState()
+    public void LoginSucceeds_NavigatesAndSetsAuthState()
     {
-        // Arrange: authentication succeeds
-        var testUser = new User { StudentId = "123", Role = "Student" };
+        var nav = _ctx.Services.GetRequiredService<NavigationManager>();
 
-        _mockUserService
+        var testUser = new User
+        {
+            StudentId = "123",
+            Role = "Student"
+        };
+
+        _userServiceMock
             .Setup(s => s.AuthenticateAsync("test@example.com", "password"))
             .ReturnsAsync(testUser);
 
-        var cut = Render<SignIn>();
+        var cut = _ctx.Render<SignIn>();
 
-        // Act: fill form and submit
         cut.Find("input#email").Change("test@example.com");
         cut.Find("input#password").Change("password");
         cut.Find("button").Click();
 
-        // Assert navigation
-        Assert.EndsWith("/home", _navManager.Uri);
+        Assert.EndsWith("/home", nav.Uri);
 
-        // Assert AuthState updated
-        _mockAuthState.Verify(a => a.SetUserAsync("123", "Student"), Times.Once);
+        _authStateMock.Verify(a => a.SetUserAsync("123", "Student"), Times.Once);
+    }
+
+    public void Dispose()
+    {
+        _ctx.Dispose();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
+using Honours_Project_CompetencyandSkillTracking.Components.Services;
 
-public class AuthStateService
+public class AuthStateService : IAuthStateService
 {
     private readonly ILocalStorageService _localStorage;
 

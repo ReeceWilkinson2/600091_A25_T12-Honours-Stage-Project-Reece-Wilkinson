@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Honours_Project_CompetencyandSkillTracking.Components.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly AppDbContext _db;
 
