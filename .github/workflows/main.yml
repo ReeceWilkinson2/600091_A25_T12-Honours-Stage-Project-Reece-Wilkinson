@@ -9,24 +9,17 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Clean bin and obj
+      - name: Clean
         shell: powershell
         run: |
           Get-ChildItem -Path . -Recurse -Directory |
             Where-Object { $_.Name -in 'bin','obj' } |
             Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
 
-      - name: Build main project
-        run: dotnet build Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.csproj -c Debug
-
-      - name: Build test project
-        run: dotnet build HonoursUnitTests/HonoursUnitTests.csproj -c Debug
-
-      - name: Run tests
+      - name: Test
         run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug
