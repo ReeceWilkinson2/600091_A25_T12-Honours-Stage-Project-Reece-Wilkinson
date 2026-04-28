@@ -41,7 +41,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             var Modules = new List<ModuleData>();
 
-            var FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Data","CSV Files", "ProgrammeConstructionReport_25.06.csv");
+            var FilePath = Path.Combine(_basePath, "Data", "CSV Files", "ProgrammeConstructionReport_25.06.csv");
 
             if (!File.Exists(FilePath))
                 throw new FileNotFoundException($"CSV file not found at: {FilePath}");
@@ -109,7 +109,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             var competencies = new List<CompetencyData>();
 
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "CSV Files", "Competencies.csv");
+            var filePath = Path.Combine(_basePath, "Data", "CSV Files", "Competencies.csv");
 
             ValidateFile(filePath);
 
@@ -147,7 +147,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             var levels = new List<CompetencyLevels>();
 
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "CSV Files", "CompetencyLevels.csv");
+            var filePath = Path.Combine(_basePath, "Data", "CSV Files", "CompetencyLevels.csv");
 
             ValidateFile(filePath);
 
@@ -195,7 +195,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             var result = new List<CompetencyLevelModule>();
 
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Data", "CSV Files", "CompetencyLevelModules.csv");
+            var filePath = Path.Combine(_basePath, "Data", "CSV Files", "CompetencyLevelModules.csv");
 
             ValidateFile(filePath);
 
@@ -246,7 +246,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             var users = new List<User>();
 
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Data", "CSV Files", "User CSVs", "Users.csv");
+            var filePath = Path.Combine(_basePath, "Data", "CSV Files", "User CSVs", "Users.csv");
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException(filePath);
@@ -290,7 +290,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             var courses = new List<Course>();
 
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "CSV Files", "User CSVs", "StudentCourses.csv");
+            var filePath = Path.Combine(_basePath, "Data", "CSV Files", "User CSVs", "StudentCourses.csv");
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException(filePath);
@@ -356,7 +356,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             var assignments = new List<Assignment>();
 
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "CSV Files", "User CSVs", "StudentAssignments.csv");
+            var filePath = Path.Combine(_basePath, "Data", "CSV Files", "User CSVs", "StudentAssignments.csv");
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"CSV file not found at: {filePath}");
@@ -424,7 +424,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             var submissions = new List<Submission>();
 
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "CSV Files","User CSVs", "StudentSubmissions.csv");
+            var filePath = Path.Combine(_basePath, "Data", "CSV Files","User CSVs", "StudentSubmissions.csv");
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException(filePath);
@@ -497,7 +497,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             var comments = new List<SubmissionComment>();
 
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "CSV Files", "User CSVs", "StudentSubmissionComments.csv");
+            var filePath = Path.Combine(_basePath, "Data", "CSV Files", "User CSVs", "StudentSubmissionComments.csv");
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"CSV file not found at: {filePath}");
@@ -562,7 +562,7 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         {
             var results = new List<CompetencyAchievement>();
 
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "CSV Files", "User CSVs", "StudentCompetencyAchievements.csv");
+            var filePath = Path.Combine(_basePath, "Data", "CSV Files", "User CSVs", "StudentCompetencyAchievements.csv");
 
             ValidateFile(filePath);
 
