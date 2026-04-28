@@ -11,14 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Show repo tree
-        run: tree /f
-
       - name: Restore
         run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
 
-      - name: Build
-        run: dotnet build Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln -c Debug --no-restore
+      - name: Build Web Project
+        run: dotnet build Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.csproj -c Debug --no-restore
+
+      - name: Build Tests
+        run: dotnet build HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-restore
 
       - name: Test
-        run: dotnet test Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln -c Debug --no-build
+        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build
