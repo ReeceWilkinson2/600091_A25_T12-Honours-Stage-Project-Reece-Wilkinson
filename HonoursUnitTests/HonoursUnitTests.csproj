@@ -17,7 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Honours_Project_CompetencyandSkillTracking\Honours_Project_CompetencyandSkillTracking.csproj" />
+	  <ProjectReference Include="..\Honours_Project_CompetencyandSkillTracking\Honours_Project_CompetencyandSkillTracking.csproj">
+		  <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+	  </ProjectReference>
   </ItemGroup>
 
 </Project>
