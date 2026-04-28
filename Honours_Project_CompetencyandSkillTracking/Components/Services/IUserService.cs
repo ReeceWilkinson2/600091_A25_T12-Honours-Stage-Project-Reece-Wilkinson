@@ -17,5 +17,5 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
         Task<string> GenerateUniqueStudentIdAsync();
         Task<List<Assignment>> GetAssignmentsByModuleCodeAsync(string modCode);
         Task<List<string>> GetAllCourseTitlesAsync();
-    }
+    } 
 }
