@@ -27,7 +27,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>options.UseSqlite($"Data S
 builder.Services.AddScoped<CanvasSyncService>();
 builder.Services.AddHttpClient<CanvasService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<AuthStateService>();
+builder.Services.AddScoped<IAuthStateService, AuthStateService>();
 builder.Services.AddScoped<CSVReading>();
 builder.Services.AddScoped<CSVReaderStartup>();
 builder.Services.AddScoped<CompetencyDataServices>();
