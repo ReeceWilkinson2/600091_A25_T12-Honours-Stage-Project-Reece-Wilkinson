@@ -5,7 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
-		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
 	</PropertyGroup>
 
 	<ItemGroup>
