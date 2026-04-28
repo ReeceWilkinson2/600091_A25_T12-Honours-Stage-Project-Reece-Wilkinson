@@ -1,21 +1,22 @@
-﻿using Bunit;
-using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
-using Honours_Project_CompetencyandSkillTracking.Components.Pages;
+﻿using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
 using Honours_Project_CompetencyandSkillTracking.Components.Services;
-using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using Xunit;
 
 namespace HonoursUnitTests;
 
 public class CSVReadingTests
 {
-    private string CreateTempCsv(string fileName, string content)
+    private string CreateTempDirWithFile(string folderName, string relativePath, string fileName, string content)
     {
-        var path = Path.Combine(Path.GetTempPath(), fileName);
-        File.WriteAllText(path, content);
-        return path;
+        var root = Path.Combine(Path.GetTempPath(), folderName);
+
+        var fullDir = Path.Combine(root, relativePath);
+        Directory.CreateDirectory(fullDir);
+
+        var filePath = Path.Combine(fullDir, fileName);
+        File.WriteAllText(filePath, content);
+
+        return root;
     }
 
     [Fact]
@@ -25,8 +26,12 @@ public class CSVReadingTests
 @"Course,Programme,Title,MAV_Name,Route,Award,CBO_Year,Trimester,Selection_Status,Level,Credits,Mod Code,Video_URLs
 CS,Computing,Intro,Module A,Full,BSc,2024,T1,Yes,4,15,CS101,link";
 
-        var path = CreateTempCsv("modules.csv", csv);
-        var basePath = Path.GetDirectoryName(path)!;
+        var basePath = CreateTempDirWithFile(
+            "csvtest_modules",
+            "CSV Files",
+            "ProgrammeConstructionReport_25.06.csv",
+            csv
+        );
 
         var service = new CSVReading(null!, basePath);
 
@@ -44,8 +49,12 @@ CS,Computing,Intro,Module A,Full,BSc,2024,T1,Yes,4,15,CS101,link";
 C1,Problem Solving,Note 1
 C2,Team Work,Note 2";
 
-        var path = CreateTempCsv("competencies.csv", csv);
-        var basePath = Path.GetDirectoryName(path)!;
+        var basePath = CreateTempDirWithFile(
+            "csvtest_comp",
+            "CSV Files",
+            "Competencies.csv",
+            csv
+        );
 
         var service = new CSVReading(null!, basePath);
 
@@ -53,6 +62,7 @@ C2,Team Work,Note 2";
 
         Assert.Equal(2, result.Count);
         Assert.Contains(result, c => c.CompetencyCode == "C1");
+        Assert.Contains(result, c => c.CompetencyCode == "C2");
     }
 
     [Fact]
@@ -61,16 +71,22 @@ C2,Team Work,Note 2";
         var csv =
 @"StudentId,UserName,StEmail,Password,Role
 123,John,john@email.com,pass,Student
-123,JohnDuplicate,john2@email.com,pass,Student";
+123,JohnDuplicate,john2@email.com,pass,Student
+456,Alice,alice@email.com,pass,Student";
 
-        var path = CreateTempCsv("users.csv", csv);
-        var basePath = Path.GetDirectoryName(path)!;
+        var basePath = CreateTempDirWithFile(
+            "csvtest_users",
+            "CSV Files/User CSVs",
+            "Users.csv",
+            csv
+        );
 
         var service = new CSVReading(null!, basePath);
 
         var result = service.ReadUsers();
 
-        Assert.Single(result);
-        Assert.Equal("123", result[0].StudentId);
+        Assert.Equal(2, result.Count); // NOT Single anymore
+        Assert.Contains(result, u => u.StudentId == "123");
+        Assert.Contains(result, u => u.StudentId == "456");
     }
 }
