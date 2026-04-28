@@ -5,11 +5,6 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
-
-		<CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
-		<CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
-		<GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
-		<PreserveCompilationContext>false</PreserveCompilationContext>
 	</PropertyGroup>
 
 	<ItemGroup>
