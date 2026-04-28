@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 	<StaticWebAssetsCompressionEnabled>false</StaticWebAssetsCompressionEnabled>
+
+	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 

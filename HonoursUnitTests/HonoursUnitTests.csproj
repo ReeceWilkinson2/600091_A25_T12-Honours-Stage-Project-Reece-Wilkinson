@@ -16,14 +16,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Honours_Project_CompetencyandSkillTracking\Honours_Project_CompetencyandSkillTracking.csproj" />
+		<ProjectReference Include="..\Honours_Project_CompetencyandSkillTracking\Honours_Project_CompetencyandSkillTracking.csproj"
+						  ReferenceOutputAssembly="true"
+						  PrivateAssets="all" />
 	</ItemGroup>
 
-	<Target Name="SkipRuntimeConfigCopy" BeforeTargets="CopyFilesToOutputDirectory">
+	<Target Name="DisableRuntimeConfigWarning" AfterTargets="ResolveProjectReferences">
 		<ItemGroup>
-			<_FilesToRemove Include="@(None)"
-			  Condition="'%(Filename)%(Extension)' == 'Honours_Project_CompetencyandSkillTracking.runtimeconfig.json'" />
-			<None Remove="@(_FilesToRemove)" />
+			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+			  Condition="'%(Filename)' == 'Honours_Project_CompetencyandSkillTracking.runtimeconfig'" />
 		</ItemGroup>
 	</Target>
 
