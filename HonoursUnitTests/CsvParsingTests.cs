@@ -26,14 +26,12 @@ public class CSVReadingTests
 CS,Computing,Intro,Module A,Full,BSc,2024,T1,Yes,4,15,CS101,link";
 
         var path = CreateTempCsv("modules.csv", csv);
+        var basePath = Path.GetDirectoryName(path)!;
 
-        var service = new CSVReading(null!);
-
-        AppDomain.CurrentDomain.SetData("APPBASE", Path.GetDirectoryName(path));
+        var service = new CSVReading(null!, basePath);
 
         var result = service.ReadModules();
 
-        // Assert
         Assert.Single(result);
         Assert.Equal("CS101", result[0].ModCode);
     }
@@ -47,9 +45,9 @@ C1,Problem Solving,Note 1
 C2,Team Work,Note 2";
 
         var path = CreateTempCsv("competencies.csv", csv);
-        AppDomain.CurrentDomain.SetData("APPBASE", Path.GetDirectoryName(path));
+        var basePath = Path.GetDirectoryName(path)!;
 
-        var service = new CSVReading(null!);
+        var service = new CSVReading(null!, basePath);
 
         var result = service.ReadCompetencies();
 
@@ -66,9 +64,9 @@ C2,Team Work,Note 2";
 123,JohnDuplicate,john2@email.com,pass,Student";
 
         var path = CreateTempCsv("users.csv", csv);
-        AppDomain.CurrentDomain.SetData("APPBASE", Path.GetDirectoryName(path));
+        var basePath = Path.GetDirectoryName(path)!;
 
-        var service = new CSVReading(null!);
+        var service = new CSVReading(null!, basePath);
 
         var result = service.ReadUsers();
 

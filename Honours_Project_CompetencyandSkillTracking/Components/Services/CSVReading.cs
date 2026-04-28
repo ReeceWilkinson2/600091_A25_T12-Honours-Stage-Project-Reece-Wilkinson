@@ -8,9 +8,11 @@ namespace Honours_Project_CompetencyandSkillTracking.Components.Services
     public class CSVReading
     {
         private readonly AppDbContext _dbContext;
-        public CSVReading(AppDbContext dbContext)
+        private readonly string _basePath;
+        public CSVReading(AppDbContext dbContext, string? basePath = null)
         {
             _dbContext = dbContext;
+            _basePath = basePath ?? AppDomain.CurrentDomain.BaseDirectory;
         }
         // what to ignore:
         // VCO Seqn
