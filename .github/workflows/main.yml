@@ -21,5 +21,8 @@ jobs:
       - name: Restore
         run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
 
+      - name: Build (SHOW REAL ERROR)
+        run: dotnet build HonoursUnitTests/HonoursUnitTests.csproj -c Debug --verbosity normal
+
       - name: Test
-        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build
+        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build --logger "console;verbosity=detailed"
