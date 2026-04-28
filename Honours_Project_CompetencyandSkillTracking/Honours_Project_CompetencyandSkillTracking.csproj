@@ -5,10 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 	<StaticWebAssetsCompressionEnabled>false</StaticWebAssetsCompressionEnabled>
-
-	  <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
-	  <CopyBuildOutputToPublishDirectory>false</CopyBuildOutputToPublishDirectory>
-	  <SkipInvalidConfigurations>true</SkipInvalidConfigurations>
   </PropertyGroup>
 
   <ItemGroup>

@@ -22,6 +22,9 @@ public class SignInTests : IDisposable
 
         _ctx.Services.AddSingleton(_userServiceMock.Object);
         _ctx.Services.AddSingleton(_authStateMock.Object);
+
+        var localStorageMock = new Mock<Blazored.LocalStorage.ILocalStorageService>();
+        _ctx.Services.AddSingleton(localStorageMock.Object);
     }
 
     [Fact]
