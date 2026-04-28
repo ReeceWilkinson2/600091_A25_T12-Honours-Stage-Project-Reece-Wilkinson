@@ -1,28 +1,23 @@
 ﻿using Honours_Project_CompetencyandSkillTracking.Canvas.Classes;
 using Honours_Project_CompetencyandSkillTracking.Components.Pages;
 using Honours_Project_CompetencyandSkillTracking.Components.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Bunit.TestDoubles;
+using Bunit;
 using Moq;
 
 namespace HonoursUnitTests;
 
-public class SignInTests : TestContext
+public class SignInTests : BunitContext
 {
     private readonly Mock<UserService> _mockUserService = new();
     private readonly Mock<AuthStateService> _mockAuthState = new();
-    private readonly TestNavigationManager _navManager;
+    private readonly NavigationManager _navManager;
 
     public SignInTests()
     {
-        // Directly instantiate TestNavigationManager and register it in DI
-        _navManager = new TestNavigationManager();
-        Services.AddSingleton<NavigationManager>(_navManager);
+        // Get bUnit's built-in fake NavigationManager
+        _navManager = Services.GetRequiredService<NavigationManager>();
 
         // Register mocked services
         Services.AddSingleton(_mockUserService.Object);
@@ -48,8 +43,9 @@ public class SignInTests : TestContext
     public void LoginFails_ShowsErrorMessage()
     {
         // Arrange: authentication fails
-        _mockUserService.Setup(s => s.AuthenticateAsync(It.IsAny<string>(), It.IsAny<string>()))
-                        .ReturnsAsync((User)null);
+        _mockUserService
+            .Setup(s => s.AuthenticateAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync((User)null);
 
         var cut = Render<SignIn>();
 
@@ -67,8 +63,10 @@ public class SignInTests : TestContext
     {
         // Arrange: authentication succeeds
         var testUser = new User { StudentId = "123", Role = "Student" };
-        _mockUserService.Setup(s => s.AuthenticateAsync("test@example.com", "password"))
-                        .ReturnsAsync(testUser);
+
+        _mockUserService
+            .Setup(s => s.AuthenticateAsync("test@example.com", "password"))
+            .ReturnsAsync(testUser);
 
         var cut = Render<SignIn>();
 
@@ -78,7 +76,7 @@ public class SignInTests : TestContext
         cut.Find("button").Click();
 
         // Assert navigation
-        Assert.Equal("/home", _navManager.Uri.Replace(_navManager.BaseUri, ""));
+        Assert.EndsWith("/home", _navManager.Uri);
 
         // Assert AuthState updated
         _mockAuthState.Verify(a => a.SetUserAsync("123", "Student"), Times.Once);
