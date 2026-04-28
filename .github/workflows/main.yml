@@ -11,15 +11,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/checkout@v4
+      
       - name: Clean
         shell: powershell
         run: |
           Get-ChildItem -Path . -Recurse -Directory |
             Where-Object { $_.Name -in 'bin','obj' } |
             Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-
-      - name: Restore
-        run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
-
-      - name: Test
-        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build
+      
+      - name: Restore ALL
+        run: dotnet restore
+      
+      - name: Build EVERYTHING (IMPORTANT DEBUG STEP)
+        run: dotnet build --no-restore -c Debug
+      
+      - name: Run tests
+        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build --logger "console;verbosity=detailed"
