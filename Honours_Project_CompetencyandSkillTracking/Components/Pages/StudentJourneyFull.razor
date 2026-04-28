@@ -1,9 +1,9 @@
 ﻿@page "/studentjourneyfull"
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
-@inject UserService service
+@inject IUserService service
 @inject CompetencyDataServices competencyService
-@inject AuthStateService AuthState
+@inject IAuthStateService AuthState
 
 @if (SelectedCourse == null)
 {

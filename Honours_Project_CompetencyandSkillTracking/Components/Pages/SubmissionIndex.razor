@@ -2,8 +2,8 @@
 @inject AppDbContext DbContext
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
-@inject UserService service
-@inject AuthStateService AuthState
+@inject IUserService service
+@inject IAuthStateService AuthState
 
 @if (_authorized)
 {

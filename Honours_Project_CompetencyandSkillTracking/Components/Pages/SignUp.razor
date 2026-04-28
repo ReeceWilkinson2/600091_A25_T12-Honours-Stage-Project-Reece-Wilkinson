@@ -2,9 +2,9 @@
 @rendermode InteractiveServer
 @layout LoggedOutLayout
 @inject NavigationManager NavigationManager
-@inject UserService UserService
+@inject IUserService UserService
 @inject IOptions<SmtpConfig> SmtpConfig
-@inject AuthStateService AuthState
+@inject IAuthStateService AuthState
 @using System.Net
 @using System.Net.Mail
 @using Microsoft.Extensions.Options

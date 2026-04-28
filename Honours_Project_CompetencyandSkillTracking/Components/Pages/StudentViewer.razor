@@ -1,9 +1,9 @@
 ﻿@page "/studentviewer/{StudentId}"
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
-@inject UserService service
+@inject IUserService service
 @inject AppDbContext DbContext
-@inject AuthStateService AuthState
+@inject IAuthStateService AuthState
 
 @if (_authorized)
 {

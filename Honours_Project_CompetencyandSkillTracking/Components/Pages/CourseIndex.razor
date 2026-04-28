@@ -1,8 +1,8 @@
 ﻿@page "/courseindex"
 @inject AppDbContext DbContext
 @inject NavigationManager NavigationManager
-@inject UserService service
-@inject AuthStateService AuthState
+@inject IUserService service
+@inject IAuthStateService AuthState
 @rendermode InteractiveServer
 
 @if (_authorized)
