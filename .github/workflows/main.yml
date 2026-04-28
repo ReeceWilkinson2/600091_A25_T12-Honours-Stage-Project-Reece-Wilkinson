@@ -12,10 +12,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Hard clean
-        shell: pwsh
+        shell: powershell
         run: |
-          Remove-Item -Recurse -Force Honours_Project_CompetencyandSkillTracking\**\bin -ErrorAction SilentlyContinue
-          Remove-Item -Recurse -Force Honours_Project_CompetencyandSkillTracking\**\obj -ErrorAction SilentlyContinue
+          Remove-Item -Recurse -Force Honours_Project_CompetencyandSkillTracking\bin -ErrorAction SilentlyContinue
+          Remove-Item -Recurse -Force Honours_Project_CompetencyandSkillTracking\obj -ErrorAction SilentlyContinue
         
       - name: Restore
         run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
