@@ -10,6 +10,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Test (diagnostic)
+        run: dotnet test Honours_Project_CompetencyandSkillTracking.sln -c Debug --verbosity normal
       
       - name: Restore
         run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
