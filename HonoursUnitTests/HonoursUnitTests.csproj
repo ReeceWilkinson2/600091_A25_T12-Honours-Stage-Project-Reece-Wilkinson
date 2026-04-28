@@ -21,5 +21,12 @@
 			<ExcludeAssets>runtime</ExcludeAssets>
 		</ProjectReference>
 	</ItemGroup>
+
+	<Target Name="FixMissingRuntimeConfig" AfterTargets="Build">
+		<ItemGroup>
+			<None Include="..\Honours_Project_CompetencyandSkillTracking\bin\Debug\net9.0\Honours_Project_CompetencyandSkillTracking.runtimeconfig.json"
+				  Condition="!Exists('..\Honours_Project_CompetencyandSkillTracking\bin\Debug\net9.0\Honours_Project_CompetencyandSkillTracking.runtimeconfig.json')" />
+		</ItemGroup>
+	</Target>
 	
 </Project>
