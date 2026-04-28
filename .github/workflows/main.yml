@@ -19,7 +19,10 @@ jobs:
             Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
       - name: Restore
-        run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build HonoursUnitTests/HonoursUnitTests.csproj -c Debug --verbosity normal
 
       - name: Test
-        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build
+        run: dotnet test HonoursUnitTests/HonoursUnitTests.csproj -c Debug --no-build --logger "console;verbosity=detailed"
