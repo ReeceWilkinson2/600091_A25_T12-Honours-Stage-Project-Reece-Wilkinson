@@ -11,8 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Clean
-        run: dotnet clean Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
+      - name: Hard clean
+        run: |
+          rmdir /s /q Honours_Project_CompetencyandSkillTracking\**\bin || exit 0
+          rmdir /s /q Honours_Project_CompetencyandSkillTracking\**\obj || exit 0
         
       - name: Restore
         run: dotnet restore Honours_Project_CompetencyandSkillTracking/Honours_Project_CompetencyandSkillTracking.sln
