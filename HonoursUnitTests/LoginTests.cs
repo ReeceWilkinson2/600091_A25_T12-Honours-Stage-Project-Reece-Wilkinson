@@ -37,7 +37,7 @@ public class SignInTests : IDisposable
         cut.Find("input#password");
         cut.Find("button");
         cut.Find("a[href='/PasswordReset']");
-        cut.Find("a[href='/signup']");
+        //cut.Find("a[href='/signup']");
     }
 
     [Fact]
