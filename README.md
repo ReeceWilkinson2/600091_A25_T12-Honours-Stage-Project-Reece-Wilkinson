@@ -1,5 +1,23 @@
 # 600091_A25_T12-Honours-Stage-Project-Reece-Wilkinson
 
-PDD Doc: https://hullacuk-my.sharepoint.com/:w:/g/personal/reece_wilkinson-2022_hull_ac_uk/EUpw_NeIPzRJiSK0LO8sgPcBQQI6UO07e9wpNGoK6mpUnQ?e=bXCF1E
+Login Details: 
 
-Main Doc: https://hullacuk-my.sharepoint.com/:w:/g/personal/reece_wilkinson-2022_hull_ac_uk/ESGc_BoF4oJPqk4QkNyInEIBckffp8_HSzQAtkevI1o12w?e=UaQPZ8
+Year 1 student: 
+Username - year1student@hull.ac.uk 
+Password - test1 
+
+Year 2 student: 
+Username - year2student@hull.ac.uk 
+Password - test2 
+
+Year 3 student: 
+Username - year3student@hull.ac.uk 
+Password – test3 
+
+Staff:
+Username - staffmember@hull.ac.uk
+Password - test4
+
+Admin:
+Username - test@email
+Password – test
