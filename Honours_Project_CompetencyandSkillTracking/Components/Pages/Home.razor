@@ -91,11 +91,7 @@
             return;
         }
 
-        bool success = await UserService.ChangePasswordAsync(
-            AuthState.UserId,
-            _passwordModel.OldPassword,
-            _passwordModel.NewPassword
-        );
+        bool success = await UserService.ChangePasswordAsync(AuthState.UserId, _passwordModel.OldPassword, _passwordModel.NewPassword);
 
         _passwordChangeSuccess = success
             ? "Password changed successfully!"
